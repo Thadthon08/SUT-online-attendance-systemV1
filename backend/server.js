@@ -1,13 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const userRoutes = require("./routes/userRoutes");
 const sequelize = require("./config/db");
 
 const app = express();
 app.use(bodyParser.json());
 
 // ใช้งานเส้นทางของ user
-app.use("/api", userRoutes);
+app.use("/api/auth", require("./routes/auth"));
+app.use("/line", require("./routes/line"));
 
 // เริ่มต้นเซิร์ฟเวอร์
 const PORT = 3000;
