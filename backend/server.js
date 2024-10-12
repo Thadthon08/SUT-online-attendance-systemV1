@@ -1,9 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const sequelize = require("./config/db");
+var cors = require("cors");
 
 const app = express();
 app.use(bodyParser.json());
+
+app.use(cors());
 
 // ใช้งานเส้นทางของ user
 app.use("/api/auth", require("./routes/auth"));
