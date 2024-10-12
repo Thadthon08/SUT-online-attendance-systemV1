@@ -1,0 +1,28 @@
+.bg-image {
+  background-image: url("https://elearning2.sut.ac.th/pluginfile.php/1/theme_suranaree/mainbgimg/1721011291/E_learing%20art_completed.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  transition: background-position 0.5s ease;
+}
+.border-0 {
+  border: 0 !important;
+}
+
+@media (max-width: 1200px) {
+  .bg-image {
+    background-position: left center;
+  }
+}
+
+@media (max-width: 768px) {
+  .bg-image {
+    background-position: center left 20%;
+  }
+}
+
+@media (max-width: 480px) {
+  .bg-image {
+    background-position: center left 20%;
+  }
+}
