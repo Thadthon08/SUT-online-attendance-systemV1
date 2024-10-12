@@ -18,6 +18,10 @@ const Teacher = sequelize.define("Teacher", {
   profile_pic: {
     type: DataTypes.TEXT,
   },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = Teacher;
