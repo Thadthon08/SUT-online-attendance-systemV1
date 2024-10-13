@@ -3,8 +3,8 @@ import { Avatar, Box, Typography } from "@mui/material";
 import { Menu, MenuItem, Sidebar, useProSidebar } from "react-pro-sidebar";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
-import SourceOutlinedIcon from "@mui/icons-material/SourceOutlined";
 import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
+import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutlined";
 import { Link } from "react-router-dom";
 import profile from "../assets/logo_round.png";
 
@@ -55,13 +55,13 @@ const SideNav = () => {
           <Typography variant="body2">Dashboard</Typography>{" "}
         </MenuItem>
         <MenuItem
-          active={activeMenu == "/product"}
-          component={<Link to="/product" />}
-          icon={<SourceOutlinedIcon />}
-          onClick={() => handleMenuClick("/product")}
+          active={activeMenu == "/room"}
+          component={<Link to="/room" />}
+          icon={<CreateNewFolderOutlinedIcon />}
+          onClick={() => handleMenuClick("/room")}
         >
           {" "}
-          <Typography variant="body2">Product </Typography>
+          <Typography variant="body2">สร้างห้อง</Typography>
         </MenuItem>
         <MenuItem
           active={activeMenu == "/report"}
