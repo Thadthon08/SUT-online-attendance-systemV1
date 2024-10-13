@@ -42,8 +42,9 @@ const SigninForm = () => {
         if (userData) {
           localStorage.setItem("data", JSON.stringify(userData));
           showToast("Signin successful!", "success");
-
-          navigate("/dashboard");
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 2000);
         }
       }
 
