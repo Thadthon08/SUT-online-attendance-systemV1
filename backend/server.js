@@ -10,6 +10,7 @@ app.use(cors());
 
 // ใช้งานเส้นทางของ user
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/create", require("./routes/attendanceRoom"));
 app.use("/line", require("./routes/line"));
 
 // เริ่มต้นเซิร์ฟเวอร์
