@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-html {
-  font-family: "IBM Plex Sans Thai", sans-serif;
+* {
+  font-family: "IBM Plex Sans Thai", "Titillium Web", sans-serif;
 }

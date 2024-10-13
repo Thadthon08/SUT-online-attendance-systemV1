@@ -10,11 +10,12 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsOutlined from "@mui/icons-material/NotificationsOutlined";
 import LanguageOutlined from "@mui/icons-material/LanguageOutlined";
-import { Logout, Money, Settings, Person } from "@mui/icons-material";
+import { Logout, Settings, Person } from "@mui/icons-material";
 import { useProSidebar } from "react-pro-sidebar";
 import { useState } from "react";
 import logo from "../assets/ENGi Logo-White.png";
 import profile from "../assets/logo_round.png";
+import { logout } from "../utils/logoutUtils";
 
 const AppHeader = () => {
   // useProSidebar hook to control the sidebar
@@ -31,8 +32,7 @@ const AppHeader = () => {
   };
 
   const handleLogout = () => {
-    // Perform logout action
-    // Example: clear authentication token, redirect to Signin page, etc.
+    logout();
   };
 
   return (
@@ -45,7 +45,9 @@ const AppHeader = () => {
           <MenuIcon />
         </IconButton>
         <Box component={"img"} sx={styles.appLogo} src={logo} />
-        <Box sx={{ ml: "20px", fontSize: "20px" }}>React Stock</Box>
+        <Box sx={{ ml: "20px", fontSize: "20px" }}>
+          SUT Online Attendance System
+        </Box>
         <Box sx={{ flexGrow: 1 }} />
         <IconButton title="Notifications" color="secondary">
           <NotificationsOutlined />
@@ -73,9 +75,6 @@ const AppHeader = () => {
           </MenuItem>
           <MenuItem onClick={handleMenuClose} sx={{ px: "30px" }}>
             <Settings sx={{ fontSize: "16px", mr: "20px" }} /> Settings
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose} sx={{ px: "30px" }}>
-            <Money sx={{ fontSize: "16px", mr: "20px" }} /> Billing
           </MenuItem>
           <MenuItem onClick={handleLogout} sx={{ px: "30px" }}>
             <Logout sx={{ fontSize: "16px", mr: "20px" }} /> Logout

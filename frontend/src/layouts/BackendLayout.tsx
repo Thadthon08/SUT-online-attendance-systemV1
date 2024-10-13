@@ -25,7 +25,7 @@ const styles = {
     bgcolor: "neutral.light",
   },
   mainSection: {
-    px: 4,
+    p: 4,
     width: "100%",
     height: "100%",
     overflow: "auto",

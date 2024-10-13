@@ -7,6 +7,7 @@ import Report from "./pages/Report";
 import Setting from "./pages/Setting";
 import PublicRoute from "./routes/PublicRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Room from "./pages/Room";
 
 function App() {
   return (
@@ -29,6 +30,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/room"
+            element={
+              <ProtectedRoute>
+                <Room />
               </ProtectedRoute>
             }
           />
