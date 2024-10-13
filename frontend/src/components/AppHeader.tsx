@@ -32,7 +32,7 @@ const AppHeader = () => {
 
   const handleLogout = () => {
     // Perform logout action
-    // Example: clear authentication token, redirect to login page, etc.
+    // Example: clear authentication token, redirect to Signin page, etc.
   };
 
   return (

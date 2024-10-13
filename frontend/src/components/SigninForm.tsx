@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import { SigninInterface } from "../interface/ISignin";
 import { SignIn } from "../services/api";
 import { showToast } from "../utils/toastUtils";
-import LoginTextField from "../components/LoginTextField";
-import LoginButton from "../components/LoginButton";
+import SigninTextField from "./SigninTextField";
+import SigninButton from "./SigninButton";
 
 const SigninForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,12 +24,12 @@ const SigninForm = () => {
       if (response.token) {
         const token = response.token;
         localStorage.setItem("token", token);
-        showToast("Login successful!", "success");
+        showToast("Signin successful!", "success");
       }
     } catch (error) {
       const errorMsg =
         (error as any)?.response?.data?.message ||
-        "Login failed. Please try again.";
+        "Signin failed. Please try again.";
       showToast(errorMsg, "error");
     } finally {
       setIsSubmitting(false);
@@ -40,7 +40,7 @@ const SigninForm = () => {
     <>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box mb={3}>
-          <LoginTextField
+          <SigninTextField
             placeholder="Teacher ID"
             name="tid"
             icon="account"
@@ -54,7 +54,7 @@ const SigninForm = () => {
         </Box>
 
         <Box mb={3}>
-          <LoginTextField
+          <SigninTextField
             placeholder="Password"
             name="password"
             type="password"
@@ -68,7 +68,7 @@ const SigninForm = () => {
           />
         </Box>
 
-        <LoginButton isSubmitting={isSubmitting} label="Log in" />
+        <SigninButton isSubmitting={isSubmitting} label="Log in" />
       </form>
     </>
   );

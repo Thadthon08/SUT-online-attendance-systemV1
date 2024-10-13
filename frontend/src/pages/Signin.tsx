@@ -9,12 +9,14 @@ import {
 } from "@mui/material";
 import { AccountCircle, Lock } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
-import { jwtDecode } from "jwt-decode";
 import { SigninInterface } from "../interface/ISignin";
 import { SignIn } from "../services/api";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles/Signin.css";
+import { decodeToken } from "../utils/tokenUtils";
+import { showToast } from "../utils/toastUtils";
 
 const SigninForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,20 +26,13 @@ const SigninForm = () => {
     formState: { errors },
   } = useForm<SigninInterface>();
 
-  const decodeToken = (token: string) => {
-    try {
-      return jwtDecode(token);
-    } catch (error) {
-      console.error("Failed to decode token:", error);
-      return null;
-    }
-  };
+  const navigate = useNavigate();
 
   const onSubmit = async (data: SigninInterface) => {
     setIsSubmitting(true);
 
     try {
-      const response = await SignIn(data); // API call
+      const response = await SignIn(data);
 
       if (response.token) {
         const token = response.token;
@@ -46,8 +41,9 @@ const SigninForm = () => {
         const userData = decodeToken(token);
         if (userData) {
           localStorage.setItem("data", JSON.stringify(userData));
-          toast.success("Login successful!", { position: "top-right" });
-          console.log("User data:", userData);
+          showToast("Signin successful!", "success");
+
+          navigate("/dashboard");
         }
       }
 
@@ -55,9 +51,9 @@ const SigninForm = () => {
     } catch (error) {
       const errorMsg =
         (error as any)?.response?.data?.message ||
-        "Login failed. Please try again.";
-      toast.error(errorMsg, { position: "top-right" });
-      console.error("Login failed:", errorMsg);
+        "Signin failed. Please try again.";
+      showToast(errorMsg, "error");
+      console.error("Signin failed:", errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -128,7 +124,7 @@ const SigninForm = () => {
           variant="contained"
           fullWidth
           type="submit"
-          disabled={isSubmitting} // Disable the button while submitting
+          disabled={isSubmitting}
           sx={{
             backgroundColor: "rgb(242, 101, 34)",
             borderRadius: "0px",
@@ -143,7 +139,6 @@ const SigninForm = () => {
         </Button>
       </form>
       <ToastContainer />{" "}
-      {/* Add Toast container here for displaying notifications */}
     </>
   );
 };

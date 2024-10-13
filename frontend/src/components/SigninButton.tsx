@@ -1,11 +1,11 @@
 import { Button } from "@mui/material";
 
-interface LoginButtonProps {
+interface SigninButtonProps {
   isSubmitting: boolean;
   label: string;
 }
 
-const LoginButton = ({ isSubmitting, label }: LoginButtonProps) => {
+const SigninButton = ({ isSubmitting, label }: SigninButtonProps) => {
   return (
     <Button
       variant="contained"
@@ -27,4 +27,4 @@ const LoginButton = ({ isSubmitting, label }: LoginButtonProps) => {
   );
 };
 
-export default LoginButton;
+export default SigninButton;
