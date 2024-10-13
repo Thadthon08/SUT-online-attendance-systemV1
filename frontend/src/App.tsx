@@ -3,19 +3,51 @@ import Login from "./pages/Signin";
 import AuthLayout from "./layouts/AuthLayout";
 import Dashboard from "./pages/Dashboard";
 import BackendLayout from "./layouts/BackendLayout";
+import Report from "./pages/Report";
+import Setting from "./pages/Setting";
+import PublicRoute from "./routes/PublicRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<AuthLayout />}>
-          <Route path="/" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
         </Route>
+
         <Route element={<BackendLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/product" element={<h1>Product</h1>} />
-          <Route path="/report" element={<h1>Report</h1>} />
-          <Route path="/setting" element={<h1>Setting</h1>} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/report"
+            element={
+              <ProtectedRoute>
+                <Report />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/setting"
+            element={
+              <ProtectedRoute>
+                <Setting />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

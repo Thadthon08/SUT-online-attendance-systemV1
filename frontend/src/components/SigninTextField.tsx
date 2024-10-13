@@ -1,7 +1,7 @@
 import { TextField, InputAdornment } from "@mui/material";
 import { AccountCircle, Lock } from "@mui/icons-material";
 
-interface LoginTextFieldProps {
+interface SigninTextFieldProps {
   placeholder: string;
   type?: string;
   register: any;
@@ -11,7 +11,7 @@ interface LoginTextFieldProps {
   validationRules: any;
 }
 
-const LoginTextField = ({
+const SigninTextField = ({
   placeholder,
   type = "text",
   register,
@@ -19,7 +19,7 @@ const LoginTextField = ({
   name,
   icon,
   validationRules,
-}: LoginTextFieldProps) => {
+}: SigninTextFieldProps) => {
   const IconComponent = icon === "account" ? <AccountCircle /> : <Lock />;
 
   return (
@@ -46,4 +46,4 @@ const LoginTextField = ({
   );
 };
 
-export default LoginTextField;
+export default SigninTextField;
