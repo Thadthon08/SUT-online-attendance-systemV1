@@ -70,7 +70,7 @@ const Room = () => {
             flex: 1,
             bgcolor: "primary.main",
             p: 2,
-            overflowY: "้hidden",
+            overflowY: "auto",
             maxHeight: isColumnLayout ? "calc(100vh - 400px - 32px)" : "100%",
           }}
         >

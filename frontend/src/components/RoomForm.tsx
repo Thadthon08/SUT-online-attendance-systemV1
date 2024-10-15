@@ -18,9 +18,17 @@ import {
   ScheduleRounded,
 } from "@mui/icons-material";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // ต้อง import css ของ react-datepicker
-import { format } from "date-fns";
-import { th } from "date-fns/locale"; // นำเข้าภาษาไทย
+import "react-datepicker/dist/react-datepicker.css";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import localeData from "dayjs/plugin/localeData";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(localeData);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const subIds = [
   { id: 1, label: "บริษัท A" },
@@ -28,9 +36,11 @@ const subIds = [
   { id: 3, label: "บริษัท C" },
 ];
 
+const timeZone = "Asia/Bangkok";
+
+// ฟังก์ชันดึงเวลาปัจจุบันและแปลงเป็นเขตเวลา "Asia/Bangkok"
 const getCurrentDateTime = () => {
-  const now = new Date();
-  return now.toISOString().slice(0, 16); // format: "YYYY-MM-DDTHH:mm"
+  return dayjs().tz(timeZone).format("YYYY-MM-DDTHH:mm");
 };
 
 interface CustomDatePickerInputProps {
@@ -206,33 +216,48 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               name="end_time"
               control={control}
               rules={{ required: "กรุณาเลือกเวลาสิ้นสุด" }}
-              render={({ field }) => (
-                <DatePicker
-                  selected={field.value ? new Date(field.value) : null}
-                  onChange={(date) => field.onChange(date)}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  timeIntervals={5}
-                  dateFormat="dd/MM/yyyy HH:mm"
-                  locale={th}
-                  placeholderText="เลือกเวลาสิ้นสุด"
-                  minDate={new Date(startTime)}
-                  minTime={new Date(startTime)}
-                  maxTime={new Date(new Date(startTime).setHours(23, 59, 59))}
-                  customInput={
-                    <CustomDatePickerInput
-                      value={
-                        field.value
-                          ? format(new Date(field.value), "dd MMMM yyyy HH:mm")
-                          : ""
-                      }
-                      onClick={field.onChange}
-                      error={!!errors.end_time}
-                      helperText={errors.end_time?.message}
-                    />
-                  }
-                />
-              )}
+              render={({ field }) => {
+                const handleDateChange = (date: any) => {
+                  // ไม่ต้องแปลงเป็น UTC ให้เก็บเป็นเวลาประเทศไทย
+                  const localizedDate = dayjs(date)
+                    .tz(timeZone)
+                    .format("YYYY-MM-DDTHH:mm");
+                  field.onChange(localizedDate);
+                };
+
+                return (
+                  <DatePicker
+                    selected={
+                      field.value
+                        ? dayjs(field.value).tz(timeZone).toDate()
+                        : null
+                    }
+                    onChange={handleDateChange}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={5}
+                    dateFormat="dd/MM/yyyy HH:mm"
+                    placeholderText="เลือกเวลาสิ้นสุด"
+                    minDate={dayjs(startTime).toDate()}
+                    minTime={dayjs(startTime).toDate()}
+                    maxTime={dayjs(startTime).endOf("day").toDate()}
+                    customInput={
+                      <CustomDatePickerInput
+                        value={
+                          field.value
+                            ? dayjs(field.value)
+                                .tz(timeZone)
+                                .format("DD MMMM YYYY HH:mm")
+                            : ""
+                        }
+                        onClick={field.onChange}
+                        error={!!errors.end_time}
+                        helperText={errors.end_time?.message}
+                      />
+                    }
+                  />
+                );
+              }}
             />
           </FormControl>
 
