@@ -33,3 +33,15 @@ export async function CreateRoom(data: any): Promise<any> {
 
   return response.json();
 }
+
+export async function GetAllSubject(): Promise<any> {
+  const response = await fetch(`${apiURL}/api/subject`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to get all subjects.");
+  }
+
+  return response.json();
+}

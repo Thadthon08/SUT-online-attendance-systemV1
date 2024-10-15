@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
   TextField,
@@ -24,21 +24,15 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import localeData from "dayjs/plugin/localeData";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { GetAllSubject } from "../services/api";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(localeData);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const subIds = [
-  { id: 1, label: "บริษัท A" },
-  { id: 2, label: "บริษัท B" },
-  { id: 3, label: "บริษัท C" },
-];
-
 const timeZone = "Asia/Bangkok";
 
-// ฟังก์ชันดึงเวลาปัจจุบันและแปลงเป็นเขตเวลา "Asia/Bangkok"
 const getCurrentDateTime = () => {
   return dayjs().tz(timeZone).format("YYYY-MM-DDTHH:mm");
 };
@@ -89,6 +83,9 @@ interface RoomFormProps {
 }
 
 export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const {
     handleSubmit,
     control,
@@ -104,6 +101,29 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
   });
 
   const startTime = watch("start_time");
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const result = await GetAllSubject();
+        setSubjects(result);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch subjects.");
+        setLoading(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <Box sx={{ p: 1, color: "white", overflow: "hidden" }}>
@@ -134,9 +154,9 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                   <MenuItem value="" disabled>
                     เลือกวิชา
                   </MenuItem>
-                  {subIds.map((sub) => (
-                    <MenuItem key={sub.id} value={sub.id}>
-                      {sub.label}
+                  {subjects.map((subject: any) => (
+                    <MenuItem key={subject.sub_id} value={subject.sub_id}>
+                      {subject.sub_name}
                     </MenuItem>
                   ))}
                 </Select>
