@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Box, Paper, useMediaQuery, useTheme } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Box, Paper, useMediaQuery } from "@mui/material";
 import { LocationMap } from "../components/LocationMap";
 import { RoomForm } from "../components/RoomForm";
+import { RoomInterface } from "../interface/IRoom";
+import { CreateRoom } from "../services/api";
 
 const Room = () => {
   const [currentLocation, setCurrentLocation] = useState({
@@ -26,13 +28,23 @@ const Room = () => {
     }
   }, []);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: RoomInterface) => {
     const formattedData = {
       ...data,
-      lat: currentLocation.lat,
-      long: currentLocation.lng,
+      ATR_lat: currentLocation.lat,
+      ATR_long: currentLocation.lng,
     };
     console.log("Form Data:", formattedData);
+
+    try {
+      const response = await CreateRoom(formattedData);
+
+      if (response.message) {
+        console.log(response.message);
+      }
+    } catch (error) {
+      console.error("Failed to create room:", error);
+    }
   };
 
   return (
@@ -74,7 +86,7 @@ const Room = () => {
             maxHeight: isColumnLayout ? "calc(100vh - 400px - 32px)" : "100%",
           }}
         >
-          <RoomForm onSubmit={onSubmit} currentLocation={currentLocation} />
+          <RoomForm onSubmit={onSubmit} />
         </Box>
       </Paper>
     </Box>

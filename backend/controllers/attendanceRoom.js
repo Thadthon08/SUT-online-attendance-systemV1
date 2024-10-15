@@ -5,15 +5,27 @@ const QRCode = require("qrcode"); // ไลบรารีสำหรับส�
 // ฟังก์ชันสำหรับสร้างห้องเช็คชื่อใหม่
 const createAttendanceRoom = async (req, res) => {
   try {
-    const {
-      sub_id,
-      ATR_name,
-      ATR_lat,
-      ATR_long,
-      start_time,
-      end_time,
-      countdown_duration,
-    } = req.body;
+    const { sub_id, ATR_name, ATR_lat, ATR_long, start_time, end_time } =
+      req.body;
+
+    // Parse start_time and end_time properly
+    const start = new Date(start_time.replace(" ", "T"));
+    const end = new Date(end_time.replace(" ", "T"));
+
+    // Calculate difference in milliseconds
+    const diffMilliseconds = end - start;
+    let countdown_duration;
+
+    if (diffMilliseconds > 0) {
+      // Calculate countdown_duration in minutes
+      const diffSeconds = diffMilliseconds / 1000;
+      const diffMinutes = diffSeconds / 60;
+
+      // ปัดค่าให้เป็นจำนวนเต็ม
+      countdown_duration = Math.round(diffMinutes); // ปัดเศษขึ้นหรือลงก็ได้ตามต้องการ
+    } else {
+      countdown_duration = 0; // Set it to 0 if start_time and end_time are the same
+    }
 
     // ตรวจสอบว่ามีวิชานี้อยู่ในฐานข้อมูลหรือไม่
     const subject = await Subject.findByPk(sub_id);
@@ -29,13 +41,13 @@ const createAttendanceRoom = async (req, res) => {
       ATR_long,
       start_time,
       end_time,
-      countdown_duration,
-      expired_at: new Date(end_time), // ตั้งค่าเวลาหมดอายุของ QR Code เป็น end_time
+      countdown_duration, // ค่าเป็น integer แล้ว
+      expired_at: new Date(end_time.replace(" ", "T")),
     });
 
     // สร้างข้อมูล QR Code ที่จะฝังลงไป (เช่น ATR_id และ Subject ID)
     const roomData = {
-      ATR_id: attendanceRoom.ATR_id, // ใช้ ATR_id ที่ถูกสร้างโดยฐานข้อมูล
+      ATR_id: attendanceRoom.ATR_id,
       subject_id: sub_id,
     };
 

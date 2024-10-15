@@ -86,7 +86,6 @@ const CustomDatePickerInput = React.forwardRef<
 
 interface RoomFormProps {
   onSubmit: (data: any) => void;
-  currentLocation: { lat: number; lng: number };
 }
 
 export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
@@ -184,7 +183,9 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               render={({ field }) => (
                 <TextField
                   {...field}
-                  type="datetime-local"
+                  value={dayjs(field.value)
+                    .tz(timeZone)
+                    .format("DD/MM/YYYY HH:mm")}
                   variant="outlined"
                   fullWidth
                   disabled
@@ -218,11 +219,8 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               rules={{ required: "กรุณาเลือกเวลาสิ้นสุด" }}
               render={({ field }) => {
                 const handleDateChange = (date: any) => {
-                  // ไม่ต้องแปลงเป็น UTC ให้เก็บเป็นเวลาประเทศไทย
-                  const localizedDate = dayjs(date)
-                    .tz(timeZone)
-                    .format("YYYY-MM-DDTHH:mm");
-                  field.onChange(localizedDate);
+                  const utcDate = dayjs(date).tz(timeZone).utc().format(); // แปลงเป็น UTC ก่อนเก็บ
+                  field.onChange(utcDate);
                 };
 
                 return (
