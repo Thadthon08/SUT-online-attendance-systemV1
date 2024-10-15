@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Box, Paper, useMediaQuery } from "@mui/material";
+import { Box, Paper, Typography, useMediaQuery } from "@mui/material";
 import { LocationMap } from "../components/LocationMap";
 import { RoomForm } from "../components/RoomForm";
 import { RoomInterface } from "../interface/IRoom";
 import { CreateRoom } from "../services/api";
+import { showToast } from "../utils/toastUtils";
+import { ToastContainer } from "react-toastify";
 
 const Room = () => {
   const [currentLocation, setCurrentLocation] = useState({
@@ -40,10 +42,10 @@ const Room = () => {
       const response = await CreateRoom(formattedData);
 
       if (response.message) {
-        console.log(response.message);
+        showToast("สร้างห้องสำเร็จ!", "success");
       }
     } catch (error) {
-      console.error("Failed to create room:", error);
+      showToast("สร้างห้องไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
     }
   };
 
@@ -53,7 +55,7 @@ const Room = () => {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "start",
         justifyContent: "center",
         p: 2,
       }}
@@ -89,6 +91,7 @@ const Room = () => {
           <RoomForm onSubmit={onSubmit} />
         </Box>
       </Paper>
+      <ToastContainer />{" "}
     </Box>
   );
 };
