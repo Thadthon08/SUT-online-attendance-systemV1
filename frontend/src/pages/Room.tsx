@@ -55,8 +55,8 @@ const Room = () => {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        alignItems: "start",
-        justifyContent: "center",
+        alignItems: "center",
+        justifyContent: "start",
         p: 2,
       }}
     >
