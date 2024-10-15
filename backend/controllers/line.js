@@ -4,7 +4,7 @@ const client = new line.Client({
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
 });
 
-let studentData = {}; // Object สำหรับเก็บข้อมูล Student ID ชั่วคราว
+let studentData = {}; 
 
 // Webhook handler
 const handleWebhook = async (req, res) => {

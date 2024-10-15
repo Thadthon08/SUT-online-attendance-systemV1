@@ -12,6 +12,7 @@ app.use(cors());
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/create", require("./routes/attendanceRoom"));
 app.use("/line", require("./routes/line"));
+app.use("/api/subject", require("./routes/subject"));
 
 // เริ่มต้นเซิร์ฟเวอร์
 const PORT = 3000;
