@@ -117,6 +117,8 @@ export default function StudentDashboard() {
   };
 
   const startScanner = () => {
+    if (!scannerRef.current) return; // ตรวจสอบว่า element ถูกสร้างขึ้นหรือไม่
+
     const html5QrCode = new Html5QrcodeScanner(
       "reader", // ID ของ div ที่จะใช้แสดงกล้อง
       {
@@ -136,9 +138,9 @@ export default function StudentDashboard() {
     );
   };
 
-  // เมื่อ popup ถูกเปิด จะเริ่มการสแกน
+  // เมื่อ popup ถูกเปิด จะเริ่มการสแกนหลังจากที่ element 'reader' ถูก mount
   useEffect(() => {
-    if (isScannerOpen) {
+    if (isScannerOpen && scannerRef.current) {
       startScanner();
     }
   }, [isScannerOpen]);
