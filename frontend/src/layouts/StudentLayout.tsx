@@ -13,9 +13,9 @@ const StudentLayout = () => {
           throw new Error("LIFF ID is not defined");
         }
         await liff.init({ liffId });
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        }
+        // if (!liff.isLoggedIn()) {
+        //   liff.login();
+        // }
       } catch (error) {
         console.error(error);
       }

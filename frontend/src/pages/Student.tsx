@@ -18,9 +18,9 @@ import {
   GetStudentIDByLineId,
   UpdateProfileUrl,
   CheckIn,
-} from "../services/api"; // CheckIn สำหรับ POST ไปเช็คชื่อ
+} from "../services/api";
 import { LocationMap } from "../components/LocationMap";
-import { Html5Qrcode } from "html5-qrcode"; // ใช้ Html5Qrcode โดยตรง
+import { Html5Qrcode } from "html5-qrcode";
 
 interface Profile {
   userId: string;
@@ -36,9 +36,10 @@ export default function StudentDashboard() {
     lat: number;
     lng: number;
   } | null>(null);
-  const [isScannerOpen, setIsScannerOpen] = useState(false); // สถานะเปิด/ปิดกล้อง
-  const [loadingCheckIn, setLoadingCheckIn] = useState(false); // สถานะการเช็คชื่อ
-  const scannerRef = useRef<HTMLDivElement | null>(null); // ใช้ ref เก็บ element ของกล้อง
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [loadingCheckIn, setLoadingCheckIn] = useState(false);
+  const scannerRef = useRef<HTMLDivElement | null>(null);
+  const html5QrCode = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -59,7 +60,6 @@ export default function StudentDashboard() {
         }
         setStudentData(student);
 
-        // Get current location
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -87,11 +87,13 @@ export default function StudentDashboard() {
     fetchProfile();
   }, []);
 
-  const handleScan = async (data: string) => {
-    if (data && studentData && currentLocation) {
+  const handleScan = async (decodedText: string) => {
+    if (decodedText && studentData && currentLocation) {
       try {
         setLoadingCheckIn(true);
-        const ATR_id = new URLSearchParams(new URL(data).search).get("ATR_id");
+        const ATR_id = new URLSearchParams(new URL(decodedText).search).get(
+          "ATR_id"
+        );
 
         if (ATR_id) {
           const checkInData = {
@@ -101,9 +103,7 @@ export default function StudentDashboard() {
             att_long: currentLocation.lng,
           };
 
-          // ส่งข้อมูลไปเช็คชื่อ
           await CheckIn(checkInData);
-
           alert("เช็คชื่อสำเร็จ!");
         }
       } catch (error) {
@@ -111,27 +111,22 @@ export default function StudentDashboard() {
         alert("เกิดข้อผิดพลาดในการเช็คชื่อ.");
       } finally {
         setLoadingCheckIn(false);
-        setIsScannerOpen(false); // ปิด popup สแกนเมื่อเช็คชื่อเสร็จ
+        setIsScannerOpen(false);
       }
     }
   };
 
-  // เริ่มต้นกล้องสแกน
   useEffect(() => {
     if (isScannerOpen && scannerRef.current) {
-      const html5QrCode = new Html5Qrcode("reader"); // ใช้ id `reader`
-
-      // เริ่มการสแกน QR Code
-      html5QrCode
+      html5QrCode.current = new Html5Qrcode("reader");
+      html5QrCode.current
         .start(
-          { facingMode: "environment" }, // เปิดกล้องหลัง
+          { facingMode: "environment" },
           {
-            fps: 10, // ความเร็วการสแกน
-            qrbox: { width: 250, height: 250 }, // ขนาดกรอบสแกน
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
           },
-          (decodedText) => {
-            handleScan(decodedText); // เรียกเมื่อสแกนสำเร็จ
-          },
+          handleScan,
           (errorMessage) => {
             console.error("QR Code scanning error:", errorMessage);
           }
@@ -139,14 +134,15 @@ export default function StudentDashboard() {
         .catch((err) => {
           console.error("Error starting QR Code scanner:", err);
         });
-
-      // คืนค่ากล้องเมื่อ popup ถูกปิด
-      return () => {
-        html5QrCode.stop().then(() => {
-          html5QrCode.clear();
-        });
-      };
     }
+
+    return () => {
+      if (html5QrCode.current) {
+        html5QrCode.current.stop().then(() => {
+          html5QrCode.current?.clear();
+        });
+      }
+    };
   }, [isScannerOpen]);
 
   if (error)
@@ -197,9 +193,9 @@ export default function StudentDashboard() {
             variant="contained"
             fullWidth
             startIcon={<CheckCircle />}
-            onClick={() => setIsScannerOpen(true)} // เปิด popup สแกน
+            onClick={() => setIsScannerOpen(true)}
             sx={{ height: "100%" }}
-            disabled={loadingCheckIn} // ปิดปุ่มถ้าเช็คชื่ออยู่
+            disabled={loadingCheckIn}
           >
             {loadingCheckIn ? "Checking..." : "Check Attendance"}
           </Button>
@@ -216,7 +212,6 @@ export default function StudentDashboard() {
         </Grid>
       </Grid>
 
-      {/* Popup สำหรับสแกน QR Code */}
       <Dialog
         open={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
@@ -235,8 +230,7 @@ export default function StudentDashboard() {
               <Close />
             </IconButton>
           </Box>
-          <Box id="reader" style={{ width: "100%" }} ref={scannerRef}></Box>{" "}
-          {/* กล้องสแกน */}
+          <Box id="reader" style={{ width: "100%" }} ref={scannerRef}></Box>
         </DialogContent>
       </Dialog>
     </Box>
