@@ -210,7 +210,7 @@ export default function StudentDashboard() {
       {/* แสดงกล้องสำหรับสแกน QR Code */}
       <Box
         id="reader"
-        style={{ width: "100%", marginTop: "20px" }}
+        style={{ width: "100%", height: "200px", marginTop: "20px" }}
         ref={scannerRef}
       ></Box>
     </Box>
