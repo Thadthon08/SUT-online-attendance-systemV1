@@ -34,6 +34,7 @@ export default function StudentDashboard() {
     lng: number;
   } | null>(null);
   const [loadingCheckIn, setLoadingCheckIn] = useState(false);
+  const [isScanning, setIsScanning] = useState(false); // state สำหรับการแสดงกล้อง
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
 
@@ -111,15 +112,15 @@ export default function StudentDashboard() {
     }
   };
 
-  useEffect(() => {
+  const startScan = () => {
     if (scannerRef.current) {
-      html5QrCode.current = new Html5Qrcode("reader"); // ใช้ `id="reader"` เพื่อแสดงกล้อง
+      html5QrCode.current = new Html5Qrcode("reader"); // ใช้ id="reader" เพื่อแสดงกล้อง
       html5QrCode.current
         .start(
-          { facingMode: "environment" }, // ใช้กล้องหลัง
+          { facingMode: "environment" }, // กล้องหลัง
           {
             fps: 10, // ความเร็วในการสแกน
-            qrbox: { width: 250, height: 250 }, // ขนาดกรอบสแกน QR
+            qrbox: { width: 250, height: 250 }, // ขนาดกล่องสแกน QR Code
           },
           handleScan, // ฟังก์ชันเมื่อสแกนสำเร็จ
           (errorMessage) => {
@@ -130,7 +131,7 @@ export default function StudentDashboard() {
           console.error("Error starting QR Code scanner:", err);
         });
 
-      // คืนค่ากล้องเมื่อ component ถูก unmount
+      // คืนค่ากล้องเมื่อ unmount
       return () => {
         if (html5QrCode.current) {
           html5QrCode.current.stop().then(() => {
@@ -139,7 +140,13 @@ export default function StudentDashboard() {
         }
       };
     }
-  }, [scannerRef]);
+  };
+
+  useEffect(() => {
+    if (isScanning) {
+      startScan(); // เริ่มการสแกนเมื่อกดปุ่ม Check Attendance
+    }
+  }, [isScanning]);
 
   if (error)
     return (
@@ -189,6 +196,7 @@ export default function StudentDashboard() {
             variant="contained"
             fullWidth
             startIcon={<CheckCircle />}
+            onClick={() => setIsScanning(true)} // เปิดกล้องเมื่อกดปุ่มนี้
             sx={{ height: "100%" }}
             disabled={loadingCheckIn}
           >
@@ -207,12 +215,14 @@ export default function StudentDashboard() {
         </Grid>
       </Grid>
 
-      {/* แสดงกล้องสำหรับสแกน QR Code */}
-      <Box
-        id="reader"
-        style={{ width: "100%", height: "300px", marginTop: "20px" }}
-        ref={scannerRef}
-      ></Box>
+      {/* แสดงกล้องสำหรับสแกน QR Code หลังจากคลิกปุ่ม */}
+      {isScanning && (
+        <Box
+          id="reader"
+          style={{ width: "100%", height: "300px", marginTop: "20px" }}
+          ref={scannerRef}
+        ></Box>
+      )}
     </Box>
   );
 }
