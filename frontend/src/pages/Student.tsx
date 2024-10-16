@@ -5,30 +5,23 @@ import {
   Card,
   CardContent,
   Avatar,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
+  Button,
+  Grid,
   Divider,
   CircularProgress,
-  Paper,
 } from "@mui/material";
-import { PersonOutline, LocationOn, School } from "@mui/icons-material";
+import { CheckCircle, Info } from "@mui/icons-material";
 import { GetStudentIDByLineId, UpdateProfileUrl } from "../services/api";
 
 interface Profile {
   userId: string;
   displayName: string;
-  statusMessage?: string;
   pictureUrl?: string;
 }
 
-export default function Student() {
+export default function StudentDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [lat, setLat] = useState<number | null>(null);
-  const [long, setLong] = useState<number | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
   const [studentData, setStudentData] = useState<any | null>(null);
 
   useEffect(() => {
@@ -40,7 +33,6 @@ export default function Student() {
         setProfile({
           userId: profileData.userId,
           displayName: profileData.displayName,
-          statusMessage: profileData.statusMessage || "",
           pictureUrl: profileData.pictureUrl || "",
         });
         const student = await GetStudentIDByLineId(profileData.userId);
@@ -57,23 +49,6 @@ export default function Student() {
     };
 
     fetchProfile();
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLat(position.coords.latitude);
-          setLong(position.coords.longitude);
-        },
-        (err) => {
-          console.error("Error fetching location:", err);
-          setLocationError(
-            "Failed to fetch location. Please enable location services."
-          );
-        }
-      );
-    } else {
-      setLocationError("Geolocation is not supported by this browser.");
-    }
   }, []);
 
   if (error)
@@ -82,7 +57,7 @@ export default function Student() {
         {error}
       </Typography>
     );
-  if (!profile)
+  if (!profile || !studentData)
     return (
       <Box display="flex" justifyContent="center" py={4}>
         <CircularProgress />
@@ -91,7 +66,7 @@ export default function Student() {
 
   return (
     <Box sx={{ maxWidth: 600, margin: "auto", p: 2 }}>
-      <Card elevation={3} sx={{ mb: 2 }}>
+      <Card elevation={3} sx={{ mb: 3 }}>
         <CardContent>
           <Box display="flex" alignItems="center" mb={2}>
             <Avatar
@@ -104,72 +79,64 @@ export default function Student() {
                 {profile.displayName}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {profile.statusMessage}
+                Student ID: {studentData.sid}
               </Typography>
             </Box>
           </Box>
           <Divider sx={{ my: 2 }} />
-          <List disablePadding>
-            <ListItem>
-              <ListItemAvatar>
-                <Avatar>
-                  <PersonOutline />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary="User ID" secondary={profile.userId} />
-            </ListItem>
-            <ListItem>
-              <ListItemAvatar>
-                <Avatar>
-                  <LocationOn />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary="Location"
-                secondary={
-                  locationError
-                    ? locationError
-                    : lat && long
-                    ? `${lat.toFixed(4)}, ${long.toFixed(4)}`
-                    : "Loading location..."
-                }
-              />
-            </ListItem>
-          </List>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography variant="body2">
+                <strong>Faculty:</strong> {studentData.faculty}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2">
+                <strong>Major:</strong> {studentData.major}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2">
+                <strong>Year:</strong> {studentData.year}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2">
+                <strong>Status:</strong> {studentData.status}
+              </Typography>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
 
-      <Card elevation={3}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            <School sx={{ verticalAlign: "middle", mr: 1 }} />
-            Student Data
-          </Typography>
-          {studentData ? (
-            <Paper
-              elevation={0}
-              sx={{
-                bgcolor: "grey.100",
-                p: 2,
-                maxHeight: 200,
-                overflow: "auto",
-              }}
-            >
-              <pre
-                style={{
-                  margin: 0,
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                }}
-              >
-                {JSON.stringify(studentData, null, 2)}
-              </pre>
-            </Paper>
-          ) : (
-            <Typography>Loading student data...</Typography>
-          )}
-        </CardContent>
-      </Card>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Button
+            variant="contained"
+            fullWidth
+            startIcon={<CheckCircle />}
+            onClick={() => {
+              /* Navigate to attendance check page */
+            }}
+            sx={{ height: "100%" }}
+          >
+            Check Attendance
+          </Button>
+        </Grid>
+        <Grid item xs={6}>
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<Info />}
+            onClick={() => {
+              /* Navigate to information display page */
+            }}
+            sx={{ height: "100%" }}
+          >
+            View Details
+          </Button>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
