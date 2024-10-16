@@ -20,7 +20,7 @@ import {
   CheckIn,
 } from "../services/api"; // CheckIn สำหรับ POST ไปเช็คชื่อ
 import { LocationMap } from "../components/LocationMap";
-import { Html5QrcodeScanner } from "html5-qrcode"; // ใช้ html5-qrcode
+import { Html5Qrcode } from "html5-qrcode"; // ใช้ Html5Qrcode โดยตรง
 
 interface Profile {
   userId: string;
@@ -38,7 +38,7 @@ export default function StudentDashboard() {
   } | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false); // สถานะเปิด/ปิดกล้อง
   const [loadingCheckIn, setLoadingCheckIn] = useState(false); // สถานะการเช็คชื่อ
-  const scannerRef = useRef<HTMLDivElement | null>(null); // ใช้ในการเก็บข้อมูลของกล้อง
+  const scannerRef = useRef<HTMLDivElement | null>(null); // ใช้ ref เก็บ element ของกล้อง
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -116,32 +116,36 @@ export default function StudentDashboard() {
     }
   };
 
-  const startScanner = () => {
-    if (!scannerRef.current) return; // ตรวจสอบว่า element ถูกสร้างขึ้นหรือไม่
-
-    const html5QrCode = new Html5QrcodeScanner(
-      "reader", // ID ของ div ที่จะใช้แสดงกล้อง
-      {
-        fps: 10, // ความเร็วในการแสกน
-        qrbox: { width: 250, height: 250 }, // ขนาดกรอบ
-      },
-      false
-    );
-
-    html5QrCode.render(
-      (decodedText) => {
-        handleScan(decodedText); // เมื่อสแกนสำเร็จ
-      },
-      (errorMessage) => {
-        console.error("QR Code scanning error:", errorMessage);
-      }
-    );
-  };
-
-  // เมื่อ popup ถูกเปิด จะเริ่มการสแกนหลังจากที่ element 'reader' ถูก mount
+  // เริ่มต้นกล้องสแกน
   useEffect(() => {
     if (isScannerOpen && scannerRef.current) {
-      startScanner();
+      const html5QrCode = new Html5Qrcode("reader"); // ใช้ id `reader`
+
+      // เริ่มการสแกน QR Code
+      html5QrCode
+        .start(
+          { facingMode: "environment" }, // เปิดกล้องหลัง
+          {
+            fps: 10, // ความเร็วการสแกน
+            qrbox: { width: 250, height: 250 }, // ขนาดกรอบสแกน
+          },
+          (decodedText) => {
+            handleScan(decodedText); // เรียกเมื่อสแกนสำเร็จ
+          },
+          (errorMessage) => {
+            console.error("QR Code scanning error:", errorMessage);
+          }
+        )
+        .catch((err) => {
+          console.error("Error starting QR Code scanner:", err);
+        });
+
+      // คืนค่ากล้องเมื่อ popup ถูกปิด
+      return () => {
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+        });
+      };
     }
   }, [isScannerOpen]);
 
@@ -231,7 +235,8 @@ export default function StudentDashboard() {
               <Close />
             </IconButton>
           </Box>
-          <Box id="reader" style={{ width: "100%" }} ref={scannerRef}></Box>
+          <Box id="reader" style={{ width: "100%" }} ref={scannerRef}></Box>{" "}
+          {/* กล้องสแกน */}
         </DialogContent>
       </Dialog>
     </Box>
