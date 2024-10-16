@@ -9,11 +9,8 @@ import {
   Grid,
   Divider,
   CircularProgress,
-  Dialog,
-  DialogContent,
-  IconButton,
 } from "@mui/material";
-import { CheckCircle, Info, Close } from "@mui/icons-material";
+import { CheckCircle, Info } from "@mui/icons-material";
 import {
   GetStudentIDByLineId,
   UpdateProfileUrl,
@@ -36,7 +33,6 @@ export default function StudentDashboard() {
     lat: number;
     lng: number;
   } | null>(null);
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [loadingCheckIn, setLoadingCheckIn] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
@@ -111,20 +107,19 @@ export default function StudentDashboard() {
         alert("เกิดข้อผิดพลาดในการเช็คชื่อ.");
       } finally {
         setLoadingCheckIn(false);
-        setIsScannerOpen(false);
       }
     }
   };
 
   useEffect(() => {
-    if (isScannerOpen && scannerRef.current) {
-      html5QrCode.current = new Html5Qrcode("reader");
+    if (scannerRef.current) {
+      html5QrCode.current = new Html5Qrcode("reader"); // ใช้ `id="reader"` เพื่อสแกน
       html5QrCode.current
         .start(
-          { facingMode: "environment" },
+          { facingMode: "environment" }, // กล้องหลัง
           {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
+            fps: 10, // ความเร็วการสแกน
+            qrbox: { width: 250, height: 250 }, // ขนาดกล่องสำหรับสแกน
           },
           handleScan,
           (errorMessage) => {
@@ -134,16 +129,17 @@ export default function StudentDashboard() {
         .catch((err) => {
           console.error("Error starting QR Code scanner:", err);
         });
-    }
 
-    return () => {
-      if (html5QrCode.current) {
-        html5QrCode.current.stop().then(() => {
-          html5QrCode.current?.clear();
-        });
-      }
-    };
-  }, [isScannerOpen]);
+      // คืนค่ากล้องเมื่อ component ถูก unmount
+      return () => {
+        if (html5QrCode.current) {
+          html5QrCode.current.stop().then(() => {
+            html5QrCode.current?.clear();
+          });
+        }
+      };
+    }
+  }, []);
 
   if (error)
     return (
@@ -193,7 +189,6 @@ export default function StudentDashboard() {
             variant="contained"
             fullWidth
             startIcon={<CheckCircle />}
-            onClick={() => setIsScannerOpen(true)}
             sx={{ height: "100%" }}
             disabled={loadingCheckIn}
           >
@@ -212,27 +207,12 @@ export default function StudentDashboard() {
         </Grid>
       </Grid>
 
-      <Dialog
-        open={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogContent>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
-            <Typography variant="h6">สแกน QR Code</Typography>
-            <IconButton onClick={() => setIsScannerOpen(false)}>
-              <Close />
-            </IconButton>
-          </Box>
-          <Box id="reader" style={{ width: "100%" }} ref={scannerRef}></Box>
-        </DialogContent>
-      </Dialog>
+      {/* แสดงกล้องสำหรับสแกน QR Code */}
+      <Box
+        id="reader"
+        style={{ width: "100%", marginTop: "20px" }}
+        ref={scannerRef}
+      ></Box>
     </Box>
   );
 }
