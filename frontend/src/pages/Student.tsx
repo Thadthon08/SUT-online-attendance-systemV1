@@ -88,21 +88,26 @@ export default function StudentDashboard() {
     if (decodedText && studentData && currentLocation) {
       try {
         setLoadingCheckIn(true);
-        const ATR_id = new URLSearchParams(new URL(decodedText).search).get(
-          "ATR_id"
-        );
 
-        if (ATR_id) {
-          const checkInData = {
-            ATR_id,
-            sid: studentData.sid,
-            att_lat: currentLocation.lat,
-            att_long: currentLocation.lng,
-          };
+        let ATR_id = decodedText; // ใช้ decodedText โดยตรงในกรณีที่เป็นตัวเลข
 
-          await CheckIn(checkInData);
-          alert("เช็คชื่อสำเร็จ!");
+        // ตรวจสอบว่าข้อมูลที่สแกนเป็น URL หรือไม่
+        try {
+          const url = new URL(decodedText);
+          ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText; // ดึง ATR_id จาก URL หรือใช้ decodedText ถ้าไม่ใช่ URL
+        } catch (error) {
+          // ถ้าไม่ใช่ URL ก็ให้ใช้ decodedText เป็น ATR_id
         }
+
+        const checkInData = {
+          ATR_id,
+          sid: studentData.sid,
+          att_lat: currentLocation.lat,
+          att_long: currentLocation.lng,
+        };
+
+        await CheckIn(checkInData);
+        alert("เช็คชื่อสำเร็จ!");
       } catch (error) {
         console.error("Error during check-in:", error);
         alert("เกิดข้อผิดพลาดในการเช็คชื่อ.");
@@ -119,8 +124,8 @@ export default function StudentDashboard() {
         .start(
           { facingMode: "environment" }, // กล้องหลัง
           {
-            fps: 10, // ความเร็วในการสแกน
-            qrbox: { width: 250, height: 250 }, // ขนาดกล่องสแกน QR Code
+            fps: 30, // ความเร็วในการสแกน
+            qrbox: { width: 500, height: 500 }, // ขนาดกล่องสแกน QR Code
           },
           handleScan, // ฟังก์ชันเมื่อสแกนสำเร็จ
           (errorMessage) => {
