@@ -15,14 +15,15 @@ export default function Student() {
   const [lat, setLat] = useState<number | null>(null);
   const [long, setLong] = useState<number | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [studentData, setStudentData] = useState<string | null>(null);
+  const [studentData, setStudentData] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const liff = (await import("@line/liff")).default;
+        const liff = (await import("@line/liff")).default; // Dynamically import LIFF
         await liff.ready;
 
+        // Fetch profile from LINE
         const profileData = await liff.getProfile();
         setProfile({
           userId: profileData.userId,
@@ -31,8 +32,11 @@ export default function Student() {
           pictureUrl: profileData.pictureUrl || "",
         });
 
+        // Fetch student data by LineID
         const student = await GetStudentIDByLineId(profileData.userId);
+        console.log(student);
 
+        // Update profile picture in your system if available
         if (student && profileData.pictureUrl) {
           try {
             const updatedProfile = await UpdateProfileUrl(student.sid, {
@@ -46,8 +50,8 @@ export default function Student() {
           console.warn("No student found or no picture URL available.");
         }
 
+        // Set student data to state
         setStudentData(student);
-        console.log("Student data:", studentData);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile. Please try again later.");
@@ -56,6 +60,7 @@ export default function Student() {
 
     fetchProfile();
 
+    // Fetch user location if available
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -107,6 +112,13 @@ export default function Student() {
         </>
       ) : (
         <div>Loading location...</div>
+      )}
+
+      <Typography variant="h4">Student Data</Typography>
+      {studentData ? (
+        <pre>{JSON.stringify(studentData, null, 2)}</pre>
+      ) : (
+        <div>Loading student data...</div>
       )}
     </Box>
   );
