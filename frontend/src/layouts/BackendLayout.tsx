@@ -22,7 +22,7 @@ const BackendLayout = () => {
 const styles = {
   container: {
     display: "flex",
-    bgcolor: "neutral.light",
+    bgcolor: "#F5F5F5",
   },
   mainSection: {
     px: 4,

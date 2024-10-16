@@ -26,7 +26,7 @@ const QRCodeSection: React.FC<QRCodeSectionProps> = ({
         justifyContent: "center",
         height: "auto",
         boxShadow: 0,
-        border: "1px solid rgba(69, 69, 71, 0.2)",
+        border: "0px solid rgba(69, 69, 71, 0.2)",
       }}
     >
       <Typography variant="h4" sx={{ fontWeight: "bold", color: "red" }}>

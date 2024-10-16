@@ -92,11 +92,11 @@ const Room = () => {
         sx={{
           width: "100%",
           maxWidth: 1410,
-          // height: isColumnLayout ? "auto" : "80vh",
           height: "auto",
           display: "flex",
           overflow: "hidden",
           flexDirection: "column",
+          boxShadow: 0,
           border: "1px solid rgba(69, 69, 71, 0.2)",
           borderRadius: 0,
         }}
@@ -114,6 +114,7 @@ const Room = () => {
               sx={{
                 flex: isColumnLayout ? "0 0 400px" : 2,
                 height: isColumnLayout ? "400px" : "80vh",
+                zIndex: 0,
               }}
             >
               <LocationMap currentLocation={currentLocation} />
