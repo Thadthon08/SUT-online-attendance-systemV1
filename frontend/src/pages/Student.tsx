@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { CheckCircle, Info } from "@mui/icons-material";
 import { GetStudentIDByLineId, UpdateProfileUrl } from "../services/api";
+import { LocationMap } from "../components/LocationMap";
 
 interface Profile {
   userId: string;
@@ -23,6 +24,10 @@ export default function StudentDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [studentData, setStudentData] = useState<any | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -42,6 +47,26 @@ export default function StudentDashboard() {
           });
         }
         setStudentData(student);
+
+        // Get current location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              setCurrentLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              });
+            },
+            (err) => {
+              console.error("Error fetching location:", err);
+              setError(
+                "Failed to fetch location. Please enable location services."
+              );
+            }
+          );
+        } else {
+          setError("Geolocation is not supported by this browser.");
+        }
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile. Please try again later.");
@@ -57,7 +82,7 @@ export default function StudentDashboard() {
         {error}
       </Typography>
     );
-  if (!profile || !studentData)
+  if (!profile || !studentData || !currentLocation)
     return (
       <Box display="flex" justifyContent="center" py={4}>
         <CircularProgress />
@@ -84,28 +109,12 @@ export default function StudentDashboard() {
             </Box>
           </Box>
           <Divider sx={{ my: 2 }} />
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography variant="body2">
-                <strong>Faculty:</strong> {studentData.faculty}
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="body2">
-                <strong>Major:</strong> {studentData.major}
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="body2">
-                <strong>Year:</strong> {studentData.year}
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="body2">
-                <strong>Status:</strong> {studentData.status}
-              </Typography>
-            </Grid>
-          </Grid>
+          <Typography variant="h6" gutterBottom>
+            Current Location
+          </Typography>
+          <Box sx={{ height: 200, width: "100%", mb: 2 }}>
+            <LocationMap currentLocation={currentLocation} />
+          </Box>
         </CardContent>
       </Card>
 
