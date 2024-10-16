@@ -113,7 +113,7 @@ const Room = () => {
             <Box
               sx={{
                 flex: isColumnLayout ? "0 0 400px" : 2,
-                height: isColumnLayout ? "400px" : "80vh",
+                height: isColumnLayout ? "400px" : "75vh",
                 zIndex: 0,
               }}
             >
