@@ -15,7 +15,7 @@ export default function Student() {
   const [lat, setLat] = useState<number | null>(null);
   const [long, setLong] = useState<number | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [student, setStudent] = useState<string | null>(null);
+  const [studentData, setStudentData] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -46,8 +46,8 @@ export default function Student() {
           console.warn("No student found or no picture URL available.");
         }
 
-        setStudent(student);
-        console.log("Student:", student);
+        setStudentData(student);
+        console.log("Student data:", studentData);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile. Please try again later.");
