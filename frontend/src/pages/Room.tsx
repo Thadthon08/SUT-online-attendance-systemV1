@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Paper, Typography, useMediaQuery } from "@mui/material";
+import { Box, Paper, useMediaQuery } from "@mui/material";
 import { LocationMap } from "../components/LocationMap";
 import { RoomForm } from "../components/RoomForm";
 import { RoomInterface } from "../interface/IRoom";
