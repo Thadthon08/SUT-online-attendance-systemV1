@@ -75,3 +75,19 @@ export async function UpdateProfileUrl(sid: string, data: any): Promise<any> {
 
   return response.json();
 }
+
+export async function CheckIn(data: any): Promise<any> {
+  const response = await fetch(`${apiURL}/api/checkin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to check in.");
+  }
+
+  return response.json();
+}

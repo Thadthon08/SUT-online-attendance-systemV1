@@ -1,4 +1,3 @@
-// controllers/attendanceRoom.js
 const { AttendanceRoom, Subject } = require("../models");
 const QRCode = require("qrcode");
 
@@ -11,16 +10,8 @@ const createAttendanceRoom = async (req, res) => {
     const end = new Date(end_time.replace(" ", "T"));
 
     const diffMilliseconds = end - start;
-    let countdown_duration;
-
-    if (diffMilliseconds > 0) {
-      const diffSeconds = diffMilliseconds / 1000;
-      const diffMinutes = diffSeconds / 60;
-
-      countdown_duration = Math.round(diffMinutes);
-    } else {
-      countdown_duration = 0;
-    }
+    let countdown_duration =
+      diffMilliseconds > 0 ? Math.round(diffMilliseconds / 60000) : 0;
 
     const subject = await Subject.findByPk(sub_id);
     if (!subject) {
@@ -38,14 +29,7 @@ const createAttendanceRoom = async (req, res) => {
       expired_at: new Date(end_time.replace(" ", "T")),
     });
 
-    const roomData = {
-      ATR_id: attendanceRoom.ATR_id,
-      subject_id: sub_id,
-    };
-
-    const qrCodeUrl = `https://ca9e-2001-fb1-16d-550f-9153-494-9048-a1d.ngrok-free.app/api/checkin?ATR_id=${attendanceRoom.ATR_id}`;
-
-    const qrCodeData = await QRCode.toDataURL(qrCodeUrl);
+    const qrCodeData = await QRCode.toDataURL(`${attendanceRoom.ATR_id}`);
 
     attendanceRoom.qrcode_data = qrCodeData;
     await attendanceRoom.save();
@@ -53,7 +37,7 @@ const createAttendanceRoom = async (req, res) => {
     return res.status(201).json({
       message: "สร้างห้องเช็คชื่อสำเร็จ",
       attendanceRoom,
-      qrCodeData,
+      qrCodeData, // ยังคงส่ง QR code กลับมาให้ client
     });
   } catch (error) {
     console.error("Error creating attendance room:", error);
