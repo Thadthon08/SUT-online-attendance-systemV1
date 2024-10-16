@@ -94,7 +94,7 @@ const styles = {
     my: 5,
   },
   avatar: {
-    width: "40%",
+    width: "50%",
     height: "auto",
   },
   yourChannel: {

@@ -8,6 +8,8 @@ import Setting from "./pages/Setting";
 import PublicRoute from "./routes/PublicRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Room from "./pages/Room";
+import StudentLayout from "./layouts/StudentLayout";
+import Student from "./pages/Student";
 
 function App() {
   return (
@@ -57,6 +59,10 @@ function App() {
               </ProtectedRoute>
             }
           />
+        </Route>
+
+        <Route element={<StudentLayout />}>
+          <Route path="/student" element={<Student />} />
         </Route>
       </Routes>
     </BrowserRouter>
