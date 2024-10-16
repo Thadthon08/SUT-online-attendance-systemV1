@@ -4,7 +4,7 @@ import { QrCode, RefreshCw } from "lucide-react";
 
 interface QRCodeSectionProps {
   qrCodeData: string;
-  countdown: number; // ค่า countdown หน่วยนาที
+  countdown: number; 
   onReset: () => void;
 }
 
@@ -14,23 +14,18 @@ const QRCodeSection: React.FC<QRCodeSectionProps> = ({
   onReset,
 }) => {
   const theme = useTheme();
-  const [timeLeft, setTimeLeft] = useState(countdown * 60); // แปลงนาทีเป็นวินาที
+  const [timeLeft, setTimeLeft] = useState(countdown * 60); 
 
-  // ใช้ useEffect เพื่อเริ่มการนับถอยหลัง
   useEffect(() => {
-    // ถ้าไม่มีเวลาเหลือแล้วให้หยุดนับ
     if (timeLeft <= 0) return;
 
-    // ตั้ง setInterval ให้ทำงานทุก ๆ 1 วินาที
     const interval = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
 
-    // Cleanup เมื่อ component ถูกทำลายหรือเวลาเหลือ 0
     return () => clearInterval(interval);
   }, [timeLeft]);
 
-  // ฟังก์ชันช่วยแปลงเวลาจากวินาทีเป็นนาทีและวินาที
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
