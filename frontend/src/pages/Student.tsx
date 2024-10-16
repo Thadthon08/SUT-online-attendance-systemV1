@@ -11,6 +11,9 @@ interface Profile {
 export default function Student() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lat, setLat] = useState<number | null>(null);
+  const [long, setLong] = useState<number | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,6 +36,24 @@ export default function Student() {
     };
 
     fetchProfile();
+
+    // Fetch the user's geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLat(position.coords.latitude);
+          setLong(position.coords.longitude);
+        },
+        (err) => {
+          console.error("Error fetching location:", err);
+          setLocationError(
+            "Failed to fetch location. Please enable location services."
+          );
+        }
+      );
+    } else {
+      setLocationError("Geolocation is not supported by this browser.");
+    }
   }, []);
 
   return (
@@ -55,7 +76,19 @@ export default function Student() {
           )}
         </>
       ) : (
-        <div>Loading...</div>
+        <div>Loading profile...</div>
+      )}
+
+      <Typography variant="h4">My Location</Typography>
+      {locationError ? (
+        <div>{locationError}</div>
+      ) : lat && long ? (
+        <>
+          <div>Latitude: {lat}</div>
+          <div>Longitude: {long}</div>
+        </>
+      ) : (
+        <div>Loading location...</div>
       )}
     </Box>
   );
