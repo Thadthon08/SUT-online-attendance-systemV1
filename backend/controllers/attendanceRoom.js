@@ -43,7 +43,9 @@ const createAttendanceRoom = async (req, res) => {
       subject_id: sub_id,
     };
 
-    const qrCodeData = await QRCode.toDataURL(JSON.stringify(roomData));
+    const qrCodeUrl = `https://ca9e-2001-fb1-16d-550f-9153-494-9048-a1d.ngrok-free.app/api/checkin?ATR_id=${attendanceRoom.ATR_id}`;
+
+    const qrCodeData = await QRCode.toDataURL(qrCodeUrl);
 
     attendanceRoom.qrcode_data = qrCodeData;
     await attendanceRoom.save();
