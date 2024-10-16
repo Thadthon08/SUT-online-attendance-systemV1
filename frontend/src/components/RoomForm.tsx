@@ -127,11 +127,8 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
 
   return (
     <Box sx={{ p: 1, color: "white", overflow: "hidden" }}>
-      <Typography variant="h5" fontWeight="bold" sx={{ mb: 1 }}>
-        สร้างห้องใหม่
-      </Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
+        <Stack spacing={3}>
           <FormControl fullWidth error={!!errors.sub_id}>
             <Typography variant="body2" sx={{ mb: 1 }}>
               วิชา
@@ -285,7 +282,6 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
             color="error"
             size="large"
             sx={{
-              mt: 2,
               fontWeight: "bold",
               textTransform: "none",
               borderRadius: 1,
