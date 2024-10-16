@@ -113,17 +113,17 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     if (scannerRef.current) {
-      html5QrCode.current = new Html5Qrcode("reader"); // ใช้ `id="reader"` เพื่อสแกน
+      html5QrCode.current = new Html5Qrcode("reader"); // ใช้ `id="reader"` เพื่อแสดงกล้อง
       html5QrCode.current
         .start(
-          { facingMode: "environment" }, // กล้องหลัง
+          { facingMode: "environment" }, // ใช้กล้องหลัง
           {
-            fps: 10, // ความเร็วการสแกน
-            qrbox: { width: 250, height: 250 }, // ขนาดกล่องสำหรับสแกน
+            fps: 10, // ความเร็วในการสแกน
+            qrbox: { width: 250, height: 250 }, // ขนาดกรอบสแกน QR
           },
-          handleScan,
+          handleScan, // ฟังก์ชันเมื่อสแกนสำเร็จ
           (errorMessage) => {
-            console.error("QR Code scanning error:", errorMessage);
+            console.error("QR Code scanning error:", errorMessage); // ข้อผิดพลาดในการสแกน
           }
         )
         .catch((err) => {
@@ -139,7 +139,7 @@ export default function StudentDashboard() {
         }
       };
     }
-  }, []);
+  }, [scannerRef]);
 
   if (error)
     return (
@@ -210,7 +210,7 @@ export default function StudentDashboard() {
       {/* แสดงกล้องสำหรับสแกน QR Code */}
       <Box
         id="reader"
-        style={{ width: "100%", height: "200px", marginTop: "20px" }}
+        style={{ width: "100%", height: "300px", marginTop: "20px" }}
         ref={scannerRef}
       ></Box>
     </Box>
