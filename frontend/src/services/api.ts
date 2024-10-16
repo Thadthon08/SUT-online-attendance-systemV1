@@ -49,7 +49,7 @@ export async function GetAllSubject(): Promise<any> {
 }
 
 export async function GetStudentIDByLineId(lineId: string): Promise<any> {
-  const response = await fetch(`${apiURL}/api/student/line/${lineId}`, {
+  const response = await fetch(`${apiURL}/api/student/${lineId}`, {
     method: "GET",
   });
 
