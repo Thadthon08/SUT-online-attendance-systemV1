@@ -1,5 +1,19 @@
-import { Box, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Avatar,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Divider,
+  CircularProgress,
+  Paper,
+} from "@mui/material";
+import { PersonOutline, LocationOn, School } from "@mui/icons-material";
 import { GetStudentIDByLineId, UpdateProfileUrl } from "../services/api";
 
 interface Profile {
@@ -20,10 +34,8 @@ export default function Student() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const liff = (await import("@line/liff")).default; // Dynamically import LIFF
+        const liff = (await import("@line/liff")).default;
         await liff.ready;
-
-        // Fetch profile from LINE
         const profileData = await liff.getProfile();
         setProfile({
           userId: profileData.userId,
@@ -31,26 +43,12 @@ export default function Student() {
           statusMessage: profileData.statusMessage || "",
           pictureUrl: profileData.pictureUrl || "",
         });
-
-        // Fetch student data by LineID
         const student = await GetStudentIDByLineId(profileData.userId);
-        console.log(student);
-
-        // Update profile picture in your system if available
         if (student && profileData.pictureUrl) {
-          try {
-            const updatedProfile = await UpdateProfileUrl(student.sid, {
-              profilePicUrl: profileData.pictureUrl,
-            });
-            console.log("Profile updated successfully:", updatedProfile);
-          } catch (err) {
-            console.error("Error updating profile:", err);
-          }
-        } else {
-          console.warn("No student found or no picture URL available.");
+          await UpdateProfileUrl(student.sid, {
+            profilePicUrl: profileData.pictureUrl,
+          });
         }
-
-        // Set student data to state
         setStudentData(student);
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -60,7 +58,6 @@ export default function Student() {
 
     fetchProfile();
 
-    // Fetch user location if available
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -79,47 +76,100 @@ export default function Student() {
     }
   }, []);
 
+  if (error)
+    return (
+      <Typography color="error" align="center" py={2}>
+        {error}
+      </Typography>
+    );
+  if (!profile)
+    return (
+      <Box display="flex" justifyContent="center" py={4}>
+        <CircularProgress />
+      </Box>
+    );
+
   return (
-    <Box>
-      <Typography variant="h3">My Profile</Typography>
-      {error ? (
-        <div>{error}</div>
-      ) : profile ? (
-        <>
-          <div>User Id: {profile.userId}</div>
-          <div>Display Name: {profile.displayName}</div>
-          <div>Status: {profile.statusMessage}</div>
-          {profile.pictureUrl && (
-            <img
+    <Box sx={{ maxWidth: 600, margin: "auto", p: 2 }}>
+      <Card elevation={3} sx={{ mb: 2 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={2}>
+            <Avatar
               src={profile.pictureUrl}
-              alt="profile"
-              height={100}
-              width={100}
+              alt={profile.displayName}
+              sx={{ width: 80, height: 80, mr: 2 }}
             />
+            <Box>
+              <Typography variant="h5" component="div">
+                {profile.displayName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {profile.statusMessage}
+              </Typography>
+            </Box>
+          </Box>
+          <Divider sx={{ my: 2 }} />
+          <List disablePadding>
+            <ListItem>
+              <ListItemAvatar>
+                <Avatar>
+                  <PersonOutline />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary="User ID" secondary={profile.userId} />
+            </ListItem>
+            <ListItem>
+              <ListItemAvatar>
+                <Avatar>
+                  <LocationOn />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary="Location"
+                secondary={
+                  locationError
+                    ? locationError
+                    : lat && long
+                    ? `${lat.toFixed(4)}, ${long.toFixed(4)}`
+                    : "Loading location..."
+                }
+              />
+            </ListItem>
+          </List>
+        </CardContent>
+      </Card>
+
+      <Card elevation={3}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            <School sx={{ verticalAlign: "middle", mr: 1 }} />
+            Student Data
+          </Typography>
+          {studentData ? (
+            <Paper
+              elevation={0}
+              sx={{
+                bgcolor: "grey.100",
+                p: 2,
+                maxHeight: 200,
+                overflow: "auto",
+              }}
+            >
+              <pre
+                style={{
+                  margin: 0,
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                }}
+              >
+                {JSON.stringify(studentData, null, 2)}
+              </pre>
+            </Paper>
+          ) : (
+            <Typography>Loading student data...</Typography>
           )}
-        </>
-      ) : (
-        <div>Loading profile...</div>
-      )}
-
-      <Typography variant="h4">My Location</Typography>
-      {locationError ? (
-        <div>{locationError}</div>
-      ) : lat && long ? (
-        <>
-          <div>Latitude: {lat}</div>
-          <div>Longitude: {long}</div>
-        </>
-      ) : (
-        <div>Loading location...</div>
-      )}
-
-      <Typography variant="h4">Student Data</Typography>
-      {studentData ? (
-        <pre>{JSON.stringify(studentData, null, 2)}</pre>
-      ) : (
-        <div>Loading student data...</div>
-      )}
+        </CardContent>
+      </Card>
     </Box>
   );
 }
