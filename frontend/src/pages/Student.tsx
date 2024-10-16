@@ -47,6 +47,7 @@ export default function Student() {
         }
 
         setStudent(student);
+        console.log("Student:", student);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile. Please try again later.");
@@ -91,7 +92,6 @@ export default function Student() {
               width={100}
             />
           )}
-          {student && <div>Student ID: {student}</div>}
         </>
       ) : (
         <div>Loading profile...</div>
