@@ -8,7 +8,7 @@ const StudentLayout = () => {
       const liff = (await import("@line/liff")).default;
 
       try {
-        const liffId = process.env.REACT_APP_LIFF_ID;
+        const liffId = "2006449283-GBkW3xMB";
         if (!liffId) {
           throw new Error("LIFF ID is not defined");
         }
@@ -22,7 +22,7 @@ const StudentLayout = () => {
     };
 
     initializeLiff();
-  }, []);
+  });
   return (
     <>
       <Box>
