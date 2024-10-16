@@ -23,34 +23,14 @@ export default function Student() {
         const liff = (await import("@line/liff")).default;
         await liff.ready;
 
-        // ดึงข้อมูลโปรไฟล์จาก LINE
         const profileData = await liff.getProfile();
+
         setProfile({
           userId: profileData.userId,
           displayName: profileData.displayName,
           statusMessage: profileData.statusMessage || "",
           pictureUrl: profileData.pictureUrl || "",
         });
-
-        // ค้นหา studentId โดยใช้ userId จาก LINE
-        const student = await GetStudentIDByLineId(profileData.userId);
-
-        // อัปเดตโปรไฟล์ของนักเรียนด้วยรูปโปรไฟล์จาก LINE
-        if (student && profileData.pictureUrl) {
-          try {
-            const updatedProfile = await UpdateProfileUrl(student.sid, {
-              profilePicUrl: profileData.pictureUrl,
-            });
-            console.log("Profile updated successfully:", updatedProfile);
-          } catch (err) {
-            console.error("Error updating profile:", err);
-          }
-        } else {
-          console.warn("No student found or no picture URL available.");
-        }
-
-        // ตั้งค่า Student ให้กับ state (กรณีต้องใช้ข้อมูลอื่นต่อ)
-        setStudent(student);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile. Please try again later.");
@@ -75,6 +55,19 @@ export default function Student() {
     } else {
       setLocationError("Geolocation is not supported by this browser.");
     }
+
+    const getStudentID = async () => {
+      try {
+        if (profile) {
+          const student = await GetStudentIDByLineId(profile.userId);
+          console.log(student);
+          setStudent(student);
+        }
+      } catch (err) {
+        console.error("Error fetching student ID:", err);
+      }
+    };
+    getStudentID();
   }, []);
 
   return (

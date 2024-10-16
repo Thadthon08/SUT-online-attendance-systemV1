@@ -1,5 +1,5 @@
 // controllers/studentController.js
-const { Student } = require("../models/student");
+const { Student } = require("../models");
 
 const getStudentByLineID = async (req, res) => {
   try {
