@@ -24,13 +24,29 @@ export default function Student() {
         await liff.ready;
 
         const profileData = await liff.getProfile();
-
         setProfile({
           userId: profileData.userId,
           displayName: profileData.displayName,
           statusMessage: profileData.statusMessage || "",
           pictureUrl: profileData.pictureUrl || "",
         });
+
+        const student = await GetStudentIDByLineId(profileData.userId);
+
+        if (student && profileData.pictureUrl) {
+          try {
+            const updatedProfile = await UpdateProfileUrl(student.sid, {
+              profilePicUrl: profileData.pictureUrl,
+            });
+            console.log("Profile updated successfully:", updatedProfile);
+          } catch (err) {
+            console.error("Error updating profile:", err);
+          }
+        } else {
+          console.warn("No student found or no picture URL available.");
+        }
+
+        setStudent(student);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile. Please try again later.");
@@ -55,19 +71,6 @@ export default function Student() {
     } else {
       setLocationError("Geolocation is not supported by this browser.");
     }
-
-    const getStudentID = async () => {
-      try {
-        if (profile) {
-          const student = await GetStudentIDByLineId(profile.userId);
-          console.log(student);
-          setStudent(student);
-        }
-      } catch (err) {
-        console.error("Error fetching student ID:", err);
-      }
-    };
-    getStudentID();
   }, []);
 
   return (
