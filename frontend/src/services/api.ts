@@ -45,3 +45,31 @@ export async function GetAllSubject(): Promise<any> {
 
   return response.json();
 }
+
+export async function GetStudentIDByLineId(lineId: string): Promise<any> {
+  const response = await fetch(`${apiURL}/api/student/line/${lineId}`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to get student ID.");
+  }
+
+  return response.json();
+}
+
+export async function UpdateProfileUrl(sid: string, data: any): Promise<any> {
+  const response = await fetch(`${apiURL}/api/student/${sid}/profile-pic`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update profile.");
+  }
+
+  return response.json();
+}

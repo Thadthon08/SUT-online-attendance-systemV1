@@ -14,6 +14,7 @@ app.use("/api/create", require("./routes/attendanceRoom"));
 app.use("/line", require("./routes/line"));
 app.use("/api/subject", require("./routes/subject"));
 app.use("/api/checkin", require("./routes/attendance"));
+app.use("/api/student", require("./routes/student"));
 
 // เริ่มต้นเซิร์ฟเวอร์
 const PORT = 3000;
