@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import {
   Box,
@@ -10,11 +10,31 @@ import {
   Grid,
   Divider,
   Paper,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
 } from "@mui/material";
 import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
 import { GetStudentIDByLineId, CheckIn } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
+
+// สร้างธีม Dark
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: {
+      main: "#90caf9",
+    },
+    secondary: {
+      main: "#f48fb1",
+    },
+    background: {
+      default: "#121212",
+      paper: "#1e1e1e",
+    },
+  },
+});
 
 interface Profile {
   userId: string;
@@ -43,6 +63,8 @@ export default function StudentDashboard() {
           icon: "info",
           allowOutsideClick: false,
           showConfirmButton: false,
+          background: "#1e1e1e",
+          color: "#ffffff",
           willOpen: () => {
             Swal.showLoading();
           },
@@ -75,6 +97,8 @@ export default function StudentDashboard() {
                 text: "Failed to fetch location. Please enable location services.",
                 icon: "error",
                 confirmButtonText: "OK",
+                background: "#1e1e1e",
+                color: "#ffffff",
               });
             }
           );
@@ -84,6 +108,8 @@ export default function StudentDashboard() {
             text: "Geolocation is not supported by this browser.",
             icon: "error",
             confirmButtonText: "OK",
+            background: "#1e1e1e",
+            color: "#ffffff",
           });
         }
       } catch (err) {
@@ -93,6 +119,8 @@ export default function StudentDashboard() {
           text: "Failed to load profile. Please try again later.",
           icon: "error",
           confirmButtonText: "OK",
+          background: "#1e1e1e",
+          color: "#ffffff",
         });
       }
     };
@@ -114,6 +142,8 @@ export default function StudentDashboard() {
           icon: "info",
           allowOutsideClick: false,
           showConfirmButton: false,
+          background: "#1e1e1e",
+          color: "#ffffff",
           willOpen: () => {
             Swal.showLoading();
           },
@@ -144,6 +174,8 @@ export default function StudentDashboard() {
           text: "Check-in successful!",
           icon: "success",
           confirmButtonText: "OK",
+          background: "#1e1e1e",
+          color: "#ffffff",
         });
       } catch (error) {
         console.error("Error during check-in:", error);
@@ -152,6 +184,8 @@ export default function StudentDashboard() {
           text: "Failed to check-in. Please try again.",
           icon: "error",
           confirmButtonText: "OK",
+          background: "#1e1e1e",
+          color: "#ffffff",
         });
       } finally {
         setIsCheckingIn(false);
@@ -181,6 +215,8 @@ export default function StudentDashboard() {
             text: "Failed to start the QR code scanner. Please try again.",
             icon: "error",
             confirmButtonText: "OK",
+            background: "#1e1e1e",
+            color: "#ffffff",
           });
         });
     }
@@ -215,98 +251,114 @@ export default function StudentDashboard() {
   if (!profile || !studentData || !currentLocation) return null;
 
   return (
-    <Box sx={{ maxWidth: 600, margin: "auto", p: 2 }}>
-      <Card elevation={3} sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" alignItems="center" mb={2}>
-            <Avatar
-              src={profile.pictureUrl}
-              alt={profile.displayName}
-              sx={{ width: 80, height: 80, mr: 2 }}
-            />
-            <Box>
-              <Typography variant="h5" component="div">
-                {profile.displayName}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Student ID: {studentData.sid}
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Box sx={{ maxWidth: 600, margin: "auto", p: 2 }}>
+        <Card elevation={3} sx={{ mb: 3, backgroundColor: "background.paper" }}>
+          <CardContent>
+            <Box display="flex" alignItems="center" mb={2}>
+              <Avatar
+                src={profile.pictureUrl}
+                alt={profile.displayName}
+                sx={{ width: 80, height: 80, mr: 2 }}
+              />
+              <Box>
+                <Typography variant="h5" component="div" color="text.primary">
+                  {profile.displayName}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Student ID: {studentData.sid}
+                </Typography>
+              </Box>
+            </Box>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="h6" gutterBottom color="text.primary">
+              Current Location
+            </Typography>
+            <Box sx={{ height: 200, width: "100%", mb: 2 }}>
+              <LocationMap currentLocation={currentLocation} />
+            </Box>
+          </CardContent>
+        </Card>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<CheckCircle />}
+              onClick={() => setIsScanning(true)}
+              sx={{ height: "100%" }}
+              disabled={isScanning}
+            >
+              Check Attendance
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <Button
+              variant="outlined"
+              fullWidth
+              startIcon={<Info />}
+              sx={{ height: "100%" }}
+            >
+              View Details
+            </Button>
+          </Grid>
+        </Grid>
+        {isScanning && (
+          <Paper
+            elevation={3}
+            sx={{
+              mt: 3,
+              p: 2,
+              position: "relative",
+              backgroundColor: "background.paper",
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              align="center"
+              color="text.primary"
+            >
+              Scan QR Code
+            </Typography>
+            <Box
+              id="reader"
+              sx={{
+                width: "100%",
+                height: 300,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                border: "2px dashed #555",
+                borderRadius: 2,
+                position: "relative",
+                overflow: "hidden",
+              }}
+              ref={scannerRef}
+            >
+              <CameraAlt sx={{ fontSize: 48, color: "#777" }} />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 2, textAlign: "center" }}
+              >
+                Position the QR code within the frame to scan
               </Typography>
             </Box>
-          </Box>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="h6" gutterBottom>
-            Current Location
-          </Typography>
-          <Box sx={{ height: 200, width: "100%", mb: 2 }}>
-            <LocationMap currentLocation={currentLocation} />
-          </Box>
-        </CardContent>
-      </Card>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Button
-            variant="contained"
-            fullWidth
-            startIcon={<CheckCircle />}
-            onClick={() => setIsScanning(true)}
-            sx={{ height: "100%" }}
-            disabled={isScanning}
-          >
-            Check Attendance
-          </Button>
-        </Grid>
-        <Grid item xs={6}>
-          <Button
-            variant="outlined"
-            fullWidth
-            startIcon={<Info />}
-            sx={{ height: "100%" }}
-          >
-            View Details
-          </Button>
-        </Grid>
-      </Grid>
-      {isScanning && (
-        <Paper elevation={3} sx={{ mt: 3, p: 2, position: "relative" }}>
-          <Typography variant="h6" gutterBottom align="center">
-            Scan QR Code
-          </Typography>
-          <Box
-            id="reader"
-            sx={{
-              width: "100%",
-              height: 300,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              border: "2px dashed #ccc",
-              borderRadius: 2,
-              position: "relative",
-              overflow: "hidden",
-            }}
-            ref={scannerRef}
-          >
-            <CameraAlt sx={{ fontSize: 48, color: "#999" }} />
-            <Typography
-              variant="body2"
-              color="textSecondary"
-              sx={{ mt: 2, textAlign: "center" }}
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<Close />}
+              onClick={stopScan}
+              sx={{ mt: 2, width: "100%" }}
             >
-              Position the QR code within the frame to scan
-            </Typography>
-          </Box>
-          <Button
-            variant="contained"
-            color="secondary"
-            startIcon={<Close />}
-            onClick={stopScan}
-            sx={{ mt: 2, width: "100%" }}
-          >
-            Stop Scanning
-          </Button>
-        </Paper>
-      )}
-    </Box>
+              Stop Scanning
+            </Button>
+          </Paper>
+        )}
+      </Box>
+    </ThemeProvider>
   );
 }
