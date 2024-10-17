@@ -92,10 +92,13 @@ export default function StudentDashboard() {
 
         let ATR_id = decodedText;
 
+        // ตรวจสอบว่าเป็น URL หรือไม่ และดึงค่า ATR_id ถ้ามี
         try {
           const url = new URL(decodedText);
           ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
-        } catch (error) {}
+        } catch (error) {
+          console.warn("Not a valid URL, using raw decoded text as ATR_id");
+        }
 
         const checkInData = {
           ATR_id,
@@ -104,29 +107,33 @@ export default function StudentDashboard() {
           att_long: currentLocation.lng,
         };
 
+        // เรียก API เช็คชื่อ
         await CheckIn(checkInData);
+
+        // ถ้าเช็คชื่อสำเร็จ
         alert("เช็คชื่อสำเร็จ!");
-        stopScan();
+        stopScan(); // หยุดการสแกนเมื่อสำเร็จ
       } catch (error) {
         console.error("Error during check-in:", error);
-        alert("เกิดข้อผิดพลาดในการเช็คชื่อ.");
+        alert("เกิดข้อผิดพลาดในการเช็คชื่อ."); // แสดงข้อผิดพลาดเมื่อเช็คชื่อไม่สำเร็จ
       } finally {
-        setLoadingCheckIn(false);
+        setLoadingCheckIn(false); // จบการโหลดไม่ว่าจะสำเร็จหรือไม่
       }
     }
   };
 
+  // ฟังก์ชันสำหรับเริ่มการสแกน
   const startScan = () => {
     if (scannerRef.current) {
       html5QrCode.current = new Html5Qrcode("reader");
       html5QrCode.current
         .start(
-          { facingMode: "environment" },
+          { facingMode: "environment" }, // ใช้กล้องหลัง
           {
-            fps: 30,
-            qrbox: { width: 250, height: 250 },
+            fps: 30, // ความเร็วในการสแกน
+            qrbox: { width: 250, height: 250 }, // ขนาดของกล่องสแกน
           },
-          handleScan,
+          handleScan, // ฟังก์ชันที่จะเรียกเมื่อสแกนเจอ
           (errorMessage) => {
             console.error("QR Code scanning error:", errorMessage);
           }
@@ -137,22 +144,23 @@ export default function StudentDashboard() {
     }
   };
 
+  // ฟังก์ชันสำหรับหยุดการสแกน
   const stopScan = () => {
     if (html5QrCode.current) {
       html5QrCode.current.stop().then(() => {
         html5QrCode.current?.clear();
-        setIsScanning(false);
+        setIsScanning(false); // ตั้งค่าสถานะการสแกนเป็น false
       });
     }
   };
 
   useEffect(() => {
     if (isScanning) {
-      startScan();
+      startScan(); // เริ่มสแกนเมื่อ isScanning เป็น true
     }
     return () => {
       if (html5QrCode.current) {
-        stopScan();
+        stopScan(); // หยุดสแกนเมื่อ component ถูก unmount
       }
     };
   }, [isScanning]);
