@@ -140,7 +140,7 @@ export default function StudentDashboard() {
           { facingMode: "environment" }, // ใช้กล้องหลัง
           {
             fps: 30, // ความเร็วในการสแกน
-            qrbox: { width: 250, height: 250 }, // ขนาดของกล่องสแกน
+            qrbox: { width: 300, height: 300 }, // ขนาดของกล่องสแกน
           },
           handleScan, // ฟังก์ชันที่จะเรียกเมื่อสแกนเจอ
           (errorMessage) => {
