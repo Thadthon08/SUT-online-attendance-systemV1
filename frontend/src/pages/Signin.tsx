@@ -27,6 +27,7 @@ const SigninForm = () => {
   } = useForm<SigninInterface>();
 
   const navigate = useNavigate();
+  document.title = "Signin | Attendance System";
 
   const onSubmit = async (data: SigninInterface) => {
     setIsSubmitting(true);
@@ -60,6 +61,40 @@ const SigninForm = () => {
     }
   };
 
+  const inputStyles = {
+    borderRadius: "4px",
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "4px",
+      backgroundColor: "rgba(160, 180, 209, 0.1)",
+      color: "#FFFFFF",
+      "& fieldset": {
+        borderColor: "#a0b4d1",
+      },
+      "&:hover fieldset": {
+        borderColor: "#c1d3e8",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#e1eeff",
+      },
+    },
+    "& .MuiFormHelperText-root": {
+      color: "#ff9999",
+    },
+    "& input:-webkit-autofill": {
+      WebkitBoxShadow: "0 0 0 1000px #2c2e30 inset !important",
+      WebkitTextFillColor: "#ffffff",
+    },
+    "& input:-webkit-autofill:hover": {
+      WebkitBoxShadow: "0 0 0 1000px #2c2e30 inset !important",
+    },
+    "& input:-webkit-autofill:focus": {
+      WebkitBoxShadow: "0 0 0 1000px #2c2e30inset !important",
+    },
+    "& input:-webkit-autofill:active": {
+      WebkitBoxShadow: "0 0 0 1000px #2c2e30  inset !important",
+    },
+  };
+
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -79,16 +114,11 @@ const SigninForm = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <AccountCircle />
+                  <AccountCircle sx={{ color: "#a0b4d1" }} />
                 </InputAdornment>
               ),
             }}
-            sx={{
-              borderRadius: "0px",
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "0px",
-              },
-            }}
+            sx={inputStyles}
           />
         </Box>
 
@@ -108,16 +138,11 @@ const SigninForm = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock />
+                  <Lock sx={{ color: "#a0b4d1" }} />
                 </InputAdornment>
               ),
             }}
-            sx={{
-              borderRadius: "0px",
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "0px",
-              },
-            }}
+            sx={inputStyles}
           />
         </Box>
 
@@ -127,19 +152,19 @@ const SigninForm = () => {
           type="submit"
           disabled={isSubmitting}
           sx={{
-            backgroundColor: "rgb(242, 101, 34)",
-            borderRadius: "0px",
-            fontSize: "0.8rem",
-            fontWeight: "bold",
+            backgroundColor: "#FF7F50",
+            borderRadius: "4px",
+            color: "white",
+            fontSize: "1rem",
+            fontWeight: "bolder",
             "&:hover": {
-              backgroundColor: "rgb(230, 92, 28)",
+              backgroundColor: "#FF6347",
             },
           }}
         >
-          {isSubmitting ? "Logging in..." : "Log in"}
+          {isSubmitting ? "Sign in..." : "Sign in"}
         </Button>
       </form>
-      <ToastContainer />{" "}
     </>
   );
 };
@@ -151,21 +176,29 @@ const Signin = () => {
         <Card
           className="w-1/2 min-w-80 max-w-md"
           sx={{
-            borderRadius: "0px",
+            borderRadius: "8px",
+            backgroundColor: "rgba(160, 180, 209, 0.2)",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
           }}
         >
           <Typography
             variant="h5"
-            className="text-center p-3 text-white m-0"
-            sx={{ backgroundColor: "rgb(51, 51, 51)" }}
+            fontWeight={"bolder"}
+            className="text-center p-3 m-0"
+            sx={{
+              backgroundColor: "rgba(160, 180, 209, 0.3)",
+              color: "white",
+            }}
           >
             SUT Attendance
           </Typography>
-          <Box className="p-10 bg-white">
+          <Box className="p-10" sx={{ backgroundColor: "transparent" }}>
             <SigninForm />
           </Box>
         </Card>
       </div>
+      <ToastContainer />
     </div>
   );
 };

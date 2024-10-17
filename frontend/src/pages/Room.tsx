@@ -5,6 +5,7 @@ import {
   useMediaQuery,
   Container,
   Typography,
+  alpha,
 } from "@mui/material";
 import { LocationMap } from "../components/LocationMap";
 import { RoomForm } from "../components/RoomForm";
@@ -13,6 +14,7 @@ import { CreateRoom } from "../services/api";
 import { showToast } from "../utils/toastUtils";
 import { ToastContainer } from "react-toastify";
 import QRCodeSection from "../components/QRCodeSection";
+import theme from "../config/theme";
 
 const Room = () => {
   const [currentLocation, setCurrentLocation] = useState({
@@ -23,6 +25,8 @@ const Room = () => {
   const [qrCodeData, setQrCodeData] = useState("");
   const [countdown, setCountdown] = useState(0);
   const isColumnLayout = useMediaQuery("(max-width:1410px)");
+
+  document.title = "Create Room | Attendance System";
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -76,9 +80,8 @@ const Room = () => {
         sx={{
           maxWidth: 1410,
           overflow: "hidden",
-          boxShadow: 0,
+          border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
           borderRadius: 0,
-          border: "1px solid rgba(69, 69, 71, 0.2)",
           p: 2,
           mb: 3,
         }}
@@ -96,8 +99,6 @@ const Room = () => {
           display: "flex",
           overflow: "hidden",
           flexDirection: "column",
-          boxShadow: 0,
-          border: "1px solid rgba(69, 69, 71, 0.2)",
           borderRadius: 0,
         }}
       >
@@ -122,7 +123,7 @@ const Room = () => {
             <Box
               sx={{
                 flex: 1,
-                bgcolor: "grey.800",
+                bgcolor: "grey.830",
                 color: "common.white",
                 p: 2,
                 overflowY: "auto",

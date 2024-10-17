@@ -1,17 +1,29 @@
+import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppHeader from "../components/AppHeader";
 import SideNav from "../components/SideNav";
+import { UserData } from "../interface/Signinrespone";
 
-const BackendLayout = () => {
+const BackendLayout: React.FC = () => {
+  const theme = useTheme();
+  const data = localStorage.getItem("data");
+  const [parsedData, setParsedData] = useState<UserData | undefined>(undefined);
+
+  useEffect(() => {
+    if (data) {
+      setParsedData(JSON.parse(data));
+    }
+  }, [data]);
+
   return (
     <>
       <CssBaseline />
-      <AppHeader />
-      <Box sx={styles.container}>
-        <SideNav />
-        <Box component={"main"} sx={styles.mainSection}>
+      <AppHeader Data={parsedData} />
+      <Box sx={styles.container(theme)}>
+        <SideNav Data={parsedData} />
+        <Box component="main" sx={styles.mainSection(theme)}>
           <Outlet />
         </Box>
       </Box>
@@ -20,17 +32,19 @@ const BackendLayout = () => {
 };
 
 const styles = {
-  container: {
+  container: (theme: any) => ({
     display: "flex",
-    bgcolor: "#F5F5F5",
-  },
-  mainSection: {
+    bgcolor: theme.palette.background.default,
+  }),
+  mainSection: (theme: any) => ({
     px: 4,
     py: 1,
     width: "100%",
     height: "100%",
     overflow: "auto",
-  },
+    bgcolor: theme.palette.background.default,
+    color: theme.palette.text.primary,
+  }),
 };
 
 export default BackendLayout;

@@ -1,7 +1,5 @@
-
 const Dashboard = () => {
-
-  document.title = "Dashboard";
+  document.title = "Dashboard | Attendance System";
 
   return (
     <>

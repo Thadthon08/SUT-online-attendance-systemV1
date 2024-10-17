@@ -1,17 +1,21 @@
-import { useState } from "react";
-import { Avatar, Box, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Avatar, Box, Typography, useTheme } from "@mui/material";
 import { Menu, MenuItem, Sidebar, useProSidebar } from "react-pro-sidebar";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
 import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutlined";
 import { Link } from "react-router-dom";
-import profile from "../assets/logo_round.png";
+import { UserData } from "../interface/Signinrespone";
 
-const SideNav = () => {
-  // useProSidebar hook to control the sidebar
+interface SideNavProps {
+  Data?: UserData;
+}
+
+const SideNav: React.FC<SideNavProps> = ({ Data }) => {
+  const theme = useTheme();
   const { collapsed, toggleSidebar } = useProSidebar();
-  const [activeMenu, setActiveMenu] = useState("Dashboard");
+  const [activeMenu, setActiveMenu] = useState("/dashboard");
 
   const handleMenuClick = (menu: string) => {
     setActiveMenu(menu);
@@ -20,66 +24,68 @@ const SideNav = () => {
 
   return (
     <Sidebar
-      style={{ height: "100vh", top: "auto" }}
+      style={{ height: "auto", top: "auto", minHeight: "100vh" }}
       breakPoint="md"
-      backgroundColor={"white"}
+      backgroundColor={theme.palette.background.paper}
     >
       <Box sx={styles.avatarContainer}>
-        <Avatar sx={styles.avatar} alt="Masoud" src={profile} />
-        {!collapsed ? (
-          <Typography variant="body2" sx={styles.yourChannel}>
-            Samit Koyom
-          </Typography>
-        ) : null}
-        {!collapsed ? (
-          <Typography variant="body2">Administrator</Typography>
-        ) : null}
+        <Avatar sx={styles.avatar} alt="Samit" src={Data?.profile_pic} />
+        {!collapsed && (
+          <>
+            <Typography variant="body2" sx={styles.yourChannel(theme)}>
+              {Data?.fname} {Data?.lname}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {Data?.email}
+            </Typography>
+          </>
+        )}
       </Box>
 
       <Menu
         menuItemStyles={{
-          button: ({ active }) => {
-            return {
-              backgroundColor: active ? "rgba(0, 0, 0, 0.04)" : "transparent",
-            };
-          },
+          button: ({ active }) => ({
+            backgroundColor: active
+              ? theme.palette.action.selected
+              : "transparent",
+            "&:hover": {
+              backgroundColor: theme.palette.action.hover,
+            },
+            color: theme.palette.text.primary,
+          }),
         }}
       >
         <MenuItem
-          active={activeMenu == "/dashboard"}
+          active={activeMenu === "/dashboard"}
           component={<Link to="/dashboard" />}
           icon={<DashboardOutlinedIcon />}
           onClick={() => handleMenuClick("/dashboard")}
         >
-          {" "}
-          <Typography variant="body2">Dashboard</Typography>{" "}
+          <Typography variant="body2">Dashboard</Typography>
         </MenuItem>
         <MenuItem
-          active={activeMenu == "/room"}
+          active={activeMenu === "/room"}
           component={<Link to="/room" />}
           icon={<CreateNewFolderOutlinedIcon />}
           onClick={() => handleMenuClick("/room")}
         >
-          {" "}
           <Typography variant="body2">สร้างห้อง</Typography>
         </MenuItem>
         <MenuItem
-          active={activeMenu == "/report"}
+          active={activeMenu === "/report"}
           component={<Link to="/report" />}
           icon={<AnalyticsOutlinedIcon />}
           onClick={() => handleMenuClick("/report")}
         >
-          {" "}
-          <Typography variant="body2">Report </Typography>
+          <Typography variant="body2">Report</Typography>
         </MenuItem>
         <MenuItem
-          active={activeMenu == "/setting"}
+          active={activeMenu === "/setting"}
           component={<Link to="/setting" />}
           icon={<StyleOutlinedIcon />}
           onClick={() => handleMenuClick("/setting")}
         >
-          {" "}
-          <Typography variant="body2">Setting </Typography>
+          <Typography variant="body2">Setting</Typography>
         </MenuItem>
       </Menu>
     </Sidebar>
@@ -91,15 +97,19 @@ const styles = {
     display: "flex",
     alignItems: "center",
     flexDirection: "column",
+    justifyContent: "center",
     my: 5,
   },
   avatar: {
     width: "50%",
     height: "auto",
+    borderRadius: "50%",
+    aspectRatio: "1 / 1",
   },
-  yourChannel: {
+  yourChannel: (theme: any) => ({
     mt: 1,
-  },
+    color: theme.palette.text.primary,
+  }),
 };
 
 export default SideNav;

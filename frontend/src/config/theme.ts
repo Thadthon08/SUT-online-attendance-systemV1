@@ -1,51 +1,124 @@
 import { createTheme } from "@mui/material/styles";
-import { green, grey, indigo } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 
-// Create a theme instance.
 let theme = createTheme();
 
-// Custom theme
 theme = createTheme(theme, {
   palette: {
+    mode: "dark",
     primary: {
-      main: grey[700],
-      light: grey[50],
-      dark: grey[900],
+      main: grey[300],
+      light: grey[100],
+      dark: grey[500],
     },
-    secondary: {
-      main: indigo[50],
+    background: {
+      default: "#121212",
+      paper: "#1e1e1e",
     },
-    success: {
-      main: green[500],
-      light: green[50],
-      dark: green[900],
+    text: {
+      primary: grey[100],
+      secondary: grey[400],
     },
   },
-  typography: {
-    fontFamily: '"IBM Plex Sans Thai", "Titillium Web", sans-serif',
-    link: {
-      fontSize: "0.8rem",
-      [theme.breakpoints.up("md")]: {
-        fontSize: "0.9rem",
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#1e1e1e",
+          borderRadius: 1,
+          borderColor: grey[600],
+          "& .MuiInputBase-input": {
+            color: grey[100],
+            height: "24px",
+            padding: "16.5px 14px 16.5px 0px",
+          },
+          "& .MuiInputBase-input::placeholder": {
+            color: grey[400],
+            opacity: 1,
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: grey[600],
+            },
+            "&:hover fieldset": {
+              borderColor: grey[400],
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: grey[300],
+            },
+          },
+          "& input:-webkit-autofill": {
+            WebkitBoxShadow: "0 0 0 1000px #1f1f1f inset",
+            WebkitTextFillColor: "#ffffff",
+          },
+          "& input:-webkit-autofill:hover": {
+            WebkitBoxShadow: "0 0 0 1000px #1f1f1f inset",
+          },
+          "& input:-webkit-autofill:focus": {
+            WebkitBoxShadow: "0 0 0 1000px #1f1f1f inset",
+          },
+          "& input:-webkit-autofill:active": {
+            WebkitBoxShadow: "0 0 0 1000px #1f1f1f  inset",
+          },
+        },
       },
-      fontWeight: 500,
-      color: theme.palette.primary.main,
-      display: "block",
-      cursor: "pointer",
     },
-    cardTitle: {
-      fontSize: "1.2rem",
-      display: "block",
-      fontWeight: 500,
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#1e1e1e",
+          color: grey[100],
+          borderRadius: 1,
+          height: "56px",
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: grey[600],
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: grey[400],
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: grey[300],
+          },
+          "& .MuiSelect-icon": {
+            color: grey[300],
+          },
+        },
+      },
     },
-    h6: {
-      fontSize: "1rem",
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontWeight: "bold",
+          textTransform: "none",
+          borderRadius: 1,
+          height: "56px",
+          backgroundColor: grey[300],
+          color: "#121212",
+          "&:hover": {
+            backgroundColor: grey[400],
+          },
+        },
+      },
     },
-    h7: {
-      fontSize: "0.8rem",
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          "& .MuiSvgIcon-root": {
+            color: grey[400],
+          },
+        },
+      },
     },
-    h8: {
-      fontSize: "0.7rem",
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          "&.Mui-disabled": {
+            "& .MuiInputBase-input": {
+              WebkitTextFillColor: grey[400],
+            },
+          },
+        },
+      },
     },
   },
 });

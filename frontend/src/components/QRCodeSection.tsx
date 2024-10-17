@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, useTheme, alpha } from "@mui/material";
-import { QrCode, RefreshCw } from "lucide-react";
+import {
+  Box,
+  Typography,
+  Button,
+  useTheme,
+  Paper,
+  Fade,
+  Stack,
+  alpha,
+} from "@mui/material";
+import { RefreshCw, Download } from "lucide-react";
 
 interface QRCodeSectionProps {
   qrCodeData: string;
-  countdown: number; 
+  countdown: number;
   onReset: () => void;
 }
 
@@ -14,7 +23,7 @@ const QRCodeSection: React.FC<QRCodeSectionProps> = ({
   onReset,
 }) => {
   const theme = useTheme();
-  const [timeLeft, setTimeLeft] = useState(countdown * 60); 
+  const [timeLeft, setTimeLeft] = useState(countdown * 60);
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -34,85 +43,131 @@ const QRCodeSection: React.FC<QRCodeSectionProps> = ({
     }`;
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = qrCodeData;
+    link.download = "qrcode.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <Box
+    <Paper
+      elevation={3}
       sx={{
-        p: 2,
-        flex: 1,
+        p: 4,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        height: "auto",
-        boxShadow: 0,
-        border: "0px solid rgba(69, 69, 71, 0.2)",
+        height: "100%",
+        bgcolor: theme.palette.background.paper,
+        border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
+        borderRadius: 0,
       }}
     >
       <Typography
-        variant="h4"
-        sx={{ fontWeight: "bold", color: timeLeft > 0 ? "red" : "black" }}
+        variant="h3"
+        sx={{
+          fontWeight: "bold",
+          color:
+            timeLeft > 0
+              ? theme.palette.error.main
+              : theme.palette.text.primary,
+          mb: 4,
+        }}
       >
-        Countdown : {formatTime(timeLeft)}
+        Countdown: {formatTime(timeLeft)}
       </Typography>
 
-      {qrCodeData ? (
+      <Fade in={!!qrCodeData}>
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             width: "100%",
-            p: 2,
+            mb: 4,
           }}
         >
-          <img
-            src={qrCodeData}
-            alt="QR Code"
-            style={{
-              width: "100%",
-              height: "auto",
-              maxWidth: 500,
-              display: "block",
-              border: "1px solid rgba(69, 69, 71, 0.2)",
-            }}
-          />
-          <Typography
+          <Paper
+            elevation={5}
             sx={{
-              fontSize: "1rem",
+              p: 2,
+              bgcolor: "white",
+              borderRadius: 2,
+            }}
+          >
+            <img
+              src={qrCodeData}
+              alt="QR Code"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxWidth: 600,
+                maxHeight: 600,
+                display: "block",
+              }}
+            />
+          </Paper>
+          <Typography
+            variant="h6"
+            fontWeight={"bold"}
+            sx={{
               color: theme.palette.text.secondary,
               textAlign: "center",
-              mt: 1,
+              mt: 2,
             }}
           >
             สแกน QR Code นี้เพื่อเข้าร่วมห้อง
           </Typography>
         </Box>
-      ) : (
-        <Box
+      </Fade>
+
+      <Stack direction="row" spacing={2}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={onReset}
+          startIcon={<RefreshCw />}
+          size="large"
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: 500,
-            width: 500,
-            bgcolor: alpha(theme.palette.primary.main, 0.1),
-            borderRadius: 0,
+            fontWeight: "bold",
+            px: 4,
+            py: 1.5,
+            borderRadius: 2,
+            boxShadow: 3,
+            "&:hover": {
+              bgcolor: theme.palette.primary.dark,
+              boxShadow: 5,
+            },
           }}
         >
-          <QrCode size={64} color={theme.palette.primary.main} />
-        </Box>
-      )}
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={onReset}
-        startIcon={<RefreshCw />}
-        sx={{ m: 1, fontWeight: "bold" }}
-      >
-        สร้างห้องใหม่
-      </Button>
-    </Box>
+          สร้างห้องใหม่
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={handleDownload}
+          startIcon={<Download />}
+          size="large"
+          sx={{
+            fontWeight: "bold",
+            px: 4,
+            py: 1.5,
+            borderRadius: 2,
+            boxShadow: 3,
+            "&:hover": {
+              bgcolor: theme.palette.primary.light,
+              boxShadow: 5,
+            },
+          }}
+        >
+          ดาวน์โหลด QR Code
+        </Button>
+      </Stack>
+    </Paper>
   );
 };
 

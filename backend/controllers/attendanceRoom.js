@@ -29,7 +29,10 @@ const createAttendanceRoom = async (req, res) => {
       expired_at: new Date(end_time.replace(" ", "T")),
     });
 
-    const qrCodeData = await QRCode.toDataURL(`${attendanceRoom.ATR_id}`);
+    const qrCodeData = await QRCode.toDataURL(`${attendanceRoom.ATR_id}`, {
+      scale: 10,
+      width: 500,
+    });
 
     attendanceRoom.qrcode_data = qrCodeData;
     await attendanceRoom.save();

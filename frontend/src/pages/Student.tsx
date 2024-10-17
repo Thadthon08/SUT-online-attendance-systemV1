@@ -54,6 +54,8 @@ export default function StudentDashboard() {
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
 
+  document.title = "Student Dashboard | Attendance System";
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {

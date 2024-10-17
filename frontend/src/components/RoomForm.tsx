@@ -10,6 +10,7 @@ import {
   Box,
   Stack,
   InputAdornment,
+  useTheme,
 } from "@mui/material";
 import {
   BusinessRounded,
@@ -47,42 +48,58 @@ interface CustomDatePickerInputProps {
 const CustomDatePickerInput = React.forwardRef<
   HTMLInputElement,
   CustomDatePickerInputProps
->(({ value, onClick, error, helperText }, ref) => (
-  <TextField
-    fullWidth
-    value={value}
-    onClick={onClick}
-    ref={ref}
-    error={error}
-    helperText={helperText}
-    placeholder="เลือกเวลาสิ้นสุด"
-    InputProps={{
-      readOnly: true,
-      startAdornment: (
-        <InputAdornment position="start">
-          <ScheduleRounded />
-        </InputAdornment>
-      ),
-    }}
-    sx={{
-      bgcolor: "white",
-      borderRadius: 1,
-      "& .MuiInputBase-input": {
-        color: "#000000",
-        marginLeft: "0px",
-        cursor: "pointer",
-        height: "24px",
-        padding: "16.5px 14px 16.5px 0px",
-      },
-    }}
-  />
-));
+>(({ value, onClick, error, helperText }, ref) => {
+  const theme = useTheme();
+
+  return (
+    <TextField
+      fullWidth
+      value={value}
+      onClick={onClick}
+      ref={ref}
+      error={error}
+      helperText={helperText}
+      placeholder="เลือกเวลาสิ้นสุด"
+      InputProps={{
+        readOnly: true,
+        startAdornment: (
+          <InputAdornment position="start">
+            <ScheduleRounded sx={{ color: theme.palette.text.secondary }} />
+          </InputAdornment>
+        ),
+      }}
+      sx={{
+        bgcolor: theme.palette.background.paper,
+        borderRadius: 1,
+        "& .MuiInputBase-input": {
+          color: theme.palette.text.primary,
+          cursor: "pointer",
+          height: "24px",
+          padding: "16.5px 14px 16.5px 0px",
+        },
+        "& .MuiInputBase-input::placeholder": {
+          color: theme.palette.common.white,
+          opacity: 1,
+        },
+        "& .MuiOutlinedInput-root": {
+          "&:hover fieldset": {
+            borderColor: theme.palette.primary.main,
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: theme.palette.primary.main,
+          },
+        },
+      }}
+    />
+  );
+});
 
 interface RoomFormProps {
   onSubmit: (data: any) => void;
 }
 
 export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
+  const theme = useTheme();
   const [subjects, setSubjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,9 +143,14 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
   }
 
   return (
-    <Box sx={{ p: 1, color: "white", overflow: "hidden" }}>
+    <Box
+      sx={{
+        p: 2,
+        color: theme.palette.text.primary,
+      }}
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={3}>
+        <Stack spacing={2}>
           <FormControl fullWidth error={!!errors.sub_id}>
             <Typography variant="body2" sx={{ mb: 1 }}>
               วิชา
@@ -136,15 +158,23 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
             <Controller
               name="sub_id"
               control={control}
-              rules={{ required: "กรุณาเลือกบริษัท" }}
+              rules={{ required: "กรุณาเลือกวิชา" }}
               render={({ field }) => (
                 <Select
                   {...field}
                   displayEmpty
-                  sx={{ bgcolor: "white", borderRadius: 1, height: "56px" }}
+                  variant="outlined"
+                  sx={{
+                    bgcolor: theme.palette.background.paper,
+                    color: theme.palette.text.primary,
+                    borderRadius: 1,
+                    height: "56px",
+                  }}
                   startAdornment={
                     <InputAdornment position="start">
-                      <BusinessRounded />
+                      <BusinessRounded
+                        sx={{ color: theme.palette.text.secondary }}
+                      />
                     </InputAdornment>
                   }
                 >
@@ -177,11 +207,21 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                   fullWidth
                   error={!!errors.ATR_name}
                   helperText={errors.ATR_name?.message}
-                  sx={{ bgcolor: "white", borderRadius: 1 }}
+                  sx={{
+                    bgcolor: theme.palette.background.paper,
+                    color: theme.palette.common.white,
+                    borderRadius: 1,
+                    "& .MuiInputBase-input::placeholder": {
+                      color: theme.palette.common.white,
+                      opacity: 1,
+                    },
+                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <RoomRounded />
+                        <RoomRounded
+                          sx={{ color: theme.palette.text.secondary }}
+                        />
                       </InputAdornment>
                     ),
                   }}
@@ -200,23 +240,30 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               render={({ field }) => (
                 <TextField
                   {...field}
+                  variant="outlined"
                   value={dayjs(field.value)
                     .tz(timeZone)
                     .format("DD/MM/YYYY HH:mm")}
-                  variant="outlined"
                   fullWidth
                   disabled
                   sx={{
-                    bgcolor: "white",
+                    bgcolor: theme.palette.background.paper,
+                    color: theme.palette.text.primary,
+                    borderColor: "white !important",
                     borderRadius: 1,
+                    ".MuiOutlinedInput-notchedOutline": {
+                      border: "1px solid #757575 !important",
+                    },
                     "& .MuiInputBase-input.Mui-disabled": {
-                      WebkitTextFillColor: "#000000",
+                      WebkitTextFillColor: theme.palette.text.primary,
                     },
                   }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <AccessTimeRounded />
+                        <AccessTimeRounded
+                          sx={{ color: theme.palette.text.secondary }}
+                        />
                       </InputAdornment>
                     ),
                     readOnly: true,
@@ -236,7 +283,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               rules={{ required: "กรุณาเลือกเวลาสิ้นสุด" }}
               render={({ field }) => {
                 const handleDateChange = (date: any) => {
-                  const utcDate = dayjs(date).tz(timeZone).utc().format(); // แปลงเป็น UTC ก่อนเก็บ
+                  const utcDate = dayjs(date).tz(timeZone).utc().format();
                   field.onChange(utcDate);
                 };
 
@@ -265,7 +312,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                                 .format("DD MMMM YYYY HH:mm")
                             : ""
                         }
-                        onClick={field.onChange}
+                        onClick={() => {}}
                         error={!!errors.end_time}
                         helperText={errors.end_time?.message}
                       />
@@ -279,13 +326,18 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
           <Button
             type="submit"
             variant="contained"
-            color="error"
             size="large"
             sx={{
               fontWeight: "bold",
               textTransform: "none",
               borderRadius: 1,
               height: "56px",
+              marginTop: "15px !important",
+              bgcolor: theme.palette.primary.light,
+              color: theme.palette.background.default,
+              "&:hover": {
+                bgcolor: theme.palette.primary.main,
+              },
             }}
           >
             สร้างห้อง
