@@ -14,7 +14,7 @@ import {
 import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
 import {
   GetStudentIDByLineId,
-  UpdateProfileUrl,
+  // UpdateProfileUrl,
   CheckIn,
 } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
@@ -36,6 +36,7 @@ export default function StudentDashboard() {
   } | null>(null);
   const [loadingCheckIn, setLoadingCheckIn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [isCheckingIn, setIsCheckingIn] = useState(false); // เพิ่มสถานะป้องกันการสแกนซ้ำ
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
 
@@ -51,11 +52,11 @@ export default function StudentDashboard() {
           pictureUrl: profileData.pictureUrl || "",
         });
         const student = await GetStudentIDByLineId(profileData.userId);
-        if (student && profileData.pictureUrl) {
-          await UpdateProfileUrl(student.sid, {
-            profilePicUrl: profileData.pictureUrl,
-          });
-        }
+        // if (student && profileData.pictureUrl) {
+        //   await UpdateProfileUrl(student.sid, {
+        //     profilePicUrl: profileData.pictureUrl,
+        //   });
+        // }
         setStudentData(student);
 
         if (navigator.geolocation) {
@@ -86,13 +87,17 @@ export default function StudentDashboard() {
   }, []);
 
   const handleScan = async (decodedText: string) => {
-    if (decodedText && studentData && currentLocation) {
+    // ป้องกันการสแกนซ้ำถ้าเช็คชื่ออยู่
+    if (isCheckingIn || !studentData || !currentLocation) return;
+
+    setIsCheckingIn(true); // ตั้งสถานะเป็นกำลังเช็คชื่อ
+
+    if (decodedText) {
       try {
         setLoadingCheckIn(true);
 
         let ATR_id = decodedText;
 
-        // ตรวจสอบว่าเป็น URL หรือไม่ และดึงค่า ATR_id ถ้ามี
         try {
           const url = new URL(decodedText);
           ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
@@ -107,24 +112,28 @@ export default function StudentDashboard() {
           att_long: currentLocation.lng,
         };
 
+        console.log("CheckIn Data:", checkInData);
+
         // เรียก API เช็คชื่อ
         await CheckIn(checkInData);
 
         // ถ้าเช็คชื่อสำเร็จ
         alert("เช็คชื่อสำเร็จ!");
         stopScan(); // หยุดการสแกนเมื่อสำเร็จ
+        setIsScanning(false); // หยุดการสแกน
       } catch (error) {
         console.error("Error during check-in:", error);
         alert("เกิดข้อผิดพลาดในการเช็คชื่อ."); // แสดงข้อผิดพลาดเมื่อเช็คชื่อไม่สำเร็จ
       } finally {
-        setLoadingCheckIn(false); // จบการโหลดไม่ว่าจะสำเร็จหรือไม่
+        setLoadingCheckIn(false);
+        setIsCheckingIn(false); // จบกระบวนการเช็คชื่อ
       }
     }
   };
 
   // ฟังก์ชันสำหรับเริ่มการสแกน
   const startScan = () => {
-    if (scannerRef.current) {
+    if (scannerRef.current && !html5QrCode.current) {
       html5QrCode.current = new Html5Qrcode("reader");
       html5QrCode.current
         .start(
@@ -147,10 +156,15 @@ export default function StudentDashboard() {
   // ฟังก์ชันสำหรับหยุดการสแกน
   const stopScan = () => {
     if (html5QrCode.current) {
-      html5QrCode.current.stop().then(() => {
-        html5QrCode.current?.clear();
-        setIsScanning(false); // ตั้งค่าสถานะการสแกนเป็น false
-      });
+      html5QrCode.current
+        .stop()
+        .then(() => {
+          html5QrCode.current?.clear();
+          html5QrCode.current = null; // เคลียร์ตัวแปรหลังจากหยุดสแกน
+        })
+        .catch((err) => {
+          console.error("Error stopping QR Code scanner:", err); // แสดงข้อผิดพลาดในการหยุดสแกน
+        });
     }
   };
 
