@@ -120,7 +120,6 @@ export default function StudentDashboard() {
         // ถ้าเช็คชื่อสำเร็จ
         alert("เช็คชื่อสำเร็จ!");
         stopScan(); // หยุดการสแกนเมื่อสำเร็จ
-        setIsScanning(false); // หยุดการสแกน
       } catch (error) {
         console.error("Error during check-in:", error);
         alert("เกิดข้อผิดพลาดในการเช็คชื่อ."); // แสดงข้อผิดพลาดเมื่อเช็คชื่อไม่สำเร็จ
@@ -133,7 +132,7 @@ export default function StudentDashboard() {
 
   // ฟังก์ชันสำหรับเริ่มการสแกน
   const startScan = () => {
-    if (scannerRef.current && !html5QrCode.current) {
+    if (scannerRef.current) {
       html5QrCode.current = new Html5Qrcode("reader");
       html5QrCode.current
         .start(
@@ -160,7 +159,8 @@ export default function StudentDashboard() {
         .stop()
         .then(() => {
           html5QrCode.current?.clear();
-          html5QrCode.current = null; // เคลียร์ตัวแปรหลังจากหยุดสแกน
+          setIsScanning(false); // ตั้งค่าสถานะการสแกนเป็น false
+          html5QrCode.current = null; // ลบตัวแปรสแกนเนอร์ออก
         })
         .catch((err) => {
           console.error("Error stopping QR Code scanner:", err); // แสดงข้อผิดพลาดในการหยุดสแกน
