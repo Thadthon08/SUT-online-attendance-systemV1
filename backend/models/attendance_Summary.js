@@ -23,7 +23,15 @@ const AttendanceSummary = sequelize.define("AttendanceSummary", {
 });
 
 // ตั้งความสัมพันธ์
-AttendanceSummary.belongsTo(Student, { foreignKey: "sid" });
-AttendanceSummary.belongsTo(Subject, { foreignKey: "sub_id" });
+AttendanceSummary.belongsTo(Student, {
+  foreignKey: "sid",
+  allowNull: false,
+  onDelete: "SET NULL",
+});
+AttendanceSummary.belongsTo(Subject, {
+  foreignKey: "sub_id",
+  allowNull: false,
+  onDelete: "CASCADE",
+});
 
 module.exports = AttendanceSummary;

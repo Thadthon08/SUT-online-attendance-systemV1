@@ -8,6 +8,18 @@ const AttendanceSummary = require("./attendance_Summary");
 const TeacherSubject = require("./teacher_subject");
 const SubjectStudent = require("./subject_student");
 
+Teacher.belongsToMany(Subject, {
+  through: TeacherSubject,
+  foreignKey: "tid",
+  onDelete: "CASCADE",
+});
+
+Subject.belongsToMany(Teacher, {
+  through: TeacherSubject,
+  foreignKey: "sub_id",
+  onDelete: "CASCADE",
+});
+
 // Sync โมเดลทั้งหมด
 sequelize
   .sync({ alter: true })
