@@ -24,7 +24,7 @@ const Room = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [qrCodeData, setQrCodeData] = useState("");
   const [countdown, setCountdown] = useState(0);
-  const isColumnLayout = useMediaQuery("(max-width:1410px)");
+  const isColumnLayout = useMediaQuery("(max-width:1472px)");
 
   document.title = "Create Room | Attendance System";
 
@@ -79,7 +79,7 @@ const Room = () => {
     >
       <Paper
         sx={{
-          maxWidth: 1410,
+          maxWidth: 1472,
           overflow: "hidden",
           border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
           borderRadius: 0,
@@ -95,7 +95,7 @@ const Room = () => {
         elevation={3}
         sx={{
           width: "100%",
-          maxWidth: 1410,
+          maxWidth: 1472,
           height: "auto",
           display: "flex",
           overflow: "hidden",
