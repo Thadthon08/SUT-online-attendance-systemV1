@@ -1,4 +1,5 @@
-const { Attendance, AttendanceRoom, Student, sequelize } = require("../models");
+const { Attendance, AttendanceRoom, Student } = require("../models");
+const sequelize = require("../config/db");
 
 const checkInAttendance = async (req, res) => {
   const t = await sequelize.transaction();
