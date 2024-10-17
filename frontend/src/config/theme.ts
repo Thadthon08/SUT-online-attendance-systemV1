@@ -19,6 +19,10 @@ theme = createTheme(theme, {
       primary: grey[100],
       secondary: grey[400],
     },
+    action: {
+      selected: grey[800],
+      hover: grey[700],
+    },
   },
   components: {
     MuiTextField: {
