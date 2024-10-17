@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+import { ToastContainer } from "react-toastify";
+import { showToast } from "../utils/toastUtils";
 import {
   Box,
   Typography,
@@ -91,11 +93,12 @@ export default function StudentDashboard() {
     if (isCheckingIn || !studentData || !currentLocation) return;
 
     setIsCheckingIn(true); // ตั้งสถานะเป็นกำลังเช็คชื่อ
+    stopScan(); // หยุดการสแกนทันทีเพื่อป้องกันการเรียกซ้ำ
 
     if (decodedText) {
-      try {
-        setLoadingCheckIn(true);
+      setLoadingCheckIn(true);
 
+      try {
         let ATR_id = decodedText;
 
         try {
@@ -117,15 +120,17 @@ export default function StudentDashboard() {
         // เรียก API เช็คชื่อ
         await CheckIn(checkInData);
 
-        // ถ้าเช็คชื่อสำเร็จ
-        alert("เช็คชื่อสำเร็จ!");
-        stopScan(); // หยุดการสแกนเมื่อสำเร็จ
+        // ถ้าเช็คชื่อสำเร็จ ใช้ toast แทน alert
+        showToast("Check-in successful!", "success");
       } catch (error) {
         console.error("Error during check-in:", error);
-        alert("เกิดข้อผิดพลาดในการเช็คชื่อ."); // แสดงข้อผิดพลาดเมื่อเช็คชื่อไม่สำเร็จ
+        // ถ้าเกิดข้อผิดพลาดในการเช็คชื่อ ใช้ toast แทน alert
+        showToast("Failed to check-in. Please try again.", "error");
       } finally {
         setLoadingCheckIn(false);
         setIsCheckingIn(false); // จบกระบวนการเช็คชื่อ
+        // หากต้องการเริ่มสแกนใหม่ สามารถเรียก startScan() ที่นี่
+        // startScan();
       }
     }
   };
@@ -220,7 +225,6 @@ export default function StudentDashboard() {
           </Box>
         </CardContent>
       </Card>
-
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Button
@@ -245,7 +249,6 @@ export default function StudentDashboard() {
           </Button>
         </Grid>
       </Grid>
-
       {isScanning && (
         <Paper elevation={3} sx={{ mt: 3, p: 2, position: "relative" }}>
           <Typography variant="h6" gutterBottom align="center">
@@ -287,6 +290,7 @@ export default function StudentDashboard() {
           </Button>
         </Paper>
       )}
+      <ToastContainer />
     </Box>
   );
 }
