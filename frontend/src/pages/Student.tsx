@@ -36,6 +36,7 @@ export default function StudentDashboard() {
   } | null>(null);
   const [loadingCheckIn, setLoadingCheckIn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [isCheckingIn, setIsCheckingIn] = useState(false); // เพิ่มสถานะป้องกันการสแกนซ้ำ
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
 
@@ -86,13 +87,17 @@ export default function StudentDashboard() {
   }, []);
 
   const handleScan = async (decodedText: string) => {
-    if (decodedText && studentData && currentLocation) {
+    // ป้องกันการสแกนซ้ำถ้าเช็คชื่ออยู่
+    if (isCheckingIn || !studentData || !currentLocation) return;
+
+    setIsCheckingIn(true); // ตั้งสถานะเป็นกำลังเช็คชื่อ
+
+    if (decodedText) {
       try {
         setLoadingCheckIn(true);
 
         let ATR_id = decodedText;
 
-        // ตรวจสอบว่าเป็น URL หรือไม่ และดึงค่า ATR_id ถ้ามี
         try {
           const url = new URL(decodedText);
           ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
@@ -107,6 +112,8 @@ export default function StudentDashboard() {
           att_long: currentLocation.lng,
         };
 
+        console.log("CheckIn Data:", checkInData);
+
         // เรียก API เช็คชื่อ
         await CheckIn(checkInData);
 
@@ -117,7 +124,8 @@ export default function StudentDashboard() {
         console.error("Error during check-in:", error);
         alert("เกิดข้อผิดพลาดในการเช็คชื่อ."); // แสดงข้อผิดพลาดเมื่อเช็คชื่อไม่สำเร็จ
       } finally {
-        setLoadingCheckIn(false); // จบการโหลดไม่ว่าจะสำเร็จหรือไม่
+        setLoadingCheckIn(false);
+        setIsCheckingIn(false); // จบกระบวนการเช็คชื่อ
       }
     }
   };
