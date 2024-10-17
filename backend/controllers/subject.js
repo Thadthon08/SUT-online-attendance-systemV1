@@ -1,31 +1,24 @@
 const { Subject, Teacher } = require("../models");
 
-// Get all subjects with teachers
 const getSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.findAll({
-      include: [{ model: Teacher, through: { attributes: [] } }], // include Teacher in response
-    });
-
-    res.status(200).json({ subjects });
+    const subjects = await Subject.findAll();
+    return res.status(200).json(subjects);
   } catch (error) {
     console.error("Error getting subjects:", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลรายวิชา" });
+    return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลวิชา" });
   }
 };
 
-// Add a new subject and link it with a teacher
 const addSubject = async (req, res) => {
   const { teacherId, subjectCode, subjectName, subjectPic } = req.body;
 
   try {
-    // ตรวจสอบว่าอาจารย์มีอยู่ในระบบหรือไม่
     const teacher = await Teacher.findByPk(teacherId);
     if (!teacher) {
       return res.status(404).json({ error: "ไม่พบอาจารย์ในระบบ" });
     }
 
-    // ตรวจสอบว่ามีวิชาที่มี subjectCode นี้อยู่แล้วหรือไม่
     const [newSubject, created] = await Subject.findOrCreate({
       where: { sub_code: subjectCode },
       defaults: {
@@ -33,6 +26,13 @@ const addSubject = async (req, res) => {
         sub_pic: subjectPic,
       },
     });
+
+    if (!created) {
+      return res.status(409).json({
+        message: "รหัสวิชานี้มีอยู่ในระบบแล้ว",
+        subject: newSubject,
+      });
+    }
 
     // เชื่อมโยงอาจารย์กับวิชาโดยใช้ addSubject (ผ่านความสัมพันธ์ belongsToMany)
     await teacher.addSubject(newSubject);
@@ -44,9 +44,7 @@ const addSubject = async (req, res) => {
     });
 
     res.status(201).json({
-      message: created
-        ? "เพิ่มรายวิชาและเชื่อมโยงกับอาจารย์สำเร็จ"
-        : "เชื่อมโยงอาจารย์กับวิชาสำเร็จ (วิชามีอยู่แล้ว)",
+      message: "เพิ่มรายวิชาและเชื่อมโยงกับอาจารย์สำเร็จ",
       subject: subjectWithTeacher,
     });
   } catch (error) {

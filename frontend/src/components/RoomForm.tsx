@@ -183,7 +183,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                   </MenuItem>
                   {subjects.map((subject: any) => (
                     <MenuItem key={subject.sub_id} value={subject.sub_id}>
-                      {subject.sub_name}
+                      {subject.sub_code}
                     </MenuItem>
                   ))}
                 </Select>
