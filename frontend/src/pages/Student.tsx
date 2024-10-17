@@ -155,10 +155,16 @@ export default function StudentDashboard() {
   // ฟังก์ชันสำหรับหยุดการสแกน
   const stopScan = () => {
     if (html5QrCode.current) {
-      html5QrCode.current.stop().then(() => {
-        html5QrCode.current?.clear();
-        setIsScanning(false); // ตั้งค่าสถานะการสแกนเป็น false
-      });
+      html5QrCode.current
+        .stop()
+        .then(() => {
+          html5QrCode.current?.clear();
+          setIsScanning(false); // ตั้งค่าสถานะการสแกนเป็น false
+          html5QrCode.current = null; // ลบตัวแปรสแกนเนอร์ออก
+        })
+        .catch((err) => {
+          console.error("Error stopping QR Code scanner:", err); // แสดงข้อผิดพลาดในการหยุดสแกน
+        });
     }
   };
 
