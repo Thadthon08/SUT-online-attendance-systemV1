@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Typography,
@@ -9,8 +9,9 @@ import {
   Grid,
   Divider,
   CircularProgress,
+  Paper,
 } from "@mui/material";
-import { CheckCircle, Info } from "@mui/icons-material";
+import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
 import {
   GetStudentIDByLineId,
   UpdateProfileUrl,
@@ -34,7 +35,7 @@ export default function StudentDashboard() {
     lng: number;
   } | null>(null);
   const [loadingCheckIn, setLoadingCheckIn] = useState(false);
-  const [isScanning, setIsScanning] = useState(false); // state สำหรับการแสดงกล้อง
+  const [isScanning, setIsScanning] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
 
@@ -105,6 +106,7 @@ export default function StudentDashboard() {
 
         await CheckIn(checkInData);
         alert("เช็คชื่อสำเร็จ!");
+        stopScan();
       } catch (error) {
         console.error("Error during check-in:", error);
         alert("เกิดข้อผิดพลาดในการเช็คชื่อ.");
@@ -116,38 +118,43 @@ export default function StudentDashboard() {
 
   const startScan = () => {
     if (scannerRef.current) {
-      html5QrCode.current = new Html5Qrcode("reader"); // ใช้ id="reader" เพื่อแสดงกล้อง
+      html5QrCode.current = new Html5Qrcode("reader");
       html5QrCode.current
         .start(
-          { facingMode: "environment" }, // กล้องหลัง
+          { facingMode: "environment" },
           {
-            fps: 30, // ความเร็วในการสแกน
-            qrbox: { width: 500, height: 500 }, // ขนาดกล่องสแกน QR Code
+            fps: 30,
+            qrbox: { width: 250, height: 250 },
           },
-          handleScan, // ฟังก์ชันเมื่อสแกนสำเร็จ
+          handleScan,
           (errorMessage) => {
-            console.error("QR Code scanning error:", errorMessage); // ข้อผิดพลาดในการสแกน
+            console.error("QR Code scanning error:", errorMessage);
           }
         )
         .catch((err) => {
           console.error("Error starting QR Code scanner:", err);
         });
+    }
+  };
 
-      // คืนค่ากล้องเมื่อ unmount
-      return () => {
-        if (html5QrCode.current) {
-          html5QrCode.current.stop().then(() => {
-            html5QrCode.current?.clear();
-          });
-        }
-      };
+  const stopScan = () => {
+    if (html5QrCode.current) {
+      html5QrCode.current.stop().then(() => {
+        html5QrCode.current?.clear();
+        setIsScanning(false);
+      });
     }
   };
 
   useEffect(() => {
     if (isScanning) {
-      startScan(); // เริ่มการสแกนเมื่อกดปุ่ม Check Attendance
+      startScan();
     }
+    return () => {
+      if (html5QrCode.current) {
+        stopScan();
+      }
+    };
   }, [isScanning]);
 
   if (error)
@@ -198,9 +205,9 @@ export default function StudentDashboard() {
             variant="contained"
             fullWidth
             startIcon={<CheckCircle />}
-            onClick={() => setIsScanning(true)} // เปิดกล้องเมื่อกดปุ่มนี้
+            onClick={() => setIsScanning(true)}
             sx={{ height: "100%" }}
-            disabled={loadingCheckIn}
+            disabled={loadingCheckIn || isScanning}
           >
             {loadingCheckIn ? "Checking..." : "Check Attendance"}
           </Button>
@@ -218,11 +225,45 @@ export default function StudentDashboard() {
       </Grid>
 
       {isScanning && (
-        <Box
-          id="reader"
-          style={{ width: "100%", height: "300px", marginTop: "20px" }}
-          ref={scannerRef}
-        ></Box>
+        <Paper elevation={3} sx={{ mt: 3, p: 2, position: "relative" }}>
+          <Typography variant="h6" gutterBottom align="center">
+            Scan QR Code
+          </Typography>
+          <Box
+            id="reader"
+            sx={{
+              width: "100%",
+              height: 300,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              border: "2px dashed #ccc",
+              borderRadius: 2,
+              position: "relative",
+              overflow: "hidden",
+            }}
+            ref={scannerRef}
+          >
+            <CameraAlt sx={{ fontSize: 48, color: "#999" }} />
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              sx={{ mt: 2, textAlign: "center" }}
+            >
+              Position the QR code within the frame to scan
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<Close />}
+            onClick={stopScan}
+            sx={{ mt: 2, width: "100%" }}
+          >
+            Stop Scanning
+          </Button>
+        </Paper>
       )}
     </Box>
   );
