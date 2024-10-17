@@ -70,6 +70,7 @@ const Room = () => {
     <Container
       sx={{
         minHeight: "100vh",
+        height: "auto",
         display: "flex",
         flexDirection: "column",
         justifyContent: "start",
@@ -108,7 +109,6 @@ const Room = () => {
               flex: 1,
               display: "flex",
               flexDirection: isColumnLayout ? "column" : "row",
-              overflow: "hidden",
             }}
           >
             <Box
@@ -126,10 +126,7 @@ const Room = () => {
                 bgcolor: "grey.830",
                 color: "common.white",
                 p: 2,
-                overflowY: "auto",
-                maxHeight: isColumnLayout
-                  ? "calc(100vh - 400px - 32px)"
-                  : "100%",
+                height: "auto",
               }}
             >
               <RoomForm onSubmit={onSubmit} />
