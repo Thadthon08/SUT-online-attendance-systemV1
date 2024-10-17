@@ -25,6 +25,6 @@ const Attendance = sequelize.define("Attendance", {
 Attendance.belongsTo(AttendanceRoom, { foreignKey: "ATR_id" });
 Attendance.belongsTo(Student, { foreignKey: "sid" });
 AttendanceRoom.hasMany(Attendance, { foreignKey: "ATR_id" });
-Student.hasMany(Attendance, { foreignKey: "sid", unique: true });
+Student.hasMany(Attendance, { foreignKey: "sid" });
 
 module.exports = Attendance;
