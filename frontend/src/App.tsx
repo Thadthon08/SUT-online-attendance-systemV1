@@ -62,6 +62,7 @@ function App() {
         </Route>
 
         <Route element={<StudentLayout />}>
+          <Route path="/student/register" element={<div>Register</div>}/>
           <Route path="/student" element={<Student />} />
         </Route>
       </Routes>
