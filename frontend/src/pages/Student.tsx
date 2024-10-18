@@ -15,7 +15,7 @@ import {
   CssBaseline,
 } from "@mui/material";
 import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
-import { GetStudentIDByLineId, CheckIn, Verify } from "../services/api";
+import { GetStudentIDByLineId, CheckIn } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
 
@@ -53,8 +53,7 @@ export default function StudentDashboard() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
-  const [os, setOs] = useState("ios") as any;
-  const [friendFlag, setFriendFlag] = useState() as any;
+
   const [code, setCode] = useState() as any;
 
   document.title = "Student Dashboard | Attendance System";
@@ -70,45 +69,17 @@ export default function StudentDashboard() {
           showConfirmButton: false,
           background: "#1e1e1e",
           color: "#ffffff",
-          willOpen: () => {
-            Swal.showLoading();
-          },
         });
 
         const liff = (await import("@line/liff")).default;
         await liff.ready;
-        const checkOs = liff.getOS();
-        setOs(checkOs);
-        console.log(os);
-        liff.getFriendship().then((data) => {
-          console.log("friendFlag: ", data);
-          if (data.friendFlag) {
-            setFriendFlag(data.friendFlag);
-          }
-          console.log("friendFlag: ", friendFlag);
-        });
 
         const profileData = await liff.getProfile();
-        setProfile({
-          userId: profileData.userId,
-          displayName: profileData.displayName,
-          pictureUrl: profileData.pictureUrl || "",
-        });
+        setProfile(profileData);
 
-        // เรียก Verify API
-        const verify = await Verify(profileData.userId);
-        if (verify.status === "fail") {
-          // ถ้าสถานะเป็น fail ให้เปลี่ยนเส้นทางไปที่ /student/register
-          console.log("Redirect to /student/register");
-
-          return;
-        }
-
-        // ถ้า Verify ผ่าน ให้ดึงข้อมูลนักศึกษา
         const student = await GetStudentIDByLineId(profileData.userId);
         setStudentData(student);
 
-        // เรียกตำแหน่งที่ตั้งปัจจุบัน
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
