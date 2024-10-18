@@ -109,6 +109,7 @@ async function verify(req, res) {
     if (user) {
       const response = {
         status: "success",
+        student: user,
       };
       res.status(200).json(response);
     } else {

@@ -10,7 +10,7 @@ interface StudentRouteProps {
 const StudentRoute = ({ children }: StudentRouteProps) => {
   const navigate = useNavigate();
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true); // ใช้สำหรับแสดงสถานะการโหลด
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initializeLiff = async () => {
@@ -23,20 +23,21 @@ const StudentRoute = ({ children }: StudentRouteProps) => {
         await liff.init({ liffId });
         if (!liff.isLoggedIn()) liff.login();
 
-        // ดึงข้อมูลโปรไฟล์จาก LINE
-        const profileData = await liff.getProfile();
-        const userId = profileData.userId;
+        const profile = await liff.getProfile();
+        const lineId = profile.userId;
 
-        // เรียก API เพื่อเช็คว่ามีข้อมูลของผู้ใช้นี้หรือไม่
-        const verifyResponse = await Verify(userId);
+        // เรียก API Verify เพื่อตรวจสอบว่าผู้ใช้ลงทะเบียนหรือยัง
+        const verifyResponse = await Verify(lineId);
 
         if (verifyResponse.status === "success") {
-          setIsVerified(true); // ถ้าผ่านให้อนุญาตเข้าถึงหน้า Student
+          setIsVerified(true); // ถ้าสำเร็จให้เข้าหน้า Student
+          navigate("/student");
         } else {
-          setIsVerified(false); // ถ้าไม่ผ่านให้ไป Register
+          setIsVerified(false); // ถ้าไม่สำเร็จให้ไปหน้า Register
+          navigate("/student/register");
         }
       } catch (error) {
-        console.error("Error verifying student:", error);
+        console.error("Error verifying user:", error);
         Swal.fire({
           title: "Error",
           text: "Failed to verify student. Please try again later.",
@@ -44,30 +45,22 @@ const StudentRoute = ({ children }: StudentRouteProps) => {
           confirmButtonText: "OK",
         });
       } finally {
-        setLoading(false); // เมื่อโหลดเสร็จ
+        setLoading(false);
       }
     };
 
     initializeLiff();
-  }, []);
+  }, [navigate]);
 
-  useEffect(() => {
-    if (!loading && isVerified === false) {
-      navigate("/student/register"); // ถ้า verify ไม่ผ่านให้ไปหน้า Register
-    }
-  }, [isVerified, loading, navigate]);
-
-  // ถ้ากำลังโหลดข้อมูลอยู่ จะแสดง spinner
   if (loading) {
     return (
       <div className="text-center">
-        <span className="sr-only">Loading...</span>
+        <p>Loading...</p>
       </div>
     );
   }
 
-  // ถ้า verify ผ่านให้แสดงเนื้อหาหน้า
-  return isVerified === true ? children : null;
+  return isVerified ? children : null;
 };
 
 export default StudentRoute;
