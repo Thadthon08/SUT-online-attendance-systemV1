@@ -59,6 +59,7 @@ export default function StudentDashboard() {
                 });
               },
               (err) => {
+                console.error("Failed to fetch location:", err);
                 Swal.fire({
                   title: "Location Error",
                   text: "Failed to fetch location. Please enable location services.",
