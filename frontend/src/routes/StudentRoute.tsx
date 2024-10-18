@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import { Verify } from "../services/api";
 import StudentDashboard from "../pages/Student";
 import StudentRegister from "../pages/Register";
