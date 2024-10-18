@@ -7,16 +7,17 @@ import Report from "./pages/Report";
 import Setting from "./pages/Setting";
 import PublicRoute from "./routes/PublicRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import StudentRoute from "./routes/StudentRoute";
+import StudentRoute from "./routes/StudentRoute"; // Route สำหรับตรวจสอบการลงทะเบียน
 import Room from "./pages/Room";
 import StudentLayout from "./layouts/StudentLayout";
-import Student from "./pages/Student";
-import Register from "./pages/Register";
+import Student from "./pages/Student"; // หน้า Student Dashboard
+import Register from "./pages/Register"; // หน้า Register สำหรับนักศึกษา
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* เส้นทางสำหรับการ login */}
         <Route element={<AuthLayout />}>
           <Route
             path="/"
@@ -28,6 +29,7 @@ function App() {
           />
         </Route>
 
+        {/* เส้นทางหลังจาก login แล้ว */}
         <Route element={<BackendLayout />}>
           <Route
             path="/dashboard"
@@ -64,15 +66,7 @@ function App() {
         </Route>
 
         <Route element={<StudentLayout />}>
-          <Route
-            path="/student"
-            element={
-              <StudentRoute>
-                <Student />
-              </StudentRoute>
-            }
-          />
-          <Route path="/student/register" element={<Register />} />
+          <Route path="/student" element={<StudentRoute />} />
         </Route>
       </Routes>
     </BrowserRouter>

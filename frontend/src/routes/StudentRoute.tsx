@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Verify } from "../services/api";
+import StudentDashboard from "../pages/Student"; // หน้าสำหรับ Dashboard
+import StudentRegister from "../pages/Register"; // หน้าสำหรับ Register
 
-interface StudentRouteProps {
-  children: JSX.Element;
-}
-
-const StudentRoute = ({ children }: StudentRouteProps) => {
-  const navigate = useNavigate();
+const StudentRoute = () => {
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,11 +26,9 @@ const StudentRoute = ({ children }: StudentRouteProps) => {
         const verifyResponse = await Verify(lineId);
 
         if (verifyResponse.status === "success") {
-          setIsVerified(true); // ถ้าสำเร็จให้เข้าหน้า Student
-          navigate("/student");
+          setIsVerified(true); // ผู้ใช้ลงทะเบียนแล้ว
         } else {
-          setIsVerified(false); // ถ้าไม่สำเร็จให้ไปหน้า Register
-          navigate("/student/register");
+          setIsVerified(false); // ผู้ใช้ยังไม่ลงทะเบียน
         }
       } catch (error) {
         console.error("Error verifying user:", error);
@@ -50,7 +44,7 @@ const StudentRoute = ({ children }: StudentRouteProps) => {
     };
 
     initializeLiff();
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return (
@@ -60,7 +54,9 @@ const StudentRoute = ({ children }: StudentRouteProps) => {
     );
   }
 
-  return isVerified ? children : null;
+  // ถ้า isVerified === true แสดงหน้า Dashboard
+  // ถ้า isVerified === false แสดงหน้า Register
+  return isVerified ? <StudentDashboard /> : <StudentRegister />;
 };
 
 export default StudentRoute;
