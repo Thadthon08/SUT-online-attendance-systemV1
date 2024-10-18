@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -9,6 +9,7 @@ import {
   InputAdornment,
   Paper,
   Avatar,
+  CircularProgress,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useTheme } from "@mui/material/styles";
@@ -20,11 +21,13 @@ import {
   HowToRegOutlined,
 } from "@mui/icons-material";
 import { StudentRegistration } from "../services/api";
-import { showToast } from "../utils/toastUtils";
+import Swal from "sweetalert2";
 
 const Register = () => {
   const theme = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const {
     handleSubmit,
     control,
@@ -32,24 +35,81 @@ const Register = () => {
   } = useForm<StudentInterface>();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const liff = (await import("@line/liff")).default;
+        await liff.ready;
+        const profileData = await liff.getProfile();
+        setUserId(profileData.userId);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        Swal.fire({
+          title: "Profile Error",
+          text: "Failed to load profile. Please try again later.",
+          icon: "error",
+          confirmButtonText: "OK",
+          background: "#1e1e1e",
+          color: "#ffffff",
+        });
+      } finally {
+        setIsLoading(false);
+        Swal.close();
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   const onSubmit = async (data: StudentInterface) => {
-    setIsSubmitting(true); // ตั้งสถานะกำลังดำเนินการ
+    setIsSubmitting(true);
+    data.LineID = userId as string;
 
     try {
-      const response = await StudentRegistration(data); // เรียกใช้ API การลงทะเบียน
+      const response = await StudentRegistration(data);
 
       if (response) {
-        showToast("ลงทะเบียนสำเร็จ!", "success");
-        navigate("/student");
+        Swal.fire({
+          title: "ลงทะเบียนสำเร็จ",
+          text: "กรุณากดปุ่ม OK เพื่อเข้าสู่หน้าหลัก",
+          icon: "success",
+          confirmButtonText: "OK",
+          background: "#1e1e1e",
+          color: "#ffffff",
+        }).then(() => {
+          navigate("/student");
+        });
       } else {
         throw new Error("เกิดข้อผิดพลาดในการลงทะเบียน");
       }
     } catch (error) {
-      showToast("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง", "error");
+      Swal.fire({
+        title: "เกิดข้อผิดพลาด",
+        text: "กรุณาลองใหม่อีกครั้ง",
+        icon: "error",
+        confirmButtonText: "OK",
+        background: "#1e1e1e",
+        color: "#ffffff",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Container
