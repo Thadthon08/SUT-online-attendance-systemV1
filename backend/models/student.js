@@ -9,7 +9,7 @@ const Student = sequelize.define("Student", {
   LineID: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: true,
+    allowNull: false,
   },
   St_fname: {
     type: DataTypes.STRING,

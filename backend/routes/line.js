@@ -1,7 +1,8 @@
 const express = require("express");
-const { handleWebhook } = require("../controllers/line");
+const { registerStudent, unregisterStudent } = require("../controllers/line");
 const router = express.Router();
 
-router.post("/webhook", handleWebhook);
+router.post("/register", registerStudent);
+router.delete("/unregister", unregisterStudent);
 
 module.exports = router;
