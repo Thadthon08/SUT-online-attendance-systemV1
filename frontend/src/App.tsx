@@ -10,6 +10,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Room from "./pages/Room";
 import StudentLayout from "./layouts/StudentLayout";
 import Student from "./pages/Student";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -62,8 +63,8 @@ function App() {
         </Route>
 
         <Route element={<StudentLayout />}>
-          <Route path="/student/register" element={<div>Register</div>}/>
           <Route path="/student" element={<Student />} />
+          <Route path="/student/register" element={<Register />} />
         </Route>
       </Routes>
     </BrowserRouter>
