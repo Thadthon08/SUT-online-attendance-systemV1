@@ -54,8 +54,6 @@ export default function StudentDashboard() {
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
 
-  const [code, setCode] = useState() as any;
-
   document.title = "Student Dashboard | Attendance System";
 
   useEffect(() => {
@@ -69,14 +67,19 @@ export default function StudentDashboard() {
           showConfirmButton: false,
           background: "#1e1e1e",
           color: "#ffffff",
+          willOpen: () => {
+            Swal.showLoading();
+          },
         });
 
         const liff = (await import("@line/liff")).default;
         await liff.ready;
-
         const profileData = await liff.getProfile();
-        setProfile(profileData);
-
+        setProfile({
+          userId: profileData.userId,
+          displayName: profileData.displayName,
+          pictureUrl: profileData.pictureUrl || "",
+        });
         const student = await GetStudentIDByLineId(profileData.userId);
         setStudentData(student);
 
@@ -126,29 +129,6 @@ export default function StudentDashboard() {
 
     fetchProfile();
   }, []);
-
-  const scanCode = async () => {
-    const liff = (await import("@line/liff")).default;
-
-    if (liff.isInClient() && liff.getOS() === "android") {
-      if (liff.scanCode) {
-        const result = await liff.scanCode();
-        setCode(result.value);
-      } else {
-        console.error("liff.scanCode is not available");
-        Swal.fire({
-          title: "Error",
-          text: "QR code scanning is not supported on this device.",
-          icon: "error",
-          confirmButtonText: "OK",
-          background: "#1e1e1e",
-          color: "#ffffff",
-        });
-      }
-    } else {
-      alert("Not support");
-    }
-  };
 
   const handleScan = async (decodedText: string) => {
     if (isCheckingIn || !studentData || !currentLocation) return;
@@ -321,10 +301,6 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<Info />}
               sx={{ height: "100%" }}
-              onClick={() => {
-                scanCode();
-                console.log("code: ", code);
-              }}
             >
               View Details
             </Button>
