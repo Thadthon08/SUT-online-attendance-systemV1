@@ -114,7 +114,7 @@ export async function StudentRegistration(
 }
 
 export async function Verify(lineId: string): Promise<any> {
-  const response = await fetch(`${apiURL}/api/line/verify/${lineId}`, {
+  const response = await fetch(`${apiURL}line/verify/${lineId}`, {
     method: "GET",
   });
 
