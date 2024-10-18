@@ -18,32 +18,20 @@ import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
 import { GetStudentIDByLineId, CheckIn } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
+import { useProfile } from "../utils/useProfile";
 
 // สร้างธีม Dark
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
-    primary: {
-      main: "#90caf9",
-    },
-    secondary: {
-      main: "#f48fb1",
-    },
-    background: {
-      default: "#121212",
-      paper: "#1e1e1e",
-    },
+    primary: { main: "#90caf9" },
+    secondary: { main: "#f48fb1" },
+    background: { default: "#121212", paper: "#1e1e1e" },
   },
 });
 
-interface Profile {
-  userId: string;
-  displayName: string;
-  pictureUrl?: string;
-}
-
 export default function StudentDashboard() {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const { profile, isLoading } = useProfile();
   const [studentData, setStudentData] = useState<any | null>(null);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
@@ -53,145 +41,98 @@ export default function StudentDashboard() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
-
-  document.title = "Student Dashboard | Attendance System";
+  const lastDecodedText = useRef<string | null>(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        Swal.fire({
-          title: "Loading...",
-          text: "Please wait while we fetch your profile",
-          icon: "info",
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          background: "#1e1e1e",
-          color: "#ffffff",
-          willOpen: () => {
-            Swal.showLoading();
-          },
-        });
+    if (profile) {
+      const fetchStudentData = async () => {
+        try {
+          const student = await GetStudentIDByLineId(profile.userId);
+          setStudentData(student);
 
-        const liff = (await import("@line/liff")).default;
-        await liff.ready;
-        const profileData = await liff.getProfile();
-        setProfile({
-          userId: profileData.userId,
-          displayName: profileData.displayName,
-          pictureUrl: profileData.pictureUrl || "",
-        });
-        const student = await GetStudentIDByLineId(profileData.userId);
-        setStudentData(student);
-
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              setCurrentLocation({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              });
-              Swal.close();
-            },
-            (err) => {
-              console.error("Error fetching location:", err);
-              Swal.fire({
-                title: "Location Error",
-                text: "Failed to fetch location. Please enable location services.",
-                icon: "error",
-                confirmButtonText: "OK",
-                background: "#1e1e1e",
-                color: "#ffffff",
-              });
-            }
-          );
-        } else {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                setCurrentLocation({
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                });
+              },
+              (err) => {
+                Swal.fire({
+                  title: "Location Error",
+                  text: "Failed to fetch location. Please enable location services.",
+                  icon: "error",
+                  confirmButtonText: "OK",
+                  background: "#1e1e1e",
+                  color: "#ffffff",
+                });
+              }
+            );
+          }
+        } catch (error) {
           Swal.fire({
-            title: "Geolocation Unsupported",
-            text: "Geolocation is not supported by this browser.",
+            title: "Error",
+            text: "Failed to load student data.",
             icon: "error",
             confirmButtonText: "OK",
             background: "#1e1e1e",
             color: "#ffffff",
           });
         }
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-        Swal.fire({
-          title: "Profile Error",
-          text: "Failed to load profile. Please try again later.",
-          icon: "error",
-          confirmButtonText: "OK",
-          background: "#1e1e1e",
-          color: "#ffffff",
-        });
-      }
-    };
-
-    fetchProfile();
-  }, []);
+      };
+      fetchStudentData();
+    }
+  }, [profile]);
 
   const handleScan = async (decodedText: string) => {
     if (isCheckingIn || !studentData || !currentLocation) return;
 
+    if (lastDecodedText.current === decodedText) return;
+
+    lastDecodedText.current = decodedText;
     setIsCheckingIn(true);
     stopScan();
 
-    if (decodedText) {
+    try {
+      let ATR_id = decodedText;
+
+      // ตรวจสอบว่า ATR_id มาจาก URL หรือไม่
       try {
-        Swal.fire({
-          title: "Checking In...",
-          text: "Please wait while we process your check-in",
-          icon: "info",
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          background: "#1e1e1e",
-          color: "#ffffff",
-          willOpen: () => {
-            Swal.showLoading();
-          },
-        });
-
-        let ATR_id = decodedText;
-
-        try {
-          const url = new URL(decodedText);
-          ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
-        } catch (error) {
-          console.warn("Not a valid URL, using raw decoded text as ATR_id");
-        }
-
-        const checkInData = {
-          ATR_id,
-          sid: studentData.sid,
-          att_lat: currentLocation.lat,
-          att_long: currentLocation.lng,
-        };
-
-        console.log("CheckIn Data:", checkInData);
-
-        await CheckIn(checkInData);
-
-        Swal.fire({
-          title: "Success!",
-          text: "Check-in successful!",
-          icon: "success",
-          confirmButtonText: "OK",
-          background: "#1e1e1e",
-          color: "#ffffff",
-        });
-      } catch (error) {
-        console.error("Error during check-in:", error);
-        Swal.fire({
-          title: "Check-in Failed",
-          text: "Failed to check-in. Please try again.",
-          icon: "error",
-          confirmButtonText: "OK",
-          background: "#1e1e1e",
-          color: "#ffffff",
-        });
-      } finally {
-        setIsCheckingIn(false);
+        const url = new URL(decodedText);
+        ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
+      } catch {
+        console.warn("Not a valid URL, using raw decoded text as ATR_id");
       }
+
+      const checkInData = {
+        ATR_id,
+        sid: studentData.sid,
+        att_lat: currentLocation.lat,
+        att_long: currentLocation.lng,
+      };
+
+      await CheckIn(checkInData);
+
+      Swal.fire({
+        title: "Success!",
+        text: "Check-in successful!",
+        icon: "success",
+        confirmButtonText: "OK",
+        background: "#1e1e1e",
+        color: "#ffffff",
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Check-in Failed",
+        text: "Failed to check-in. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
+        background: "#1e1e1e",
+        color: "#ffffff",
+      });
+    } finally {
+      setIsCheckingIn(false);
     }
   };
 
@@ -201,17 +142,12 @@ export default function StudentDashboard() {
       html5QrCode.current
         .start(
           { facingMode: "environment" },
-          {
-            fps: 30,
-            qrbox: { width: 250, height: 250 },
-          },
+          { fps: 30, qrbox: { width: 250, height: 250 } },
           handleScan,
-          (errorMessage) => {
-            console.error("QR Code scanning error:", errorMessage);
-          }
+          (errorMessage) =>
+            console.error("QR Code scanning error:", errorMessage)
         )
         .catch((err) => {
-          console.error("Error starting QR Code scanner:", err);
           Swal.fire({
             title: "Scanner Error",
             text: "Failed to start the QR code scanner. Please try again.",
@@ -226,16 +162,11 @@ export default function StudentDashboard() {
 
   const stopScan = () => {
     if (html5QrCode.current) {
-      html5QrCode.current
-        .stop()
-        .then(() => {
-          html5QrCode.current?.clear();
-          setIsScanning(false);
-          html5QrCode.current = null;
-        })
-        .catch((err) => {
-          console.error("Error stopping QR Code scanner:", err);
-        });
+      html5QrCode.current.stop().then(() => {
+        html5QrCode.current?.clear();
+        setIsScanning(false);
+        html5QrCode.current = null;
+      });
     }
   };
 
@@ -243,14 +174,10 @@ export default function StudentDashboard() {
     if (isScanning) {
       startScan();
     }
-    return () => {
-      if (html5QrCode.current) {
-        stopScan();
-      }
-    };
+    return stopScan; // หยุดการสแกนเมื่อคอมโพเนนต์ถูก unmount
   }, [isScanning]);
 
-  if (!profile || !studentData || !currentLocation) return null;
+  if (isLoading || !profile || !studentData || !currentLocation) return null;
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -265,7 +192,7 @@ export default function StudentDashboard() {
                 sx={{ width: 80, height: 80, mr: 2 }}
               />
               <Box>
-                <Typography variant="h5" component="div" color="text.primary">
+                <Typography variant="h5" color="text.primary">
                   {profile.displayName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -274,7 +201,7 @@ export default function StudentDashboard() {
               </Box>
             </Box>
             <Divider sx={{ my: 2 }} />
-            <Typography variant="h6" gutterBottom color="text.primary">
+            <Typography variant="h6" color="text.primary">
               Current Location
             </Typography>
             <Box sx={{ height: 200, width: "100%", mb: 2 }}>
@@ -316,12 +243,7 @@ export default function StudentDashboard() {
               backgroundColor: "background.paper",
             }}
           >
-            <Typography
-              variant="h6"
-              gutterBottom
-              align="center"
-              color="text.primary"
-            >
+            <Typography variant="h6" align="center" color="text.primary">
               Scan QR Code
             </Typography>
             <Box
@@ -330,13 +252,10 @@ export default function StudentDashboard() {
                 width: "100%",
                 height: 300,
                 display: "flex",
-                flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
                 border: "2px dashed #555",
                 borderRadius: 2,
-                position: "relative",
-                overflow: "hidden",
               }}
               ref={scannerRef}
             >

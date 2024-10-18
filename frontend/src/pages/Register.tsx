@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useCallback } from "react";
 import {
   Box,
   Button,
@@ -19,80 +19,58 @@ import {
   DriveFileRenameOutlineOutlined,
   HowToRegOutlined,
 } from "@mui/icons-material";
-import { StudentRegistration } from "../services/api";
 import Swal from "sweetalert2";
+import { useProfile } from "../utils/useProfile";
+import { StudentRegistration } from "../services/api";
 
-const Register = () => {
+const Register: React.FC = () => {
   const theme = useTheme();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { profile, isLoading } = useProfile();
+
   const {
     handleSubmit,
     control,
     formState: { errors },
   } = useForm<StudentInterface>();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
+  const onSubmit = useCallback(
+    async (data: StudentInterface) => {
+      setIsSubmitting(true);
+      data.LineID = profile?.userId as string;
+
       try {
-        const liff = (await import("@line/liff")).default;
-        await liff.ready;
-        const profileData = await liff.getProfile();
-        setUserId(profileData.userId);
-      } catch (err) {
-        console.error("Error fetching profile:", err);
+        const response = await StudentRegistration(data);
+
+        if (response) {
+          Swal.fire({
+            title: "ลงทะเบียนสำเร็จ",
+            text: "กรุณากดปุ่ม OK เพื่อเข้าสู่หน้าหลัก",
+            icon: "success",
+            confirmButtonText: "OK",
+            background: "#1e1e1e",
+            color: "#ffffff",
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          throw new Error("เกิดข้อผิดพลาดในการลงทะเบียน");
+        }
+      } catch (error) {
         Swal.fire({
-          title: "Profile Error",
-          text: "Failed to load profile. Please try again later.",
+          title: "เกิดข้อผิดพลาด",
+          text: "กรุณาลองใหม่อีกครั้ง",
           icon: "error",
           confirmButtonText: "OK",
           background: "#1e1e1e",
           color: "#ffffff",
         });
       } finally {
-        setIsLoading(false);
-        Swal.close();
+        setIsSubmitting(false);
       }
-    };
-
-    fetchProfile();
-  }, []);
-
-  const onSubmit = async (data: StudentInterface) => {
-    setIsSubmitting(true);
-    data.LineID = userId as string;
-
-    try {
-      const response = await StudentRegistration(data);
-
-      if (response) {
-        Swal.fire({
-          title: "ลงทะเบียนสำเร็จ",
-          text: "กรุณากดปุ่ม OK เพื่อเข้าสู่หน้าหลัก",
-          icon: "success",
-          confirmButtonText: "OK",
-          background: "#1e1e1e",
-          color: "#ffffff",
-        }).then(() => {
-          window.location.reload();
-        });
-      } else {
-        throw new Error("เกิดข้อผิดพลาดในการลงทะเบียน");
-      }
-    } catch (error) {
-      Swal.fire({
-        title: "เกิดข้อผิดพลาด",
-        text: "กรุณาลองใหม่อีกครั้ง",
-        icon: "error",
-        confirmButtonText: "OK",
-        background: "#1e1e1e",
-        color: "#ffffff",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+    [profile]
+  );
 
   if (isLoading) {
     return (
@@ -253,8 +231,8 @@ const Register = () => {
                 backgroundColor: "rgba(255, 255, 255, 0.2)",
               },
               "&:disabled": {
-                backgroundColor: "rgba(255, 255, 255, 0.05)", // สีเมื่อปุ่มถูก disable
-                color: "rgba(255, 255, 255, 0.3)", // สีข้อความเมื่อปุ่มถูก disable
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                color: "rgba(255, 255, 255, 0.3)",
               },
             }}
           >
