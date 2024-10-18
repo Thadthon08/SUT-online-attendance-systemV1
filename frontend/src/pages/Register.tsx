@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -33,7 +32,6 @@ const Register = () => {
     control,
     formState: { errors },
   } = useForm<StudentInterface>();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
