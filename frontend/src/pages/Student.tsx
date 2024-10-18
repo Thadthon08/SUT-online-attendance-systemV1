@@ -99,7 +99,8 @@ export default function StudentDashboard() {
         const verify = await Verify(profileData.userId);
         if (verify.status === "fail") {
           // ถ้าสถานะเป็น fail ให้เปลี่ยนเส้นทางไปที่ /student/register
-          window.location.href = "/student/register";
+          console.log("Redirect to /student/register");
+
           return;
         }
 
