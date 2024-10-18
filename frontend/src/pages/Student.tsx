@@ -149,6 +149,8 @@ export default function StudentDashboard() {
             console.error("QR Code scanning error:", errorMessage)
         )
         .catch((err) => {
+          console.log("Failed to start QR code scanner:", err);
+
           Swal.fire({
             title: "Scanner Error",
             text: "Failed to start the QR code scanner. Please try again.",
