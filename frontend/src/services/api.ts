@@ -119,7 +119,7 @@ export async function Verify(lineId: string): Promise<any> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to get student ID.");
+    throw new Error("Failed to verify student.");
   }
 
   return response.json();

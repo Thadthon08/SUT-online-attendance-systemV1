@@ -97,10 +97,11 @@ export default function StudentDashboard() {
 
         // เรียก Verify API
         const verify = await Verify(profileData.userId);
-        if (verify.status === "fail") {
+        if (verify) {
           // ถ้าสถานะเป็น fail ให้เปลี่ยนเส้นทางไปที่ /student/register
-          window.location.href = "/student/register";
-          return;
+          console.log("verify: ", verify);
+        } else {
+          console.log("สมัครก่อน");
         }
 
         // ถ้า Verify ผ่าน ให้ดึงข้อมูลนักศึกษา
