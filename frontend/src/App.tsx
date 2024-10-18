@@ -10,8 +10,6 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import StudentRoute from "./routes/StudentRoute"; // Route สำหรับตรวจสอบการลงทะเบียน
 import Room from "./pages/Room";
 import StudentLayout from "./layouts/StudentLayout";
-import Student from "./pages/Student"; // หน้า Student Dashboard
-import Register from "./pages/Register"; // หน้า Register สำหรับนักศึกษา
 
 function App() {
   return (
