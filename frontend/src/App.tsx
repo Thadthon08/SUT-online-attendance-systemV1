@@ -72,14 +72,7 @@ function App() {
               </StudentRoute>
             }
           />
-          <Route
-            path="/student/register"
-            element={
-              <StudentRoute>
-                <Register />
-              </StudentRoute>
-            }
-          />
+          <Route path="/student/register" element={<Register />} />
         </Route>
       </Routes>
     </BrowserRouter>
