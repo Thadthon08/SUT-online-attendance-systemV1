@@ -87,6 +87,7 @@ export default function StudentDashboard() {
           }
           console.log("friendFlag: ", friendFlag);
         });
+
         const profileData = await liff.getProfile();
         setProfile({
           userId: profileData.userId,
@@ -94,15 +95,19 @@ export default function StudentDashboard() {
           pictureUrl: profileData.pictureUrl || "",
         });
 
+        // เรียก Verify API
         const verify = await Verify(profileData.userId);
         if (verify.status === "fail") {
+          // ถ้าสถานะเป็น fail ให้เปลี่ยนเส้นทางไปที่ /student/register
           window.location.href = "/student/register";
           return;
         }
 
+        // ถ้า Verify ผ่าน ให้ดึงข้อมูลนักศึกษา
         const student = await GetStudentIDByLineId(profileData.userId);
         setStudentData(student);
 
+        // เรียกตำแหน่งที่ตั้งปัจจุบัน
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
