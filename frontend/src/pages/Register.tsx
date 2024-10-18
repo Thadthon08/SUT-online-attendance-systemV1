@@ -77,7 +77,7 @@ const Register = () => {
           background: "#1e1e1e",
           color: "#ffffff",
         }).then(() => {
-          navigate("/student");
+          window.location.reload();
         });
       } else {
         throw new Error("เกิดข้อผิดพลาดในการลงทะเบียน");
