@@ -15,7 +15,7 @@ import {
   CssBaseline,
 } from "@mui/material";
 import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
-import { GetStudentIDByLineId, CheckIn } from "../services/api";
+import { GetStudentIDByLineId, CheckIn, Verify } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
 
@@ -53,6 +53,9 @@ export default function StudentDashboard() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
+  const [os, setOs] = useState("ios") as any;
+  const [friendFlag, setFriendFlag] = useState() as any;
+  const [code, setCode] = useState() as any;
 
   document.title = "Student Dashboard | Attendance System";
 
@@ -74,12 +77,29 @@ export default function StudentDashboard() {
 
         const liff = (await import("@line/liff")).default;
         await liff.ready;
+        const checkOs = liff.getOS();
+        setOs(checkOs);
+        console.log(os);
+        liff.getFriendship().then((data) => {
+          console.log("friendFlag: ", data);
+          if (data.friendFlag) {
+            setFriendFlag(data.friendFlag);
+          }
+          console.log("friendFlag: ", friendFlag);
+        });
         const profileData = await liff.getProfile();
         setProfile({
           userId: profileData.userId,
           displayName: profileData.displayName,
           pictureUrl: profileData.pictureUrl || "",
         });
+
+        const verify = await Verify(profileData.userId);
+        if (verify.status === "fail") {
+          window.location.href = "/student/register";
+          return;
+        }
+
         const student = await GetStudentIDByLineId(profileData.userId);
         setStudentData(student);
 
@@ -129,6 +149,29 @@ export default function StudentDashboard() {
 
     fetchProfile();
   }, []);
+
+  const scanCode = async () => {
+    const liff = (await import("@line/liff")).default;
+
+    if (liff.isInClient() && liff.getOS() === "android") {
+      if (liff.scanCode) {
+        const result = await liff.scanCode();
+        setCode(result.value);
+      } else {
+        console.error("liff.scanCode is not available");
+        Swal.fire({
+          title: "Error",
+          text: "QR code scanning is not supported on this device.",
+          icon: "error",
+          confirmButtonText: "OK",
+          background: "#1e1e1e",
+          color: "#ffffff",
+        });
+      }
+    } else {
+      alert("Not support");
+    }
+  };
 
   const handleScan = async (decodedText: string) => {
     if (isCheckingIn || !studentData || !currentLocation) return;
@@ -301,6 +344,10 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<Info />}
               sx={{ height: "100%" }}
+              onClick={() => {
+                scanCode();
+                console.log("code: ", code);
+              }}
             >
               View Details
             </Button>

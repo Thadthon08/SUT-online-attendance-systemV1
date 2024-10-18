@@ -112,3 +112,15 @@ export async function StudentRegistration(
 
   return response.json();
 }
+
+export async function Verify(lineId: string): Promise<any> {
+  const response = await fetch(`${apiURL}/api/student/${lineId}`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to get student ID.");
+  }
+
+  return response.json();
+}

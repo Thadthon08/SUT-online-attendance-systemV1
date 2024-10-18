@@ -100,4 +100,28 @@ async function unregisterStudent(req, res) {
   }
 }
 
-module.exports = { registerStudent, unregisterStudent };
+async function verify(req, res) {
+  const { LineID } = req.params;
+
+  try {
+    const user = await Student.findOne({ where: { LineID } });
+
+    if (user) {
+      const response = {
+        status: "success",
+      };
+      res.status(200).json(response);
+    } else {
+      const response = {
+        status: "fail",
+        message: "no data",
+      };
+      res.status(404).json(response);
+    }
+  } catch (error) {
+    console.error("Error verifying user:", error);
+    res.status(500).json({ status: "fail", message: "An error occurred" });
+  }
+}
+
+module.exports = { registerStudent, unregisterStudent, verify };
