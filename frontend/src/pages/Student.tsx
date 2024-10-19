@@ -246,7 +246,12 @@ export default function StudentDashboard() {
               backgroundColor: "background.paper",
             }}
           >
-            <Typography variant="h6" align="center" color="text.primary">
+            <Typography
+              variant="h6"
+              gutterBottom
+              align="center"
+              color="text.primary"
+            >
               Scan QR Code
             </Typography>
             <Box
@@ -255,10 +260,13 @@ export default function StudentDashboard() {
                 width: "100%",
                 height: 300,
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
                 border: "2px dashed #555",
                 borderRadius: 2,
+                position: "relative",
+                overflow: "hidden",
               }}
               ref={scannerRef}
             >
