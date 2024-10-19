@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Avatar, Box, Typography, useTheme } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { Menu, MenuItem, Sidebar, useProSidebar } from "react-pro-sidebar";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
@@ -14,6 +20,7 @@ interface SideNavProps {
 
 const SideNav: React.FC<SideNavProps> = ({ Data }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { collapsed, toggleSidebar } = useProSidebar();
   const [activeMenu, setActiveMenu] = useState("/dashboard");
 
@@ -24,7 +31,11 @@ const SideNav: React.FC<SideNavProps> = ({ Data }) => {
 
   return (
     <Sidebar
-      style={{ height: "100vh", top: "auto" }}
+      style={{
+        height: isMobile ? "100vh" : "auto",
+        top: "auto",
+        minHeight: "100vh",
+      }}
       breakPoint="md"
       backgroundColor={theme.palette.background.paper}
     >
