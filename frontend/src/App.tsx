@@ -8,8 +8,7 @@ import Setting from "./pages/Setting";
 import PublicRoute from "./routes/PublicRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Room from "./pages/Room";
-import { Suspense, lazy } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
+import { lazy } from "react";
 import StudentLayout from "./layouts/StudentLayout";
 
 // Lazy load สำหรับ student route
@@ -66,14 +65,7 @@ function App() {
         </Route>
 
         <Route element={<StudentLayout />}>
-          <Route
-            path="/student"
-            element={
-              <Suspense fallback={<CircularProgress />}>
-                <StudentRoute />
-              </Suspense>
-            }
-          />
+          <Route path="/student" element={<StudentRoute />} />
         </Route>
       </Routes>
     </BrowserRouter>
