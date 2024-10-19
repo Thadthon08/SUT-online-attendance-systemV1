@@ -56,16 +56,17 @@ export default function StudentDashboard() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
               });
-            });
-          } else {
-            Swal.fire({
-              title: "Location Error",
-              text: "Failed to fetch location. Please enable location services.",
-              icon: "error",
-              confirmButtonText: "OK",
-              background: "#1e1e1e",
-              color: "#ffffff",
-            });
+            }),
+              () => {
+                Swal.fire({
+                  title: "Location Error",
+                  text: "Failed to fetch location. Please enable location services.",
+                  icon: "error",
+                  confirmButtonText: "OK",
+                  background: "#1e1e1e",
+                  color: "#ffffff",
+                });
+              };
           }
         } catch (error) {
           Swal.fire({
