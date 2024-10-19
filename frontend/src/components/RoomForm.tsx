@@ -287,6 +287,13 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                   field.onChange(utcDate);
                 };
 
+                const selectedStartDate = dayjs(startTime).startOf("day");
+                const selectedEndDate = dayjs(field.value).startOf("day");
+                const isSameDay = selectedStartDate.isSame(
+                  selectedEndDate,
+                  "day"
+                );
+
                 return (
                   <DatePicker
                     selected={
@@ -301,8 +308,12 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                     dateFormat="dd/MM/yyyy HH:mm"
                     placeholderText="เลือกเวลาสิ้นสุด"
                     minDate={dayjs(startTime).toDate()}
-                    minTime={dayjs(startTime).toDate()}
-                    maxTime={dayjs(startTime).endOf("day").toDate()}
+                    minTime={
+                      isSameDay
+                        ? dayjs(startTime).toDate()
+                        : dayjs().startOf("day").toDate()
+                    }
+                    maxTime={dayjs().endOf("day").toDate()}
                     customInput={
                       <CustomDatePickerInput
                         value={
