@@ -50,28 +50,50 @@ export default function StudentDashboard() {
           const student = await GetStudentIDByLineId(profile.userId);
           setStudentData(student);
 
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-              setCurrentLocation({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              });
-            }),
-              () => {
-                Swal.fire({
-                  title: "Location Error",
-                  text: "Failed to fetch location. Please enable location services.",
-                  icon: "error",
-                  confirmButtonText: "OK",
-                  background: "#1e1e1e",
-                  color: "#ffffff",
-                });
-              };
+          if (!navigator.geolocation) {
+            throw new Error("Geolocation is not supported by this browser.");
           }
+
+          const geolocationOptions = {
+            timeout: 20000,
+            maximumAge: 0,
+            enableHighAccuracy: true,
+          };
+
+          // ฟังก์ชันสำหรับดึงตำแหน่งที่ตั้ง
+          const getLocation = () => {
+            return new Promise<GeolocationPosition>((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(
+                resolve,
+                reject,
+                geolocationOptions
+              );
+            });
+          };
+
+          const timeout = new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Geolocation timed out")),
+              geolocationOptions.timeout
+            )
+          );
+
+          const position = await Promise.race([getLocation(), timeout]);
+
+          const geoPosition = position as GeolocationPosition;
+
+          setCurrentLocation({
+            lat: geoPosition.coords.latitude,
+            lng: geoPosition.coords.longitude,
+          });
         } catch (error) {
+          console.error("Error fetching student data or location:", error);
+
           Swal.fire({
             title: "Error",
-            text: "Failed to load student data.",
+            text: `Failed to load data: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`,
             icon: "error",
             confirmButtonText: "OK",
             background: "#1e1e1e",
@@ -79,6 +101,7 @@ export default function StudentDashboard() {
           });
         }
       };
+
       fetchStudentData();
     }
   }, [profile]);
