@@ -20,7 +20,7 @@ const StudentRoute = () => {
 
         if (!liff.isLoggedIn()) {
           liff.login();
-          return; // หลังจาก login จะ reload page
+          return;
         }
 
         const profile = await liff.getProfile();

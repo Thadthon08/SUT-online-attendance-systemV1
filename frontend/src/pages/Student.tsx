@@ -51,25 +51,21 @@ export default function StudentDashboard() {
           setStudentData(student);
 
           if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                setCurrentLocation({
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                });
-              },
-              (err) => {
-                console.error("Failed to fetch location:", err);
-                Swal.fire({
-                  title: "Location Error",
-                  text: "Failed to fetch location. Please enable location services.",
-                  icon: "error",
-                  confirmButtonText: "OK",
-                  background: "#1e1e1e",
-                  color: "#ffffff",
-                });
-              }
-            );
+            navigator.geolocation.getCurrentPosition((position) => {
+              setCurrentLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              });
+            });
+          } else {
+            Swal.fire({
+              title: "Location Error",
+              text: "Failed to fetch location. Please enable location services.",
+              icon: "error",
+              confirmButtonText: "OK",
+              background: "#1e1e1e",
+              color: "#ffffff",
+            });
           }
         } catch (error) {
           Swal.fire({
