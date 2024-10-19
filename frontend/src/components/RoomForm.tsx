@@ -25,17 +25,17 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import localeData from "dayjs/plugin/localeData";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { GetAllSubject } from "../services/api";
+import { GetAllSubject } from "../services/api"; // API ดึงข้อมูลวิชา
 
 dayjs.extend(customParseFormat);
 dayjs.extend(localeData);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const timeZone = "Asia/Bangkok";
+const timeZone = "Asia/Bangkok"; // ใช้ Time Zone ของกรุงเทพ
 
 const getCurrentDateTime = () => {
-  return dayjs().tz(timeZone).format("YYYY-MM-DDTHH:mm");
+  return dayjs().tz(timeZone).format("YYYY-MM-DDTHH:mm"); // คืนค่าเวลาในรูปแบบที่ต้องการ
 };
 
 interface CustomDatePickerInputProps {
@@ -134,6 +134,21 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
     fetchSubjects();
   }, []);
 
+  const handleFormSubmit = (formData: any) => {
+    // แปลงเวลาเป็น UTC ก่อนส่งข้อมูลไปยัง backend
+    const startTimeUTC = dayjs(formData.start_time).tz(timeZone).utc().format();
+    const endTimeUTC = dayjs(formData.end_time).tz(timeZone).utc().format();
+
+    const dataToSend = {
+      ...formData,
+      start_time: startTimeUTC,
+      end_time: endTimeUTC,
+    };
+
+    console.log("Form Data:", dataToSend);
+    onSubmit(dataToSend);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -149,7 +164,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
         color: theme.palette.text.primary,
       }}
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack spacing={2}>
           <FormControl fullWidth error={!!errors.sub_id}>
             <Typography variant="body2" sx={{ mb: 1 }}>
@@ -283,16 +298,9 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               rules={{ required: "กรุณาเลือกเวลาสิ้นสุด" }}
               render={({ field }) => {
                 const handleDateChange = (date: any) => {
-                  const utcDate = dayjs(date).tz(timeZone).utc().format(); // แปลงเป็น UTC
+                  const utcDate = dayjs(date).tz(timeZone).utc().format(); // แปลงเวลาเป็น UTC ก่อนส่งออก
                   field.onChange(utcDate);
                 };
-
-                const selectedStartDate = dayjs(startTime).startOf("day");
-                const selectedEndDate = dayjs(field.value).startOf("day");
-                const isSameDay = selectedStartDate.isSame(
-                  selectedEndDate,
-                  "day"
-                );
 
                 return (
                   <DatePicker
@@ -307,13 +315,6 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                     timeIntervals={5}
                     dateFormat="dd/MM/yyyy HH:mm"
                     placeholderText="เลือกเวลาสิ้นสุด"
-                    minDate={dayjs(startTime).toDate()}
-                    minTime={
-                      isSameDay
-                        ? dayjs(startTime).toDate()
-                        : dayjs().startOf("day").toDate()
-                    }
-                    maxTime={dayjs().endOf("day").toDate()}
                     customInput={
                       <CustomDatePickerInput
                         value={
