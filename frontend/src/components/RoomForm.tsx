@@ -117,8 +117,6 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
     },
   });
 
-  const startTime = watch("start_time");
-
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
