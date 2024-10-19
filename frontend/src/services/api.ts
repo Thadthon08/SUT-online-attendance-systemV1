@@ -3,7 +3,7 @@ import { StudentInterface } from "../interface/IStudent";
 
 // const apiURL = "http://localhost:3000";
 const apiURL =
-  "https://9f78-2001-fb1-16f-2fbf-98ab-60cd-3369-1a9f.ngrok-free.app";
+  "https://3d97-2001-fb1-16f-2fbf-98ab-60cd-3369-1a9f.ngrok-free.app";
 
 export async function SignIn(login: SigninInterface): Promise<any> {
   const response = await fetch(`${apiURL}/api/auth/signin`, {

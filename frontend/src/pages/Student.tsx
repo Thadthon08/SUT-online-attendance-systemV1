@@ -177,7 +177,7 @@ export default function StudentDashboard() {
     if (isScanning) {
       startScan();
     }
-    return stopScan; // หยุดการสแกนเมื่อคอมโพเนนต์ถูก unmount
+    return stopScan;
   }, [isScanning]);
 
   if (isLoading || !profile || !studentData || !currentLocation) return null;
