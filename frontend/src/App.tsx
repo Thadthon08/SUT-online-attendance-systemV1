@@ -7,15 +7,18 @@ import Report from "./pages/Report";
 import Setting from "./pages/Setting";
 import PublicRoute from "./routes/PublicRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import StudentRoute from "./routes/StudentRoute"; // Route สำหรับตรวจสอบการลงทะเบียน
 import Room from "./pages/Room";
+import { Suspense, lazy } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
 import StudentLayout from "./layouts/StudentLayout";
+
+// Lazy load สำหรับ student route
+const StudentRoute = lazy(() => import("./routes/StudentRoute"));
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* เส้นทางสำหรับการ login */}
         <Route element={<AuthLayout />}>
           <Route
             path="/"
@@ -27,7 +30,6 @@ function App() {
           />
         </Route>
 
-        {/* เส้นทางหลังจาก login แล้ว */}
         <Route element={<BackendLayout />}>
           <Route
             path="/dashboard"
@@ -64,7 +66,14 @@ function App() {
         </Route>
 
         <Route element={<StudentLayout />}>
-          <Route path="/student" element={<StudentRoute />} />
+          <Route
+            path="/student"
+            element={
+              <Suspense fallback={<CircularProgress />}>
+                <StudentRoute />
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
