@@ -22,8 +22,16 @@ const Attendance = sequelize.define("Attendance", {
 });
 
 // ตั้งความสัมพันธ์
-Attendance.belongsTo(AttendanceRoom, { foreignKey: "ATR_id", allowNull: false, onDelete: "CASCADE" });
-Attendance.belongsTo(Student, { foreignKey: "sid" });
+Attendance.belongsTo(AttendanceRoom, {
+  foreignKey: "ATR_id",
+  allowNull: false,
+  onDelete: "CASCADE",
+});
+Attendance.belongsTo(Student, {
+  foreignKey: "sid",
+  allowNull: false,
+  onDelete: "CASCADE",
+});
 AttendanceRoom.hasMany(Attendance, { foreignKey: "ATR_id" });
 Student.hasMany(Attendance, { foreignKey: "sid" });
 
