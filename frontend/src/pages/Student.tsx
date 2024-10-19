@@ -107,16 +107,14 @@ export default function StudentDashboard() {
   const handleScan = async (decodedText: string) => {
     if (isCheckingIn || !studentData || !currentLocation) return;
 
-    // ป้องกันการส่งคำขอซ้ำซ้อน
     if (lastDecodedText.current === decodedText) return;
 
     setIsCheckingIn(true);
-    stopScan(); // หยุดการสแกนหลังจากได้ค่า QR Code
+    stopScan();
 
     try {
       let ATR_id = decodedText;
 
-      // ตรวจสอบว่าเป็น URL หรือไม่ ถ้าเป็นดึงค่าจาก query parameter
       try {
         const url = new URL(decodedText);
         ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
@@ -124,7 +122,6 @@ export default function StudentDashboard() {
         console.warn("Not a valid URL, using raw decoded text as ATR_id");
       }
 
-      // สร้างข้อมูลเช็คชื่อที่จะส่งไปยัง API
       const checkInData = {
         ATR_id,
         sid: studentData.sid,
@@ -132,10 +129,8 @@ export default function StudentDashboard() {
         att_long: currentLocation.lng,
       };
 
-      // เรียกใช้ฟังก์ชัน CheckIn เพื่อตรวจสอบและเช็คชื่อ
       await CheckIn(checkInData);
 
-      // บันทึกค่า decodedText เพื่อป้องกันการส่งซ้ำ
       lastDecodedText.current = decodedText;
 
       Swal.fire({
@@ -149,9 +144,8 @@ export default function StudentDashboard() {
     } catch (error: any) {
       let errorMessage = "เกิดข้อผิดพลาดในการเช็คชื่อ กรุณาลองใหม่อีกครั้ง";
 
-      if (error.response) {
-        const responseData = await error.response.json();
-        errorMessage = responseData.error || errorMessage;
+      if (error.message) {
+        errorMessage = error.message;
       }
 
       Swal.fire({
@@ -163,7 +157,7 @@ export default function StudentDashboard() {
         color: "#ffffff",
       });
     } finally {
-      setIsCheckingIn(false); // รีเซ็ตสถานะหลังดำเนินการเสร็จ
+      setIsCheckingIn(false);
     }
   };
 
