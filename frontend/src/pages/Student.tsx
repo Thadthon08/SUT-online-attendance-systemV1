@@ -90,12 +90,10 @@ export default function StudentDashboard() {
           console.error("Error fetching student data or location:", error);
 
           Swal.fire({
-            title: "Error",
-            text: `Failed to load data: ${
-              error instanceof Error ? error.message : "Unknown error"
-            }`,
+            title: "Error fetching location",
+            text: "กรุณาเปิดการใช้งานตำแหน่งที่ตั้งและลองใหม่อีกครั้ง",
             icon: "error",
-            confirmButtonText: "OK",
+            confirmButtonText: "ตกลง",
             background: "#1e1e1e",
             color: "#ffffff",
           });
