@@ -106,7 +106,6 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
   const {
     handleSubmit,
     control,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
