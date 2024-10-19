@@ -109,14 +109,12 @@ export default function StudentDashboard() {
 
     if (lastDecodedText.current === decodedText) return;
 
-    lastDecodedText.current = decodedText;
     setIsCheckingIn(true);
     stopScan();
 
     try {
       let ATR_id = decodedText;
 
-      // ตรวจสอบว่า ATR_id มาจาก URL หรือไม่
       try {
         const url = new URL(decodedText);
         ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
@@ -133,6 +131,8 @@ export default function StudentDashboard() {
 
       await CheckIn(checkInData);
 
+      lastDecodedText.current = decodedText;
+
       Swal.fire({
         title: "Success!",
         text: "Check-in successful!",
@@ -142,6 +142,8 @@ export default function StudentDashboard() {
         color: "#ffffff",
       });
     } catch (error) {
+      console.error("Error during check-in:", error);
+
       Swal.fire({
         title: "Check-in Failed",
         text: "Failed to check-in. Please try again.",
