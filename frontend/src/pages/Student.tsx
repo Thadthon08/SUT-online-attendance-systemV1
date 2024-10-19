@@ -107,14 +107,16 @@ export default function StudentDashboard() {
   const handleScan = async (decodedText: string) => {
     if (isCheckingIn || !studentData || !currentLocation) return;
 
+    // ป้องกันการส่งคำขอซ้ำซ้อน
     if (lastDecodedText.current === decodedText) return;
 
     setIsCheckingIn(true);
-    stopScan();
+    stopScan(); // หยุดการสแกนหลังจากได้ค่า QR Code
 
     try {
       let ATR_id = decodedText;
 
+      // ตรวจสอบว่าเป็น URL หรือไม่ ถ้าเป็นดึงค่าจาก query parameter
       try {
         const url = new URL(decodedText);
         ATR_id = new URLSearchParams(url.search).get("ATR_id") || decodedText;
@@ -122,6 +124,7 @@ export default function StudentDashboard() {
         console.warn("Not a valid URL, using raw decoded text as ATR_id");
       }
 
+      // สร้างข้อมูลเช็คชื่อที่จะส่งไปยัง API
       const checkInData = {
         ATR_id,
         sid: studentData.sid,
@@ -129,31 +132,35 @@ export default function StudentDashboard() {
         att_long: currentLocation.lng,
       };
 
+      // เรียกใช้ฟังก์ชัน CheckIn เพื่อตรวจสอบและเช็คชื่อ
       await CheckIn(checkInData);
 
+      // บันทึกค่า decodedText เพื่อป้องกันการส่งซ้ำ
       lastDecodedText.current = decodedText;
 
       Swal.fire({
-        title: "Success!",
-        text: "Check-in successful!",
+        title: "สำเร็จ!",
+        text: "เช็คชื่อสำเร็จ!",
         icon: "success",
-        confirmButtonText: "OK",
+        confirmButtonText: "ตกลง",
         background: "#1e1e1e",
         color: "#ffffff",
       });
     } catch (error) {
-      console.error("Error during check-in:", error);
+      // เพิ่มการตรวจสอบข้อความแจ้งข้อผิดพลาดจาก API
+      const errorMessage =
+        String(error) || "เกิดข้อผิดพลาดขณะเช็คชื่อ กรุณาลองใหม่อีกครั้ง";
 
       Swal.fire({
-        title: "Check-in Failed",
-        text: "Failed to check-in. Please try again.",
+        title: "เช็คชื่อไม่สำเร็จ",
+        text: errorMessage,
         icon: "error",
-        confirmButtonText: "OK",
+        confirmButtonText: "ตกลง",
         background: "#1e1e1e",
         color: "#ffffff",
       });
     } finally {
-      setIsCheckingIn(false);
+      setIsCheckingIn(false); // รีเซ็ตสถานะหลังดำเนินการเสร็จ
     }
   };
 
