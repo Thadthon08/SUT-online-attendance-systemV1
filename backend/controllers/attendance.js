@@ -38,11 +38,11 @@ const checkInAttendance = async (req, res) => {
       });
     }
 
-    // const student = await Student.findByPk(sid, { transaction: t });
-    // if (!student) {
-    //   await t.rollback();
-    //   return res.status(404).json({ error: "ไม่พบนักศึกษา" });
-    // }
+    const student = await Student.findByPk(sid, { transaction: t });
+    if (!student) {
+      await t.rollback();
+      return res.status(404).json({ error: "ไม่พบนักศึกษา" });
+    }
 
     const existingAttendance = await Attendance.findOne({
       where: { ATR_id, sid },
