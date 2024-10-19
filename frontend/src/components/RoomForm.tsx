@@ -283,7 +283,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               rules={{ required: "กรุณาเลือกเวลาสิ้นสุด" }}
               render={({ field }) => {
                 const handleDateChange = (date: any) => {
-                  const utcDate = dayjs(date).tz(timeZone).utc().format();
+                  const utcDate = dayjs(date).tz(timeZone).utc().format(); // แปลงเป็น UTC
                   field.onChange(utcDate);
                 };
 
