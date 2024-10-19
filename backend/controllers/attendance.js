@@ -1,6 +1,21 @@
 const { Attendance, AttendanceRoom, Student } = require("../models");
 const sequelize = require("../config/db");
 
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+  const toRad = (value) => (value * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // ระยะทางเป็นกิโลเมตร
+};
+
 const checkInAttendance = async (req, res) => {
   const t = await sequelize.transaction();
   try {
@@ -12,6 +27,15 @@ const checkInAttendance = async (req, res) => {
     if (!attendanceRoom) {
       await t.rollback();
       return res.status(404).json({ error: "ไม่พบห้องเช็คชื่อ" });
+    }
+
+    // ตรวจสอบว่าหมดเวลา expired หรือยัง
+    const currentTime = new Date();
+    if (attendanceRoom.expired_at && attendanceRoom.expired_at < currentTime) {
+      await t.rollback();
+      return res.status(400).json({
+        error: "ไม่สามารถเช็คชื่อได้เนื่องจากหมดเวลาแล้ว",
+      });
     }
 
     const student = await Student.findByPk(sid, { transaction: t });
@@ -31,6 +55,21 @@ const checkInAttendance = async (req, res) => {
       return res.status(400).json({ error: "คุณได้เช็คชื่อไปแล้ว" });
     }
 
+    // ตรวจสอบระยะห่างระหว่างพิกัด
+    const distance = haversineDistance(
+      attendanceRoom.ATR_lat,
+      attendanceRoom.ATR_long,
+      att_lat,
+      att_long
+    );
+    if (distance > 1) {
+      await t.rollback();
+      return res.status(400).json({
+        error: `เช็คชื่อไม่สำเร็จ ระยะห่าง ${distance.toFixed(2)} กิโลเมตร`,
+      });
+    }
+
+    // สร้างข้อมูลการเช็คชื่อ
     const attendance = await Attendance.create(
       {
         ATR_id,

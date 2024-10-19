@@ -10,11 +10,11 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
     ? {
         ssl: {
           require: true,
-          rejectUnauthorized: false, // เปิด SSL สำหรับ production
+          rejectUnauthorized: false,
         },
       }
-    : {}, // ปิด SSL สำหรับ local
-  logging: false, // ปิดการแสดง log
+    : {},
+  logging: false,
 });
 
 module.exports = sequelize;

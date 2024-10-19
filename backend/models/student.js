@@ -17,9 +17,6 @@ const Student = sequelize.define("Student", {
   St_lname: {
     type: DataTypes.STRING,
   },
-  St_profile_pic: {
-    type: DataTypes.TEXT,
-  },
 });
 
 module.exports = Student;

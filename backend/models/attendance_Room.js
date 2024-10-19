@@ -4,8 +4,8 @@ const Subject = require("./subject");
 
 const AttendanceRoom = sequelize.define("AttendanceRoom", {
   ATR_id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
   ATR_name: {

@@ -6,7 +6,6 @@ const AttendanceRoom = require("./attendance_Room");
 const Attendance = require("./attendance");
 const AttendanceSummary = require("./attendance_Summary");
 const TeacherSubject = require("./teacher_subject");
-const SubjectStudent = require("./subject_student");
 
 Teacher.belongsToMany(Subject, {
   through: TeacherSubject,
@@ -22,7 +21,7 @@ Subject.belongsToMany(Teacher, {
 
 // Sync โมเดลทั้งหมด
 sequelize
-  .sync({ alter: true })
+  .sync({ force: true })
   .then(() => {
     console.log("All models were synchronized successfully.");
   })
@@ -38,5 +37,4 @@ module.exports = {
   Attendance,
   AttendanceSummary,
   TeacherSubject,
-  SubjectStudent,
 };
