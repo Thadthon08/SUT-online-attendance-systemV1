@@ -146,10 +146,13 @@ export default function StudentDashboard() {
         background: "#1e1e1e",
         color: "#ffffff",
       });
-    } catch (error) {
-      // เพิ่มการตรวจสอบข้อความแจ้งข้อผิดพลาดจาก API
-      const errorMessage =
-        String(error) || "เกิดข้อผิดพลาดขณะเช็คชื่อ กรุณาลองใหม่อีกครั้ง";
+    } catch (error: any) {
+      let errorMessage = "เกิดข้อผิดพลาดในการเช็คชื่อ กรุณาลองใหม่อีกครั้ง";
+
+      if (error.response) {
+        const responseData = await error.response.json();
+        errorMessage = responseData.error || errorMessage;
+      }
 
       Swal.fire({
         title: "เช็คชื่อไม่สำเร็จ",

@@ -86,7 +86,8 @@ export async function CheckIn(data: any): Promise<any> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to check in.");
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to check in.");
   }
 
   return response.json();
