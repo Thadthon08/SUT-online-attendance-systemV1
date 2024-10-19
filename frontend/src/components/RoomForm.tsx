@@ -15,32 +15,15 @@ import {
 import {
   BusinessRounded,
   RoomRounded,
-  AccessTimeRounded,
   ScheduleRounded,
 } from "@mui/icons-material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import localeData from "dayjs/plugin/localeData";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { GetAllSubject } from "../services/api"; // API ดึงข้อมูลวิชา
-
-dayjs.extend(customParseFormat);
-dayjs.extend(localeData);
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const timeZone = "Asia/Bangkok"; // ใช้ Time Zone ของกรุงเทพ
-
-const getCurrentDateTime = () => {
-  return dayjs().tz(timeZone).format("YYYY-MM-DDTHH:mm"); // คืนค่าเวลาในรูปแบบที่ต้องการ
-};
+import { GetAllSubject } from "../services/api";
 
 interface CustomDatePickerInputProps {
   value: string;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   error?: boolean;
   helperText?: string;
 }
@@ -56,10 +39,10 @@ const CustomDatePickerInput = React.forwardRef<
       fullWidth
       value={value}
       onClick={onClick}
-      ref={ref}
+      inputRef={ref}
       error={error}
       helperText={helperText}
-      placeholder="เลือกเวลาสิ้นสุด"
+      placeholder="เลือกวันที่และเวลา"
       InputProps={{
         readOnly: true,
         startAdornment: (
@@ -76,10 +59,6 @@ const CustomDatePickerInput = React.forwardRef<
           cursor: "pointer",
           height: "24px",
           padding: "16.5px 14px 16.5px 0px",
-        },
-        "& .MuiInputBase-input::placeholder": {
-          color: theme.palette.common.white,
-          opacity: 1,
         },
         "& .MuiOutlinedInput-root": {
           "&:hover fieldset": {
@@ -106,15 +85,18 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
   const {
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
       sub_id: "",
       ATR_name: "",
-      start_time: getCurrentDateTime(),
-      end_time: getCurrentDateTime(),
+      start_time: new Date(),
+      end_time: new Date(),
     },
   });
+
+  const start_time = watch("start_time"); // ดูค่า start_time
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -132,9 +114,8 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
   }, []);
 
   const handleFormSubmit = (formData: any) => {
-    // แปลงเวลาเป็น UTC ก่อนส่งข้อมูลไปยัง backend
-    const startTimeUTC = dayjs(formData.start_time).tz(timeZone).utc().format();
-    const endTimeUTC = dayjs(formData.end_time).tz(timeZone).utc().format();
+    const startTimeUTC = formData.start_time.toISOString();
+    const endTimeUTC = formData.end_time.toISOString();
 
     const dataToSend = {
       ...formData,
@@ -142,7 +123,6 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
       end_time: endTimeUTC,
     };
 
-    console.log("Form Data:", dataToSend);
     onSubmit(dataToSend);
   };
 
@@ -242,50 +222,38 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
             />
           </FormControl>
 
-          <FormControl fullWidth>
+          {/* Start Time */}
+          <FormControl fullWidth error={!!errors.start_time}>
             <Typography variant="body2" sx={{ mb: 1 }}>
               เวลาเริ่มต้น
             </Typography>
             <Controller
               name="start_time"
               control={control}
+              rules={{ required: "กรุณาเลือกเวลาเริ่มต้น" }}
               render={({ field }) => (
-                <TextField
-                  {...field}
-                  variant="outlined"
-                  value={dayjs(field.value)
-                    .tz(timeZone)
-                    .format("DD/MM/YYYY HH:mm")}
-                  fullWidth
+                <DatePicker
                   disabled
-                  sx={{
-                    bgcolor: theme.palette.background.paper,
-                    color: theme.palette.text.primary,
-                    borderColor: "white !important",
-                    borderRadius: 1,
-                    ".MuiOutlinedInput-notchedOutline": {
-                      border: "1px solid #757575 !important",
-                    },
-                    "& .MuiInputBase-input.Mui-disabled": {
-                      WebkitTextFillColor: theme.palette.text.primary,
-                    },
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccessTimeRounded
-                          sx={{ color: theme.palette.text.secondary }}
-                        />
-                      </InputAdornment>
-                    ),
-                    readOnly: true,
-                  }}
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  customInput={
+                    <CustomDatePickerInput
+                      value={field.value ? field.value.toLocaleString() : ""}
+                      onClick={(e: React.MouseEvent) =>
+                        (e.target as HTMLInputElement).focus()
+                      }
+                      error={!!errors.start_time}
+                      helperText={errors.start_time?.message}
+                    />
+                  }
+                  showTimeSelect
+                  dateFormat="Pp"
                 />
               )}
             />
           </FormControl>
 
-          <FormControl fullWidth>
+          <FormControl fullWidth error={!!errors.end_time}>
             <Typography variant="body2" sx={{ mb: 1 }}>
               เวลาสิ้นสุด
             </Typography>
@@ -293,42 +261,37 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               name="end_time"
               control={control}
               rules={{ required: "กรุณาเลือกเวลาสิ้นสุด" }}
-              render={({ field }) => {
-                const handleDateChange = (date: any) => {
-                  const utcDate = dayjs(date).tz(timeZone).utc().format(); // แปลงเวลาเป็น UTC ก่อนส่งออก
-                  field.onChange(utcDate);
-                };
+              render={({ field }) => (
+                <DatePicker
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  filterDate={(date) => date.getTime() >= start_time.getTime()}
+                  filterTime={(time) => {
+                    if (start_time && field.value) {
+                      const start = new Date(start_time);
+                      const end = new Date(field.value);
 
-                return (
-                  <DatePicker
-                    selected={
-                      field.value
-                        ? dayjs(field.value).tz(timeZone).toDate()
-                        : null
+                      if (start.toDateString() === end.toDateString()) {
+                        return time.getTime() > start_time.getTime();
+                      }
                     }
-                    onChange={handleDateChange}
-                    showTimeSelect
-                    timeFormat="HH:mm"
-                    timeIntervals={5}
-                    dateFormat="dd/MM/yyyy HH:mm"
-                    placeholderText="เลือกเวลาสิ้นสุด"
-                    customInput={
-                      <CustomDatePickerInput
-                        value={
-                          field.value
-                            ? dayjs(field.value)
-                                .tz(timeZone)
-                                .format("DD MMMM YYYY HH:mm")
-                            : ""
-                        }
-                        onClick={() => {}}
-                        error={!!errors.end_time}
-                        helperText={errors.end_time?.message}
-                      />
-                    }
-                  />
-                );
-              }}
+                    return true;
+                  }}
+                  customInput={
+                    <CustomDatePickerInput
+                      value={field.value ? field.value.toLocaleString() : ""}
+                      onClick={(e: React.MouseEvent) =>
+                        (e.target as HTMLInputElement).focus()
+                      }
+                      error={!!errors.end_time}
+                      helperText={errors.end_time?.message}
+                    />
+                  }
+                  showTimeSelect
+                  timeIntervals={5}
+                  dateFormat="Pp"
+                />
+              )}
             />
           </FormControl>
 

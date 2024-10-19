@@ -24,7 +24,7 @@ const SideNav: React.FC<SideNavProps> = ({ Data }) => {
 
   return (
     <Sidebar
-      style={{ height: "auto", top: "auto", minHeight: "100vh" }}
+      style={{ height: "100vh", top: "auto" }}
       breakPoint="md"
       backgroundColor={theme.palette.background.paper}
     >

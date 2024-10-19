@@ -108,6 +108,10 @@ const styles = {
     ml: "20px",
     fontSize: "20px",
     fontWeight: 500,
+    display: {
+      xs: "none",
+      sm: "block",
+    },
   },
   avatar: {
     width: 32,
