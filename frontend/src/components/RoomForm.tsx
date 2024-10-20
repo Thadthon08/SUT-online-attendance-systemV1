@@ -88,6 +88,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -98,7 +99,8 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
     },
   });
 
-  const start_time = watch("start_time"); // ดูค่า start_time
+  const start_time = watch("start_time");
+  const selectedSubjectId = watch("sub_id");
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -114,6 +116,19 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
 
     fetchSubjects();
   }, []);
+
+  // อัปเดตค่า ATR_name เมื่อเลือกวิชา
+  useEffect(() => {
+    const selectedSubject = subjects.find(
+      (subject) => subject.sub_id === selectedSubjectId
+    );
+    if (selectedSubject) {
+      const roomName = `${
+        selectedSubject.sub_code
+      }เช็คชื่อ${new Date().toLocaleDateString()}ครั้งที่ 1`;
+      setValue("ATR_name", roomName); // ตั้งชื่อห้องอัตโนมัติ
+    }
+  }, [selectedSubjectId, subjects, setValue]);
 
   const handleFormSubmit = (formData: any) => {
     const startTimeUTC = formData.start_time.toISOString();
@@ -147,7 +162,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
         <Stack spacing={2}>
           <FormControl fullWidth error={!!errors.sub_id}>
             <Typography variant="body2" sx={{ mb: 1 }}>
-              วิชา
+              เลือกวิชา
             </Typography>
             <Controller
               name="sub_id"
