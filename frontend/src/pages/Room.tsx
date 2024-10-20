@@ -6,6 +6,7 @@ import {
   Container,
   Typography,
   alpha,
+  Grid,
 } from "@mui/material";
 import { LocationMap } from "../components/LocationMap";
 import { RoomForm } from "../components/RoomForm";
@@ -77,20 +78,29 @@ const Room = () => {
         p: 4,
       }}
     >
-      <Paper
+      <Grid
+        container
+        justifyContent="space-between"
+        alignItems="center"
         sx={{
           maxWidth: 1472,
           overflow: "hidden",
+          bgcolor: theme.palette.background.paper,
           border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
           borderRadius: 0,
           p: 2,
           mb: 3,
         }}
       >
-        <Typography variant="h5" fontWeight={"bolder"}>
-          Create Attendance Check
-        </Typography>
-      </Paper>
+        <Grid item>
+          <Typography variant="h5" fontWeight="bolder">
+            Room Management
+          </Typography>
+          <Typography variant="subtitle2">
+            All aspects related to the app users can be managed from this page.
+          </Typography>
+        </Grid>
+      </Grid>
       <Paper
         elevation={3}
         sx={{
@@ -123,7 +133,7 @@ const Room = () => {
             <Box
               sx={{
                 flex: 1,
-                bgcolor: "grey.830",
+                bgcolor: "brown.830",
                 color: "common.white",
                 p: 2,
                 height: "auto",

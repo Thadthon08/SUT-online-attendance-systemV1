@@ -50,4 +50,39 @@ const createAttendanceRoom = async (req, res) => {
   }
 };
 
-module.exports = { createAttendanceRoom };
+const getRoomsBySubject = async (req, res) => {
+  try {
+    const { sub_id } = req.params; // รับค่า sub_id จาก URL parameter
+
+    // ดึงข้อมูลห้องทั้งหมดที่สัมพันธ์กับวิชานั้นๆ โดยใช้ sub_id
+    const rooms = await AttendanceRoom.findAll({
+      where: { sub_id }, // ใช้ sub_id ที่รับมาเป็นเงื่อนไขการค้นหา
+      attributes: [
+        "ATR_id",
+        "ATR_name",
+        "ATR_lat",
+        "ATR_long",
+        "start_time",
+        "end_time",
+        "created_at",
+        "expired_at",
+      ], // เลือกเฉพาะฟิลด์ที่ต้องการ
+      order: [["created_at", "DESC"]], // เรียงลำดับตามวันที่สร้างล่าสุด
+    });
+
+    // หากไม่พบห้องใดๆ
+    if (rooms.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "ไม่พบห้องเช็คชื่อสำหรับวิชานี้" });
+    }
+
+    // ส่งข้อมูลห้องกลับในรูปแบบ JSON
+    res.status(200).json(rooms);
+  } catch (error) {
+    console.error("Error fetching rooms:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลห้องเช็คชื่อ" });
+  }
+};
+
+module.exports = { createAttendanceRoom, getRoomsBySubject };
