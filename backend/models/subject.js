@@ -5,8 +5,8 @@ const TeacherSubject = require("./teacher_subject"); // import ตาราง�
 
 const Subject = sequelize.define("Subject", {
   sub_id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
   sub_code: {

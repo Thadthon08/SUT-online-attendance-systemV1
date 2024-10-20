@@ -5,8 +5,8 @@ const Subject = require("./subject");
 
 const AttendanceSummary = sequelize.define("AttendanceSummary", {
   summary_id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
   total_sessions: {

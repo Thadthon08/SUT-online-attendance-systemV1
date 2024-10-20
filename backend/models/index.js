@@ -21,7 +21,7 @@ Subject.belongsToMany(Teacher, {
 
 // Sync โมเดลทั้งหมด
 sequelize
-  .sync({ Alter: true })
+  .sync({ force: true })
   .then(() => {
     console.log("All models were synchronized successfully.");
   })

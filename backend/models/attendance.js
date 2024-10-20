@@ -5,8 +5,8 @@ const Student = require("./student");
 
 const Attendance = sequelize.define("Attendance", {
   att_id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
   att_lat: {
