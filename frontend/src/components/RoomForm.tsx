@@ -20,6 +20,8 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { GetAllSubject } from "../services/api";
+import { SubjectInterface } from "../interface/ISubject";
+import { RoomInterface } from "../interface/IRoom";
 
 interface CustomDatePickerInputProps {
   value: string;
@@ -74,12 +76,12 @@ const CustomDatePickerInput = React.forwardRef<
 });
 
 interface RoomFormProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: RoomInterface) => void;
 }
 
 export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
   const theme = useTheme();
-  const [subjects, setSubjects] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<SubjectInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const {
@@ -173,7 +175,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                   <MenuItem value="" disabled>
                     เลือกวิชา
                   </MenuItem>
-                  {subjects.map((subject: any) => (
+                  {subjects.map((subject: SubjectInterface) => (
                     <MenuItem key={subject.sub_id} value={subject.sub_id}>
                       {subject.sub_code}
                     </MenuItem>

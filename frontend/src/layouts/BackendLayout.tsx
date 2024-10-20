@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Box, useTheme } from "@mui/material";
+import { Box, Theme, useTheme } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppHeader from "../components/AppHeader";
 import SideNav from "../components/SideNav";
@@ -32,11 +32,11 @@ const BackendLayout: React.FC = () => {
 };
 
 const styles = {
-  container: (theme: any) => ({
+  container: (theme: Theme) => ({
     display: "flex",
     bgcolor: theme.palette.background.default,
   }),
-  mainSection: (theme: any) => ({
+  mainSection: (theme: Theme) => ({
     px: 4,
     py: 1,
     width: "100%",

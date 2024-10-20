@@ -20,37 +20,6 @@ const getStudentByLineID = async (req, res) => {
   }
 };
 
-const updateProfilePicture = async (req, res) => {
-  try {
-    const { sid } = req.params;
-    const { profilePicUrl } = req.body;
-
-    if (!profilePicUrl) {
-      return res
-        .status(400)
-        .json({ message: "Profile picture URL is required" });
-    }
-
-    const student = await Student.findByPk(sid);
-
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    student.St_profile_pic = profilePicUrl;
-    await student.save();
-
-    return res.status(200).json({
-      message: "Profile picture updated successfully",
-      profilePic: profilePicUrl,
-    });
-  } catch (error) {
-    console.error("Error updating profile picture:", error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
 module.exports = {
   getStudentByLineID,
-  updateProfilePicture,
 };

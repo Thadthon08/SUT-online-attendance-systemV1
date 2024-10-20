@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Avatar,
   Box,
+  Theme,
   Typography,
   useMediaQuery,
   useTheme,
@@ -117,7 +118,7 @@ const styles = {
     borderRadius: "50%",
     aspectRatio: "1 / 1",
   },
-  yourChannel: (theme: any) => ({
+  yourChannel: (theme: Theme) => ({
     mt: 1,
     color: theme.palette.text.primary,
   }),

@@ -1,10 +1,16 @@
 import { SigninInterface } from "../interface/ISignin";
 import { StudentInterface } from "../interface/IStudent";
+import { SigninResponse } from "../interface/Signinrespone";
 
 // const apiURL = "http://localhost:3000";
 const apiURL = "https://sut-online-attendance-systemv1.onrender.com";
 
-export async function SignIn(login: SigninInterface): Promise<any> {
+function getToken() {
+  const token = localStorage.getItem("token");
+  return token;
+}
+
+export async function SignIn(login: SigninInterface): Promise<SigninResponse> {
   const response = await fetch(`${apiURL}/api/auth/signin`, {
     method: "POST",
     headers: {
@@ -25,6 +31,7 @@ export async function CreateRoom(data: any): Promise<any> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
     },
     body: JSON.stringify(data),
   });
@@ -39,6 +46,9 @@ export async function CreateRoom(data: any): Promise<any> {
 export async function GetAllSubject(): Promise<any> {
   const response = await fetch(`${apiURL}/api/subject`, {
     method: "GET",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
   });
 
   if (!response.ok) {
@@ -55,22 +65,6 @@ export async function GetStudentIDByLineId(lineId: string): Promise<any> {
 
   if (!response.ok) {
     throw new Error("Failed to get student ID.");
-  }
-
-  return response.json();
-}
-
-export async function UpdateProfileUrl(sid: string, data: any): Promise<any> {
-  const response = await fetch(`${apiURL}/api/student/${sid}/profile-pic`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update profile.");
   }
 
   return response.json();

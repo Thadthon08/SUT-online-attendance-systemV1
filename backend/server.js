@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const sequelize = require("./config/db");
+const authenticateJWT = require("./middlewares/auth.middleware");
 var cors = require("cors");
 
 const app = express();
@@ -10,9 +11,9 @@ app.use(cors());
 
 // ใช้งานเส้นทางของ user
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/create", require("./routes/attendanceRoom"));
+app.use("/api/create", authenticateJWT, require("./routes/attendanceRoom"));
 app.use("/line", require("./routes/line"));
-app.use("/api/subject", require("./routes/subject"));
+app.use("/api/subject", authenticateJWT, require("./routes/subject"));
 app.use("/api/checkin", require("./routes/attendance"));
 app.use("/api/student", require("./routes/student"));
 

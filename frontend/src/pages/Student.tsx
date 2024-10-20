@@ -19,6 +19,7 @@ import { GetStudentIDByLineId, CheckIn } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
 import { useProfile } from "../utils/useProfile";
+import { StudentInterface } from "../interface/IStudent";
 
 // สร้างธีม Dark
 const darkTheme = createTheme({
@@ -32,7 +33,7 @@ const darkTheme = createTheme({
 
 export default function StudentDashboard() {
   const { profile, isLoading } = useProfile();
-  const [studentData, setStudentData] = useState<any | null>(null);
+  const [studentData, setStudentData] = useState<StudentInterface | null>(null);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;

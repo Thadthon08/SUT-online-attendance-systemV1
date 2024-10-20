@@ -18,6 +18,7 @@ import { useProSidebar } from "react-pro-sidebar";
 import logo from "../assets/ENGi Logo-White.png";
 import { logout } from "../utils/logoutUtils";
 import { UserData } from "../interface/Signinrespone";
+import { Theme } from "@mui/material/styles";
 
 interface AppHeaderProps {
   Data?: UserData;
@@ -94,7 +95,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ Data }) => {
 };
 
 const styles = {
-  appBar: (theme: any) => ({
+  appBar: (theme: Theme) => ({
     backgroundColor: theme.palette.background.paper,
     color: theme.palette.text.primary,
   }),
@@ -117,7 +118,7 @@ const styles = {
     width: 32,
     height: 32,
   },
-  menu: (theme: any) => ({
+  menu: (theme: Theme) => ({
     backgroundColor: theme.palette.background.paper,
     color: theme.palette.text.primary,
   }),

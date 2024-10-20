@@ -7,3 +7,8 @@ export interface UserData {
   iat: number;
   exp: number;
 }
+
+export interface SigninResponse {
+  message: string;
+  token: string;
+}
