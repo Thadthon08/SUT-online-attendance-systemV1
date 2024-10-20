@@ -10,7 +10,6 @@ const AttendanceRoom = sequelize.define("AttendanceRoom", {
   },
   ATR_name: {
     type: DataTypes.STRING,
-    unique: true,
   },
   ATR_lat: {
     type: DataTypes.FLOAT,

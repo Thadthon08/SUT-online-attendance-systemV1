@@ -94,4 +94,40 @@ const checkInAttendance = async (req, res) => {
   }
 };
 
-module.exports = { checkInAttendance };
+const getAttendanceForRoom = async (req, res) => {
+  try {
+    const { ATR_id } = req.params;
+
+    const attendanceRecords = await Attendance.findAll({
+      where: { ATR_id },
+      include: [
+        {
+          model: Student,
+          attributes: ["sid", "St_fname", "St_lname"],
+        },
+      ],
+      order: [["att_time", "ASC"]],
+    });
+
+    if (attendanceRecords.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "ไม่พบข้อมูลการเช็คชื่อสำหรับห้องนี้" });
+    }
+
+    res.status(200).json({
+      roomId: ATR_id,
+      totalCheckedIn: attendanceRecords.length,
+      students: attendanceRecords.map((record) => ({
+        sid: record.Student.sid,
+        name: `${record.Student.St_fname} ${record.Student.St_lname}`,
+        checkInTime: record.att_time,
+      })),
+    });
+  } catch (error) {
+    console.error("Error fetching attendance records:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลการเช็คชื่อ" });
+  }
+};
+
+module.exports = { checkInAttendance, getAttendanceForRoom };
