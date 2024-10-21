@@ -148,3 +148,20 @@ export async function GetRoomFromSubject(id: string): Promise<any> {
 
   return response.json();
 }
+
+// Delete Room
+export async function DeleteRoom(id: string): Promise<any> {
+  // const response = await fetch(`${apiURL}/api/room/${id}`, {
+  //   method: "DELETE",
+  //   headers: {
+  //     Authorization: `Bearer ${getToken()}`,
+  //   },
+  // });
+
+  // if (!response.ok) {
+  //   throw new Error("Failed to delete room.");
+  // }
+
+  // return response.json();
+  console.log("Delete Room ID: ", id);
+}

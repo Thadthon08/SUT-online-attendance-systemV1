@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   alpha,
   Container,
@@ -18,12 +19,18 @@ import {
   Divider,
   InputAdornment,
   TextField,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
+import QrCodeIcon from "@mui/icons-material/QrCode";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PeopleIcon from "@mui/icons-material/People";
 import { GetAllSubject, GetRoomFromSubject } from "../services/api";
 import { SubjectInterface } from "../interface/ISubject";
 import theme from "../config/theme";
+import QRCodeModal from "../components/QRCodeModal";
 
 const TabsWrapper = styled(Tabs)(
   ({ theme }) => `
@@ -71,6 +78,9 @@ export default function Report() {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [query, setQuery] = useState<string>("");
+  const [openQRCode, setOpenQRCode] = useState(false);
+  const [currentQRCode, setCurrentQRCode] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -129,16 +139,33 @@ export default function Report() {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredRoom = room.filter((r: any) =>
-    r.ATR_name.toLowerCase().includes(query.toLowerCase())
-  );
-  const paginatedRoom = filteredRoom.slice(page * limit, page * limit + limit);
-
   const handleQueryChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     setQuery(event.target.value);
   };
+
+  const handleViewQRCode = (qrcodeData: string) => {
+    setCurrentQRCode(qrcodeData);
+    setOpenQRCode(true);
+  };
+
+  const handleCloseQRCode = () => {
+    setOpenQRCode(false);
+  };
+
+  const handleDeleteRoom = async (roomId: string) => {
+    console.log(`Deleting room ${roomId}`);
+  };
+
+  const handleViewAttendees = async (roomId: string) => {
+    navigate(`/report/room/${roomId}`);
+  };
+
+  const filteredRoom = room.filter((r: any) =>
+    r.ATR_name.toLowerCase().includes(query.toLowerCase())
+  );
+  const paginatedRoom = filteredRoom.slice(page * limit, page * limit + limit);
 
   return (
     <Container
@@ -253,22 +280,50 @@ export default function Report() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Room ID</TableCell>
                     <TableCell>Room Name</TableCell>
                     <TableCell>Start Time</TableCell>
                     <TableCell>End Time</TableCell>
+                    <TableCell>QR Code</TableCell>
+                    <TableCell>Attendees</TableCell>
+                    <TableCell>Delete</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {paginatedRoom.map((record) => (
                     <TableRow hover key={record.ATR_id}>
-                      <TableCell>{record.ATR_id}</TableCell>
                       <TableCell>{record.ATR_name}</TableCell>
                       <TableCell>
                         {new Date(record.start_time).toLocaleString()}
                       </TableCell>
                       <TableCell>
                         {new Date(record.end_time).toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip title="View QR Code">
+                          <IconButton
+                            onClick={() => handleViewQRCode(record.qrcode_data)}
+                          >
+                            <QrCodeIcon sx={{ color: "#ffffff" }} />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip title="View Attendees">
+                          <IconButton
+                            onClick={() => handleViewAttendees(record.ATR_id)}
+                          >
+                            <PeopleIcon sx={{ color: "#ffffff" }} />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip title="Delete Room">
+                          <IconButton
+                            onClick={() => handleDeleteRoom(record.ATR_id)}
+                          >
+                            <DeleteIcon sx={{ color: "#ffffff" }} />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -289,6 +344,12 @@ export default function Report() {
           </>
         )}
       </Card>
+
+      <QRCodeModal
+        open={openQRCode}
+        onClose={handleCloseQRCode}
+        qrcode={currentQRCode}
+      />
     </Container>
   );
 }

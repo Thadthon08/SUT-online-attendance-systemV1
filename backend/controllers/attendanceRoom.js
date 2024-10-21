@@ -66,6 +66,7 @@ const getRoomsBySubject = async (req, res) => {
         "end_time",
         "created_at",
         "expired_at",
+        "qrcode_data",
       ], // เลือกเฉพาะฟิลด์ที่ต้องการ
       order: [["created_at", "DESC"]], // เรียงลำดับตามวันที่สร้างล่าสุด
     });
