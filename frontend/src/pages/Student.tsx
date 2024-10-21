@@ -165,7 +165,7 @@ export default function StudentDashboard() {
   };
 
   const startScan = () => {
-    // ปิดการแสดงผลกราฟเมื่อเริ่มเปิดกล้อง
+    // ปิดการแสดงผลกราฟก่อนเปิดกล้อง
     setShowDetails(false);
     setIsScanning(true);
 
@@ -250,7 +250,7 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<CheckCircle />}
               onClick={() => {
-                // เริ่มการสแกนและปิดการแสดงกราฟ
+                // ตรวจสอบว่าไม่ได้อยู่ในโหมดแสดงกราฟก่อนเปิดกล้อง
                 if (!isScanning) {
                   setIsScanning(true);
                   setShowDetails(false);
@@ -269,10 +269,10 @@ export default function StudentDashboard() {
               startIcon={<Info />}
               sx={{ height: "100%" }}
               onClick={() => {
-                // เปิดกราฟและหยุดการสแกน
+                // หยุดการสแกนก่อนแสดงกราฟ
                 if (!showDetails) {
-                  setShowDetails(true);
-                  stopScan();
+                  stopScan(); // หยุดกล้องถ้าเปิดอยู่
+                  setShowDetails(true); // แสดงกราฟ
                 }
               }}
             >
@@ -281,6 +281,7 @@ export default function StudentDashboard() {
           </Grid>
         </Grid>
 
+        {/* กล้องแสดงเฉพาะเมื่อ isScanning เป็น true */}
         {isScanning && (
           <Paper
             elevation={3}
