@@ -66,7 +66,6 @@ export default function Report() {
   const [filters, setFilters] = useState<{ role: string }>({ role: "" });
   const [subjects, setSubjects] = useState<SubjectInterface[]>([]);
   const [room, setRoom] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const tabsRef = useRef<HTMLDivElement | null>(null);
   const [tabBounds, setTabBounds] = useState({ left: 0, width: 0 });
   const [page, setPage] = useState<number>(0);
@@ -111,15 +110,12 @@ export default function Report() {
   ) => {
     setFilters({ ...filters, role: newValue });
     setRoom([]); // Clear the room data before fetching new one
-    setLoading(true);
 
     try {
       const result = await GetRoomFromSubject(newValue);
       setRoom(result);
     } catch (err) {
       console.log(err);
-    } finally {
-      setLoading(false);
     }
   };
 
