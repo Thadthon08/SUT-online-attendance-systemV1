@@ -15,6 +15,7 @@ app.use("/api/create", authenticateJWT, require("./routes/attendanceRoom"));
 app.use("/line", require("./routes/line"));
 app.use("/api/subject", authenticateJWT, require("./routes/subject"));
 app.use("/api/checkin", require("./routes/attendance"));
+app.use("/api/attsum", require("./routes/attendanceSum"));
 app.use("/api/student", require("./routes/student"));
 
 // เริ่มต้นเซิร์ฟเวอร์

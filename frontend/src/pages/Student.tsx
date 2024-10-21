@@ -10,17 +10,12 @@ import {
   Grid,
   Divider,
   Paper,
-  Modal,
   ThemeProvider,
   createTheme,
   CssBaseline,
 } from "@mui/material";
 import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
-import {
-  GetStudentIDByLineId,
-  CheckIn,
-  GetLast10Attendances,
-} from "../services/api";
+import { GetStudentIDByLineId, CheckIn } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
 import { useProfile } from "../utils/useProfile";
@@ -39,16 +34,13 @@ const darkTheme = createTheme({
 export default function StudentDashboard() {
   const { profile, isLoading } = useProfile();
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
-  const [attendanceHistory, setAttendanceHistory] = useState<
-    { att_time: string; ATR_id: string }[]
-  >([]); //
+
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
-  const [showDetails, setShowDetails] = useState(false); // สำหรับแสดง modal
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
   const lastDecodedText = useRef<string | null>(null);
@@ -207,24 +199,6 @@ export default function StudentDashboard() {
     }
   };
 
-  const handleViewDetails = async () => {
-    try {
-      if (!studentData) return;
-      const history = await GetLast10Attendances(studentData.sid);
-      setAttendanceHistory(history);
-      setShowDetails(true); // แสดง modal
-    } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "ไม่สามารถดึงข้อมูลเช็คชื่อได้",
-        icon: "error",
-        confirmButtonText: "ตกลง",
-        background: "#1e1e1e",
-        color: "#ffffff",
-      });
-    }
-  };
-
   useEffect(() => {
     if (isScanning) {
       startScan();
@@ -283,54 +257,11 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<Info />}
               sx={{ height: "100%" }}
-              onClick={handleViewDetails} // เมื่อคลิกจะแสดงรายละเอียดการเช็คชื่อ
             >
               View Details
             </Button>
           </Grid>
         </Grid>
-
-        {/* แสดง modal ข้อมูลเช็คชื่อ */}
-        <Modal open={showDetails} onClose={() => setShowDetails(false)}>
-          <Paper
-            sx={{
-              maxWidth: 600,
-              margin: "auto",
-              mt: 5,
-              p: 2,
-              backgroundColor: "background.paper",
-            }}
-          >
-            <Typography variant="h6" gutterBottom color="text.primary">
-              Attendance History
-            </Typography>
-            {attendanceHistory.length > 0 ? (
-              <Box>
-                {attendanceHistory.map((att, index) => (
-                  <Box key={index} mb={2}>
-                    <Typography color="text.secondary">
-                      {new Date(att.att_time).toLocaleString()} - Room ID:{" "}
-                      {att.ATR_id}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            ) : (
-              <Typography color="text.secondary">
-                No attendance records
-              </Typography>
-            )}
-            <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<Close />}
-              onClick={() => setShowDetails(false)}
-              sx={{ mt: 2 }}
-            >
-              Close
-            </Button>
-          </Paper>
-        </Modal>
 
         {isScanning && (
           <Paper

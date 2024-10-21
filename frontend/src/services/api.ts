@@ -47,6 +47,7 @@ export async function GetAllSubject(): Promise<any> {
   const response = await fetch(`${apiURL}/api/subject`, {
     method: "GET",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${getToken()}`,
     },
   });
@@ -123,6 +124,7 @@ export async function GetAttendanceForRoom(roomId: string): Promise<any> {
   const response = await fetch(`${apiURL}/api/checkin/${roomId}`, {
     method: "GET",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${getToken()}`,
     },
   });
@@ -142,6 +144,7 @@ export async function GetRoomFromSubject(id: string): Promise<any> {
   const response = await fetch(`${apiURL}/api/subject/room/${id}`, {
     method: "GET",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${getToken()}`,
     },
   });
@@ -173,9 +176,12 @@ export async function DeleteRoom(id: string): Promise<any> {
   console.log("Delete Room ID: ", id);
 }
 
-export async function GetLast10Attendances(sid: string): Promise<any> {
+export async function GetAttSumBtSid(sid: string): Promise<any> {
+  const apiUrl = `${apiURL}/api/attsum/${sid}`;
+
   try {
-    const response = await fetch(`/api/attendances/${sid}`, {
+    // ส่ง request ไปยัง backend API
+    const response = await fetch(apiUrl, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -183,13 +189,13 @@ export async function GetLast10Attendances(sid: string): Promise<any> {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch attendance records for SID: ${sid}`);
+      throw new Error("Failed to fetch attendance summary.");
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching last 10 attendances:", error);
-    throw error;
+    console.error("Error fetching attendance summary:", error);
+    return { error: "เกิดข้อผิดพลาดในการดึงข้อมูลสรุปการเช็คชื่อ" };
   }
 }
