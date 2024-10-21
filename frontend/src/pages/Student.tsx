@@ -35,9 +35,9 @@ const darkTheme = createTheme({
 export default function StudentDashboard() {
   const { profile, isLoading } = useProfile();
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
-  const [showDetails, setShowDetails] = useState(false); // state สำหรับแสดงกราฟ
-  const [isScanning, setIsScanning] = useState(false); // state สำหรับการเปิดกล้อง
-  const [isCameraInitializing, setIsCameraInitializing] = useState(false); // state สำหรับตรวจสอบการเริ่มต้นของกล้อง
+  const [showDetails, setShowDetails] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [isCameraInitializing, setIsCameraInitializing] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
@@ -165,10 +165,9 @@ export default function StudentDashboard() {
   };
 
   const startScan = () => {
-    // ตั้งค่าสถานะว่ากำลังเริ่มกล้อง
     setIsCameraInitializing(true);
-    setShowDetails(false); // ปิดกราฟเมื่อเริ่มกล้อง
-    setIsScanning(true); // เปิดการสแกน
+    setShowDetails(false);
+    setIsScanning(true);
 
     if (scannerRef.current) {
       html5QrCode.current = new Html5Qrcode("reader");
@@ -181,7 +180,6 @@ export default function StudentDashboard() {
             console.error("QR Code scanning error:", errorMessage)
         )
         .then(() => {
-          // เมื่อกล้องเริ่มทำงานสำเร็จ ให้ปิดสถานะการเริ่มต้นกล้อง
           setIsCameraInitializing(false);
         })
         .catch((err) => {
@@ -196,7 +194,6 @@ export default function StudentDashboard() {
             color: "#ffffff",
           });
 
-          // หากเกิดข้อผิดพลาด ให้ปิดการเริ่มต้นและการสแกน
           setIsCameraInitializing(false);
           setIsScanning(false);
         });
@@ -260,12 +257,12 @@ export default function StudentDashboard() {
               startIcon={<CheckCircle />}
               onClick={() => {
                 if (!isScanning && !isCameraInitializing) {
-                  setIsScanning(true); // เปิดการสแกน QR Code
-                  setShowDetails(false); // ปิดการแสดงกราฟ
+                  setIsScanning(true);
+                  setShowDetails(false);
                 }
               }}
               sx={{ height: "100%" }}
-              disabled={isScanning || isCameraInitializing} // ป้องกันการคลิกซ้ำเมื่อกล้องกำลังเริ่มต้น
+              disabled={isScanning || isCameraInitializing}
             >
               Check Attendance
             </Button>
@@ -277,13 +274,13 @@ export default function StudentDashboard() {
               startIcon={<Info />}
               sx={{ height: "100%" }}
               onClick={() => {
-                // แสดงกราฟเฉพาะเมื่อกล้องไม่ได้เปิดหรือไม่ได้อยู่ในขั้นตอนการเริ่มต้น
-                if (!showDetails && !isCameraInitializing) {
-                  stopScan(); // หยุดการสแกนกล้อง
-                  setShowDetails(true); // แสดงกราฟ
+                if (!showDetails) {
+                  stopScan();
+                  setShowDetails(true);
+                  setIsScanning(false);
                 }
               }}
-              disabled={isCameraInitializing} // ปิดการใช้งานปุ่ม View Details ในขณะที่กล้องกำลังเริ่มต้น
+              disabled={isCameraInitializing}
             >
               View Details
             </Button>
@@ -337,7 +334,10 @@ export default function StudentDashboard() {
               variant="contained"
               color="secondary"
               startIcon={<Close />}
-              onClick={stopScan}
+              onClick={() => {
+                stopScan();
+                setIsScanning(false);
+              }}
               sx={{ mt: 2, width: "100%" }}
             >
               Stop Scanning
@@ -345,7 +345,26 @@ export default function StudentDashboard() {
           </Paper>
         )}
 
-        {showDetails && <AttendanceSummaryChart sid={studentData.sid} />}
+        {showDetails && !isScanning && (
+          <Paper
+            elevation={3}
+            sx={{
+              mt: 3,
+              p: 2,
+              backgroundColor: "background.paper",
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              align="center"
+              color="text.primary"
+            >
+              Attendance Summary
+            </Typography>
+            <AttendanceSummaryChart sid={studentData.sid} />
+          </Paper>
+        )}
       </Box>
     </ThemeProvider>
   );
