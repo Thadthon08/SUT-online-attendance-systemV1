@@ -73,9 +73,7 @@ const getRoomsBySubject = async (req, res) => {
 
     // หากไม่พบห้องใดๆ
     if (rooms.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "ไม่พบห้องเช็คชื่อสำหรับวิชานี้" });
+      return res.status(204);
     }
 
     // ส่งข้อมูลห้องกลับในรูปแบบ JSON

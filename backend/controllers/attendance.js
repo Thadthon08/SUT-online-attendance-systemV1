@@ -110,9 +110,7 @@ const getAttendanceForRoom = async (req, res) => {
     });
 
     if (attendanceRecords.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "ไม่พบข้อมูลการเช็คชื่อสำหรับห้องนี้" });
+      return res.status(204);
     }
 
     res.status(200).json({

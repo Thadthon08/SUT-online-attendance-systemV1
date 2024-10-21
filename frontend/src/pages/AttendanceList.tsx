@@ -12,6 +12,8 @@ import {
   Button,
   Grid,
   alpha,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import { GetAttendanceForRoom } from "../services/api";
 import * as XLSX from "xlsx";
@@ -34,14 +36,10 @@ export default function ViewAttendees() {
     }
 
     try {
+      setLoading(true);
       const data = await GetAttendanceForRoom(id);
-
-      if (data.students && data.students.length > 0) {
-        setAttendanceData(data);
-        setError(null);
-      } else {
-        setError("ไม่พบข้อมูลการเข้าร่วมในห้องเรียนนี้");
-      }
+      setAttendanceData(data);
+      setError(null);
     } catch (err) {
       setError("เกิดข้อผิดพลาดในการโหลดข้อมูล");
     } finally {
@@ -50,14 +48,18 @@ export default function ViewAttendees() {
   }, [id]);
 
   useEffect(() => {
+    let pollingTimeout: NodeJS.Timeout;
+
     const longPolling = async () => {
       await fetchAttendance();
-      setTimeout(longPolling, 5000);
+      pollingTimeout = setTimeout(longPolling, 5000); // ดึงข้อมูลใหม่ทุกๆ 5 วินาที
     };
 
     longPolling();
 
-    return () => {};
+    return () => {
+      clearTimeout(pollingTimeout); // ยกเลิกการดึงข้อมูลเมื่อออกจากคอมโพเนนต์
+    };
   }, [fetchAttendance]);
 
   const handleBack = () => {
@@ -65,7 +67,11 @@ export default function ViewAttendees() {
   };
 
   const handleExport = () => {
-    if (!attendanceData || !attendanceData.students) {
+    if (
+      !attendanceData ||
+      !attendanceData.students ||
+      attendanceData.students.length === 0
+    ) {
       alert("No data available to export");
       return;
     }
@@ -85,7 +91,19 @@ export default function ViewAttendees() {
   };
 
   if (loading && !attendanceData) {
-    return <Typography>Loading attendees data...</Typography>;
+    return (
+      <Container
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress />
+        <Typography sx={{ ml: 2 }}>Loading attendees data...</Typography>
+      </Container>
+    );
   }
 
   return (
@@ -98,6 +116,7 @@ export default function ViewAttendees() {
         p: 4,
       }}
     >
+      {/* Header */}
       <Grid
         container
         justifyContent="space-between"
@@ -142,6 +161,7 @@ export default function ViewAttendees() {
         </Grid>
       </Grid>
 
+      {/* Export and Back Buttons */}
       <Grid container justifyContent="flex-end" sx={{ mb: 2 }}>
         <Button
           variant="contained"
@@ -157,29 +177,34 @@ export default function ViewAttendees() {
           onClick={handleExport}
           sx={{ borderRadius: 1 }}
           startIcon={<FileDownloadIcon />}
+          disabled={!attendanceData || attendanceData.totalCheckedIn === 0}
         >
           Export to Excel
         </Button>
       </Grid>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Student ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Check-in Time</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {error ? (
+      {/* Error Alert */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Data Table */}
+      {attendanceData && attendanceData.totalCheckedIn === 0 ? (
+        <Alert severity="info">ไม่พบข้อมูลการเข้าร่วมในห้องเรียนนี้</Alert>
+      ) : (
+        <Paper>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  <Typography color="error">{error}</Typography>
-                </TableCell>
+                <TableCell>Student ID</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Check-in Time</TableCell>
               </TableRow>
-            ) : (
-              attendanceData?.students.map((student: any) => (
+            </TableHead>
+            <TableBody>
+              {attendanceData?.students.map((student: any) => (
                 <TableRow key={student.sid}>
                   <TableCell>{student.sid}</TableCell>
                   <TableCell>{student.name}</TableCell>
@@ -187,11 +212,11 @@ export default function ViewAttendees() {
                     {new Date(student.checkInTime).toLocaleString()}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Paper>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
     </Container>
   );
 }

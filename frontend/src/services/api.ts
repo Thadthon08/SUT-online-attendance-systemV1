@@ -2,8 +2,8 @@ import { SigninInterface } from "../interface/ISignin";
 import { StudentInterface } from "../interface/IStudent";
 import { SigninResponse } from "../interface/Signinrespone";
 
-// const apiURL = "http://localhost:3000";
-const apiURL = "https://sut-online-attendance-systemv1.onrender.com";
+const apiURL = "http://localhost:3000";
+// const apiURL = "https://sut-online-attendance-systemv1.onrender.com";
 
 function getToken() {
   const token = localStorage.getItem("token");
@@ -131,6 +131,10 @@ export async function GetAttendanceForRoom(roomId: string): Promise<any> {
     throw new Error("Failed to get attendance.");
   }
 
+  if (response.status === 201) {
+    return [];
+  }
+
   return response.json();
 }
 
@@ -144,6 +148,9 @@ export async function GetRoomFromSubject(id: string): Promise<any> {
 
   if (!response.ok) {
     throw new Error("Failed to get attendance.");
+  }
+  if (response.status === 201) {
+    return [];
   }
 
   return response.json();
