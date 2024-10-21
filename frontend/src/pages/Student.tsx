@@ -20,6 +20,7 @@ import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
 import { useProfile } from "../utils/useProfile";
 import { StudentInterface } from "../interface/IStudent";
+import AttendanceSummaryChart from "../components/AttendanceSummaryChart";
 
 // สร้างธีม Dark
 const darkTheme = createTheme({
@@ -34,6 +35,7 @@ const darkTheme = createTheme({
 export default function StudentDashboard() {
   const { profile, isLoading } = useProfile();
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
+  const [showDetails, setShowDetails] = useState(false); // สร้าง state สำหรับแสดงกราฟ
 
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
@@ -62,7 +64,6 @@ export default function StudentDashboard() {
             enableHighAccuracy: true,
           };
 
-          // ฟังก์ชันสำหรับดึงตำแหน่งที่ตั้ง
           const getLocation = () => {
             return new Promise<GeolocationPosition>((resolve, reject) => {
               navigator.geolocation.getCurrentPosition(
@@ -257,6 +258,7 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<Info />}
               sx={{ height: "100%" }}
+              onClick={() => setShowDetails(!showDetails)} // เปลี่ยนสถานะ showDetails
             >
               View Details
             </Button>
@@ -317,6 +319,8 @@ export default function StudentDashboard() {
             </Button>
           </Paper>
         )}
+
+        {showDetails && <AttendanceSummaryChart sid={studentData.sid} />}
       </Box>
     </ThemeProvider>
   );
