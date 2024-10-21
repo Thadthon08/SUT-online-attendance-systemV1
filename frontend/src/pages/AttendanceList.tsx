@@ -52,13 +52,13 @@ export default function ViewAttendees() {
 
     const longPolling = async () => {
       await fetchAttendance();
-      pollingTimeout = setTimeout(longPolling, 5000); // ดึงข้อมูลใหม่ทุกๆ 5 วินาที
+      pollingTimeout = setTimeout(longPolling, 5000);
     };
 
     longPolling();
 
     return () => {
-      clearTimeout(pollingTimeout); // ยกเลิกการดึงข้อมูลเมื่อออกจากคอมโพเนนต์
+      clearTimeout(pollingTimeout);
     };
   }, [fetchAttendance]);
 
@@ -161,7 +161,6 @@ export default function ViewAttendees() {
         </Grid>
       </Grid>
 
-      {/* Export and Back Buttons */}
       <Grid container justifyContent="flex-end" sx={{ mb: 2 }}>
         <Button
           variant="contained"
@@ -183,14 +182,12 @@ export default function ViewAttendees() {
         </Button>
       </Grid>
 
-      {/* Error Alert */}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
 
-      {/* Data Table */}
       {attendanceData && attendanceData.totalCheckedIn === 0 ? (
         <Alert severity="info">ไม่พบข้อมูลการเข้าร่วมในห้องเรียนนี้</Alert>
       ) : (
