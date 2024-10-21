@@ -35,12 +35,13 @@ const darkTheme = createTheme({
 export default function StudentDashboard() {
   const { profile, isLoading } = useProfile();
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
-  const [showDetails, setShowDetails] = useState(false); // สร้าง state สำหรับแสดงกราฟ
+  const [showDetails, setShowDetails] = useState(false); // state สำหรับแสดงกราฟ
+  const [isScanning, setIsScanning] = useState(false); // state สำหรับการเปิดกล้อง
+
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
@@ -164,6 +165,8 @@ export default function StudentDashboard() {
   };
 
   const startScan = () => {
+    // ปิดการแสดงผลกราฟเมื่อเริ่มเปิดกล้อง
+    setShowDetails(false);
     setIsScanning(true);
 
     if (scannerRef.current) {
@@ -204,7 +207,6 @@ export default function StudentDashboard() {
   useEffect(() => {
     if (isScanning) {
       startScan();
-      setShowDetails(false);
     }
     return stopScan;
   }, [isScanning]);
@@ -248,8 +250,11 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<CheckCircle />}
               onClick={() => {
-                setIsScanning(true); // เปิดการสแกน QR code
-                setShowDetails(false); // ปิดการแสดงกราฟ
+                // เริ่มการสแกนและปิดการแสดงกราฟ
+                if (!isScanning) {
+                  setIsScanning(true);
+                  setShowDetails(false);
+                }
               }}
               sx={{ height: "100%" }}
               disabled={isScanning}
@@ -264,8 +269,11 @@ export default function StudentDashboard() {
               startIcon={<Info />}
               sx={{ height: "100%" }}
               onClick={() => {
-                setShowDetails(true); // เปิดการแสดงกราฟ
-                stopScan(); // ปิดการสแกน QR code
+                // เปิดกราฟและหยุดการสแกน
+                if (!showDetails) {
+                  setShowDetails(true);
+                  stopScan();
+                }
               }}
             >
               View Details
