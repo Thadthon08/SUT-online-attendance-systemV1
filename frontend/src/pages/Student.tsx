@@ -37,7 +37,7 @@ export default function StudentDashboard() {
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
   const [showDetails, setShowDetails] = useState(false); // state สำหรับแสดงกราฟ
   const [isScanning, setIsScanning] = useState(false); // state สำหรับการเปิดกล้อง
-
+  const [isCameraInitializing, setIsCameraInitializing] = useState(false); // state สำหรับตรวจสอบการเริ่มต้นของกล้อง
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
@@ -165,9 +165,10 @@ export default function StudentDashboard() {
   };
 
   const startScan = () => {
-    // ปิดการแสดงผลกราฟก่อนเปิดกล้อง
-    setShowDetails(false);
-    setIsScanning(true);
+    // ตั้งค่าสถานะว่ากำลังเริ่มกล้อง
+    setIsCameraInitializing(true);
+    setShowDetails(false); // ปิดกราฟเมื่อเริ่มกล้อง
+    setIsScanning(true); // เปิดการสแกน
 
     if (scannerRef.current) {
       html5QrCode.current = new Html5Qrcode("reader");
@@ -179,6 +180,10 @@ export default function StudentDashboard() {
           (errorMessage) =>
             console.error("QR Code scanning error:", errorMessage)
         )
+        .then(() => {
+          // เมื่อกล้องเริ่มทำงานสำเร็จ ให้ปิดสถานะการเริ่มต้นกล้อง
+          setIsCameraInitializing(false);
+        })
         .catch((err) => {
           console.log("Failed to start QR code scanner:", err);
 
@@ -190,6 +195,10 @@ export default function StudentDashboard() {
             background: "#1e1e1e",
             color: "#ffffff",
           });
+
+          // หากเกิดข้อผิดพลาด ให้ปิดการเริ่มต้นและการสแกน
+          setIsCameraInitializing(false);
+          setIsScanning(false);
         });
     }
   };
@@ -250,14 +259,13 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<CheckCircle />}
               onClick={() => {
-                // ตรวจสอบว่าไม่ได้อยู่ในโหมดแสดงกราฟก่อนเปิดกล้อง
-                if (!isScanning) {
-                  setIsScanning(true);
-                  setShowDetails(false);
+                if (!isScanning && !isCameraInitializing) {
+                  setIsScanning(true); // เปิดการสแกน QR Code
+                  setShowDetails(false); // ปิดการแสดงกราฟ
                 }
               }}
               sx={{ height: "100%" }}
-              disabled={isScanning}
+              disabled={isScanning || isCameraInitializing} // ป้องกันการคลิกซ้ำเมื่อกล้องกำลังเริ่มต้น
             >
               Check Attendance
             </Button>
@@ -269,19 +277,19 @@ export default function StudentDashboard() {
               startIcon={<Info />}
               sx={{ height: "100%" }}
               onClick={() => {
-                // หยุดการสแกนก่อนแสดงกราฟ
-                if (!showDetails) {
-                  stopScan(); // หยุดกล้องถ้าเปิดอยู่
+                // แสดงกราฟเฉพาะเมื่อกล้องไม่ได้เปิดหรือไม่ได้อยู่ในขั้นตอนการเริ่มต้น
+                if (!showDetails && !isCameraInitializing) {
+                  stopScan(); // หยุดการสแกนกล้อง
                   setShowDetails(true); // แสดงกราฟ
                 }
               }}
+              disabled={isCameraInitializing} // ปิดการใช้งานปุ่ม View Details ในขณะที่กล้องกำลังเริ่มต้น
             >
               View Details
             </Button>
           </Grid>
         </Grid>
 
-        {/* กล้องแสดงเฉพาะเมื่อ isScanning เป็น true */}
         {isScanning && (
           <Paper
             elevation={3}
