@@ -264,16 +264,6 @@ export default function Report() {
           >
             No rooms available for this subject.
           </Typography>
-        ) : paginatedRoom.length === 0 ? (
-          <Typography
-            sx={{ py: 10 }}
-            variant="h3"
-            fontWeight="normal"
-            color="text.secondary"
-            align="center"
-          >
-            No room data matching your search.
-          </Typography>
         ) : (
           <>
             <TableContainer>

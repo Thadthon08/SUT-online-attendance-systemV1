@@ -172,3 +172,24 @@ export async function DeleteRoom(id: string): Promise<any> {
   // return response.json();
   console.log("Delete Room ID: ", id);
 }
+
+export async function GetLast10Attendances(sid: string): Promise<any> {
+  try {
+    const response = await fetch(`/api/attendances/${sid}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch attendance records for SID: ${sid}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching last 10 attendances:", error);
+    throw error;
+  }
+}
