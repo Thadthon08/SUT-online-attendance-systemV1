@@ -164,8 +164,6 @@ export default function StudentDashboard() {
   };
 
   const startScan = () => {
-    // ปิดการแสดงผลกราฟเมื่อเริ่มเปิดกล้อง
-    setShowDetails(false);
     setIsScanning(true);
 
     if (scannerRef.current) {
@@ -206,6 +204,7 @@ export default function StudentDashboard() {
   useEffect(() => {
     if (isScanning) {
       startScan();
+      setShowDetails(false);
     }
     return stopScan;
   }, [isScanning]);
