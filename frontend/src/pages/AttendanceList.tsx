@@ -41,6 +41,7 @@ export default function ViewAttendees() {
       setAttendanceData(data);
       setError(null);
     } catch (err) {
+      setLoading(false);
       setError("เกิดข้อผิดพลาดในการโหลดข้อมูล");
     } finally {
       setLoading(false);
