@@ -188,7 +188,7 @@ export default function ViewAttendees() {
         </Alert>
       )}
 
-      {attendanceData && attendanceData.totalCheckedIn === 0 ? (
+      {attendanceData.totalCheckedIn === 0 ? (
         <Typography
           sx={{ py: 10 }}
           variant="h3"
@@ -209,15 +209,24 @@ export default function ViewAttendees() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {attendanceData?.students.map((student: any) => (
-                <TableRow key={student.sid}>
-                  <TableCell>{student.sid}</TableCell>
-                  <TableCell>{student.name}</TableCell>
-                  <TableCell>
-                    {new Date(student.checkInTime).toLocaleString()}
+              {attendanceData?.students &&
+              attendanceData.students.length > 0 ? (
+                attendanceData.students.map((student: any) => (
+                  <TableRow key={student.sid}>
+                    <TableCell>{student.sid}</TableCell>
+                    <TableCell>{student.name}</TableCell>
+                    <TableCell>
+                      {new Date(student.checkInTime).toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">
+                    No attendees found
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
