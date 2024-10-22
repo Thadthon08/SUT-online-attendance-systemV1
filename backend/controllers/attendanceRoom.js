@@ -1,6 +1,7 @@
 const {
   AttendanceRoom,
   Subject,
+  Attendance,
   AttendanceSummary,
   Student,
 } = require("../models");
@@ -166,7 +167,7 @@ const deleteAttendanceRoom = async (req, res) => {
   const t = await sequelize.transaction();
 
   try {
-    // ค้นหาห้องเช็คชื่อที่ต้องการลบ
+    // ค้นหาห้องเช็คชื่อที่จะลบ
     const attendanceRoom = await AttendanceRoom.findByPk(ATR_id, {
       transaction: t,
     });
@@ -175,13 +176,13 @@ const deleteAttendanceRoom = async (req, res) => {
       return res.status(404).json({ error: "ไม่พบห้องเช็คชื่อ" });
     }
 
-    // ดึงนักเรียนที่เช็คชื่อในห้องนี้ (ห้องที่จะถูกลบ)
+    // ดึงนักเรียนที่เช็คชื่อในห้องนี้
     const studentsWhoAttended = await Attendance.findAll({
       where: { ATR_id },
       transaction: t,
     });
 
-    // ดึงข้อมูลนักเรียนทั้งหมดในวิชา (ลด total_sessions ของทุกคนในวิชานั้น)
+    // ดึงข้อมูลนักเรียนทั้งหมดในวิชานี้เพื่ออัปเดต total_sessions
     const studentsInSubject = await AttendanceSummary.findAll({
       where: { sub_id: attendanceRoom.sub_id },
       transaction: t,
@@ -190,10 +191,11 @@ const deleteAttendanceRoom = async (req, res) => {
     // ลด total_sessions ของนักเรียนทุกคนในวิชานี้
     await Promise.all(
       studentsInSubject.map(async (summary) => {
-        summary.total_sessions -= 1;
-        if (summary.total_sessions < 0) summary.total_sessions = 0; // กันไม่ให้ติดลบ
+        summary.total_sessions = Math.max(summary.total_sessions - 1, 0); // ป้องกันไม่ให้ติดลบ
         summary.attendance_rate =
-          (summary.attended_sessions / summary.total_sessions) * 100 || 0;
+          summary.total_sessions > 0
+            ? (summary.attended_sessions / summary.total_sessions) * 100
+            : 0;
         await summary.save({ transaction: t });
       })
     );
@@ -206,16 +208,20 @@ const deleteAttendanceRoom = async (req, res) => {
           transaction: t,
         });
         if (summary) {
-          summary.attended_sessions -= 1;
-          if (summary.attended_sessions < 0) summary.attended_sessions = 0; // กันไม่ให้ติดลบ
+          summary.attended_sessions = Math.max(
+            summary.attended_sessions - 1,
+            0
+          ); // ป้องกันไม่ให้ติดลบ
           summary.attendance_rate =
-            (summary.attended_sessions / summary.total_sessions) * 100 || 0;
+            summary.total_sessions > 0
+              ? (summary.attended_sessions / summary.total_sessions) * 100
+              : 0;
           await summary.save({ transaction: t });
         }
       })
     );
 
-    // ลบการเช็คชื่อของนักเรียนที่เช็คชื่อในห้องนี้
+    // ลบข้อมูลการเช็คชื่อในห้องนี้
     await Attendance.destroy({
       where: { ATR_id },
       transaction: t,
