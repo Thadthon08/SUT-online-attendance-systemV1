@@ -197,7 +197,7 @@ const getAttendanceForRoom = async (req, res) => {
     });
 
     if (attendanceRecords.length === 0) {
-      return res.status(200).json({ message: "No attendance records found." });
+      return res.status(204).json({ message: "No attendance records found." });
     }
 
     res.status(200).json({
