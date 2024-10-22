@@ -22,15 +22,18 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
+import Swal from "sweetalert2";
 import { styled } from "@mui/material/styles";
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 import QrCodeIcon from "@mui/icons-material/QrCode";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PeopleIcon from "@mui/icons-material/People";
-import { GetAllSubject, GetRoomFromSubject } from "../services/api";
+import { DeleteRoom, GetAllSubject, GetRoomFromSubject } from "../services/api";
 import { SubjectInterface } from "../interface/ISubject";
 import theme from "../config/theme";
 import QRCodeModal from "../components/QRCodeModal";
+import { UserData } from "../interface/Signinrespone";
+import { showToast } from "../utils/toastUtils";
 
 const TabsWrapper = styled(Tabs)(
   ({ theme }) => `
@@ -83,16 +86,29 @@ export default function Report() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const data = localStorage.getItem("data");
+
+    let tid: string = "";
+    if (data) {
+      const parsedData = JSON.parse(data) as UserData;
+      tid = parsedData.id;
+    }
     const fetchSubjects = async () => {
       try {
-        const result = await GetAllSubject();
+        const result = await GetAllSubject(tid);
         setSubjects(result);
 
         if (result.length > 0) {
           const firstSubjectId = result[0].sub_id;
           setFilters({ role: firstSubjectId });
+
           const roomResult = await GetRoomFromSubject(firstSubjectId);
-          setRoom(roomResult);
+          // ตรวจสอบว่าข้อมูลที่ได้เป็นอาร์เรย์ก่อนตั้งค่า
+          if (Array.isArray(roomResult)) {
+            setRoom(roomResult);
+          } else {
+            setRoom([]); // ถ้าไม่ใช่อาร์เรย์ให้ตั้งเป็นอาร์เรย์ว่าง
+          }
         }
       } catch (err) {
         console.log(err);
@@ -155,16 +171,38 @@ export default function Report() {
   };
 
   const handleDeleteRoom = async (roomId: string) => {
-    console.log(`Deleting room ${roomId}`);
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await DeleteRoom(roomId);
+        const roomResult = await GetRoomFromSubject(filters.role);
+        setRoom(roomResult);
+
+        showToast("The room has been deleted.", "success");
+      } catch (err) {
+        showToast("There was an issue deleting the room.", "error");
+      }
+    }
   };
 
   const handleViewAttendees = async (roomId: string) => {
     navigate(`/report/room/${roomId}`);
   };
 
-  const filteredRoom = room.filter((r: any) =>
-    r.ATR_name.toLowerCase().includes(query.toLowerCase())
-  );
+  const filteredRoom = Array.isArray(room)
+    ? room.filter((r: any) =>
+        r.ATR_name.toLowerCase().includes(query.toLowerCase())
+      )
+    : [];
   const paginatedRoom = filteredRoom.slice(page * limit, page * limit + limit);
 
   return (

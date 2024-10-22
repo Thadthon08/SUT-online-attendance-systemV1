@@ -10,6 +10,31 @@ const getSubjects = async (req, res) => {
   }
 };
 
+const getTeacherSubjects = async (req, res) => {
+  const { tid } = req.params; // รับค่า tid จาก params
+
+  try {
+    const teacher = await Teacher.findOne({
+      where: { tid },
+      include: [
+        {
+          model: Subject,
+          through: { attributes: [] },
+        },
+      ],
+    });
+
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    return res.status(200).json(teacher.Subjects);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 const addSubject = async (req, res) => {
   const { teacherId, subjectCode, subjectName, subjectPic } = req.body;
 
@@ -53,4 +78,4 @@ const addSubject = async (req, res) => {
   }
 };
 
-module.exports = { addSubject, getSubjects };
+module.exports = { addSubject, getSubjects, getTeacherSubjects };

@@ -22,6 +22,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { GetAllSubject } from "../services/api";
 import { SubjectInterface } from "../interface/ISubject";
 import { RoomInterface } from "../interface/IRoom";
+import { UserData } from "../interface/Signinrespone";
 
 interface CustomDatePickerInputProps {
   value: string;
@@ -103,9 +104,16 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
   const selectedSubjectId = watch("sub_id");
 
   useEffect(() => {
+    const data = localStorage.getItem("data");
+
+    let tid: string = "";
+    if (data) {
+      const parsedData = JSON.parse(data) as UserData;
+      tid = parsedData.id;
+    }
     const fetchSubjects = async () => {
       try {
-        const result = await GetAllSubject();
+        const result = await GetAllSubject(tid);
         setSubjects(result);
         setLoading(false);
       } catch (err) {

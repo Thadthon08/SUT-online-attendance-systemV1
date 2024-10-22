@@ -27,7 +27,7 @@ export async function SignIn(login: SigninInterface): Promise<SigninResponse> {
 }
 
 export async function CreateRoom(data: any): Promise<any> {
-  const response = await fetch(`${apiURL}/api/create/room`, {
+  const response = await fetch(`${apiURL}/api/room/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,8 +43,8 @@ export async function CreateRoom(data: any): Promise<any> {
   return response.json();
 }
 
-export async function GetAllSubject(): Promise<any> {
-  const response = await fetch(`${apiURL}/api/subject`, {
+export async function GetAllSubject(tid: string): Promise<any> {
+  const response = await fetch(`${apiURL}/api/subject/teacher/${tid}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -161,19 +161,18 @@ export async function GetRoomFromSubject(id: string): Promise<any> {
 
 // Delete Room
 export async function DeleteRoom(id: string): Promise<any> {
-  // const response = await fetch(`${apiURL}/api/room/${id}`, {
-  //   method: "DELETE",
-  //   headers: {
-  //     Authorization: `Bearer ${getToken()}`,
-  //   },
-  // });
+  const response = await fetch(`${apiURL}/api/room/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
 
-  // if (!response.ok) {
-  //   throw new Error("Failed to delete room.");
-  // }
+  if (!response.ok) {
+    throw new Error("Failed to delete room.");
+  }
 
-  // return response.json();
-  console.log("Delete Room ID: ", id);
+  return response.json();
 }
 
 export async function GetAttSumBtSid(sid: string): Promise<any> {

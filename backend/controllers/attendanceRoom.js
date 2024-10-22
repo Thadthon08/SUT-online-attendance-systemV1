@@ -159,4 +159,25 @@ const getRoomsBySubject = async (req, res) => {
   }
 };
 
-module.exports = { createAttendanceRoom, getRoomsBySubject };
+const deleteAttendanceRoom = async (req, res) => {
+  try {
+    const { ATR_id } = req.params;
+    const attendanceRoom = await AttendanceRoom.findByPk(ATR_id);
+
+    if (!attendanceRoom) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+
+    await attendanceRoom.destroy();
+    return res.status(200).json({ message: "Room deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting room:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+module.exports = {
+  createAttendanceRoom,
+  getRoomsBySubject,
+  deleteAttendanceRoom,
+};

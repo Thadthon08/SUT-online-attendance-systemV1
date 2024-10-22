@@ -11,7 +11,7 @@ app.use(cors());
 
 // ใช้งานเส้นทางของ user
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/create", authenticateJWT, require("./routes/attendanceRoom"));
+app.use("/api/room", authenticateJWT, require("./routes/attendanceRoom"));
 app.use("/line", require("./routes/line"));
 app.use("/api/subject", authenticateJWT, require("./routes/subject"));
 app.use("/api/checkin", require("./routes/attendance"));
