@@ -22,7 +22,7 @@ const getStudentAttendanceSummary = async (req, res) => {
     });
 
     if (summaries.length === 0) {
-      return res.status(204).json({ message: "ไม่มีข้อมูลสรุปการเช็คชื่อ" });
+      return res.status(200).json({ message: "ไม่มีข้อมูลสรุปการเช็คชื่อ" });
     }
 
     // แปลงข้อมูลเพื่อส่งกลับ

@@ -148,7 +148,7 @@ const getRoomsBySubject = async (req, res) => {
 
     // หากไม่พบห้องใดๆ
     if (rooms.length === 0) {
-      return res.status(204).json({ message: "No Room records found." });
+      return res.status(200).json({ message: "No Room records found." });
     }
 
     // ส่งข้อมูลห้องกลับในรูปแบบ JSON
