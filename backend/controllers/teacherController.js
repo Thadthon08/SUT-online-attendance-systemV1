@@ -80,10 +80,9 @@ exports.getClassesCreated = async (req, res) => {
 };
 
 exports.getAverageAttendanceRate = async (req, res) => {
-  const { tid } = req.params; // รับรหัสอาจารย์จาก URL
-
+  const { tid } = req.params;
   try {
-    const [results, metadata] = await sequelize.query(
+    const [results] = await sequelize.query(
       `
       SELECT AVG("as"."attendance_rate") AS "averageAttendanceRate"
       FROM "AttendanceSummaries" AS "as"
@@ -92,21 +91,21 @@ exports.getAverageAttendanceRate = async (req, res) => {
       WHERE "ts"."tid" = :tid
     `,
       {
-        replacements: { tid }, // แทนที่ค่า tid ด้วยค่าที่รับมาใน URL
+        replacements: { tid },
         type: sequelize.QueryTypes.SELECT,
       }
     );
 
-    // แสดงผลลัพธ์เพื่อตรวจสอบว่าโครงสร้างเป็นอย่างไร
-    console.log(results);
+    console.log("Results from query:", results);
 
-    // ตรวจสอบว่ามีผลลัพธ์และมีค่าเฉลี่ยหรือไม่
-    if (results.length > 0 && results[0].averageAttendanceRate !== null) {
+    if (results && results.averageAttendanceRate !== null) {
       res.json({
-        averageAttendanceRate: results[0].averageAttendanceRate.toFixed(2),
+        averageAttendanceRate: parseFloat(
+          results.averageAttendanceRate
+        ).toFixed(2),
       });
     } else {
-      res.json({ averageAttendanceRate: 0 }); // ถ้าไม่มีข้อมูลให้แสดงค่า 0
+      res.json({ averageAttendanceRate: 0 });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -115,9 +114,8 @@ exports.getAverageAttendanceRate = async (req, res) => {
 
 exports.getTotalAttendances = async (req, res) => {
   const { tid } = req.params;
-
   try {
-    const [results, metadata] = await sequelize.query(
+    const [results] = await sequelize.query(
       `
       SELECT COUNT("a"."att_id") AS "totalAttendances"
       FROM "Attendances" AS "a"
@@ -132,8 +130,8 @@ exports.getTotalAttendances = async (req, res) => {
       }
     );
 
-    if (results && results.length > 0 && results[0].totalAttendances !== null) {
-      res.json({ totalAttendances: results[0].totalAttendances });
+    if (results && results.totalAttendances !== null) {
+      res.json({ totalAttendances: results.totalAttendances });
     } else {
       res.json({ totalAttendances: 0 });
     }
