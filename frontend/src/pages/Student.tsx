@@ -37,7 +37,6 @@ export default function StudentDashboard() {
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [isCameraInitializing, setIsCameraInitializing] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
@@ -165,7 +164,6 @@ export default function StudentDashboard() {
   };
 
   const startScan = () => {
-    setIsCameraInitializing(true);
     setShowDetails(false);
     setIsScanning(true);
 
@@ -179,9 +177,6 @@ export default function StudentDashboard() {
           (errorMessage) =>
             console.error("QR Code scanning error:", errorMessage)
         )
-        .then(() => {
-          setIsCameraInitializing(false);
-        })
         .catch((err) => {
           console.log("Failed to start QR code scanner:", err);
 
@@ -193,9 +188,6 @@ export default function StudentDashboard() {
             background: "#1e1e1e",
             color: "#ffffff",
           });
-
-          setIsCameraInitializing(false);
-          setIsScanning(false);
         });
     }
   };
@@ -209,7 +201,6 @@ export default function StudentDashboard() {
       });
     }
   };
-
   useEffect(() => {
     if (isScanning) {
       startScan();
@@ -256,13 +247,13 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<CheckCircle />}
               onClick={() => {
-                if (!isScanning && !isCameraInitializing) {
+                if (!isScanning) {
                   setIsScanning(true);
                   setShowDetails(false);
                 }
               }}
               sx={{ height: "100%" }}
-              disabled={isScanning || isCameraInitializing}
+              disabled={isScanning}
             >
               Check Attendance
             </Button>
@@ -280,7 +271,6 @@ export default function StudentDashboard() {
                   setIsScanning(false);
                 }
               }}
-              disabled={isCameraInitializing}
             >
               View Details
             </Button>
