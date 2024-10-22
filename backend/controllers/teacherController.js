@@ -114,7 +114,7 @@ exports.getAverageAttendanceRate = async (req, res) => {
 };
 
 exports.getTotalAttendances = async (req, res) => {
-  const { tid } = req.params; // รับรหัสอาจารย์จาก URL
+  const { tid } = req.params;
 
   try {
     const [results, metadata] = await sequelize.query(
@@ -127,16 +127,15 @@ exports.getTotalAttendances = async (req, res) => {
       WHERE "ts"."tid" = :tid
     `,
       {
-        replacements: { tid }, // แทนที่ค่า tid ด้วยค่าที่รับมาใน URL
+        replacements: { tid },
         type: sequelize.QueryTypes.SELECT,
       }
     );
 
-    // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-    if (results.length > 0 && results[0].totalAttendances !== null) {
+    if (results && results.length > 0 && results[0].totalAttendances !== null) {
       res.json({ totalAttendances: results[0].totalAttendances });
     } else {
-      res.json({ totalAttendances: 0 }); // ถ้าไม่มีข้อมูลให้แสดงค่า 0
+      res.json({ totalAttendances: 0 });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
