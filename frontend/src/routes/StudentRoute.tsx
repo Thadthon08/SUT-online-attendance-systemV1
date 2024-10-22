@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, lazy } from "react";
+import { useEffect, useState, lazy } from "react";
 import { Verify } from "../services/api";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
