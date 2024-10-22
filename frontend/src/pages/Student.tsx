@@ -7,22 +7,19 @@ import {
   CardContent,
   Avatar,
   Button,
-  Grid,
   Divider,
   Paper,
   ThemeProvider,
   createTheme,
   CssBaseline,
 } from "@mui/material";
-import { CheckCircle, Info, CameraAlt, Close } from "@mui/icons-material";
+import { CheckCircle, CameraAlt, Close } from "@mui/icons-material";
 import { GetStudentIDByLineId, CheckIn } from "../services/api";
 import { LocationMap } from "../components/LocationMap";
 import { Html5Qrcode } from "html5-qrcode";
 import { useProfile } from "../utils/useProfile";
 import { StudentInterface } from "../interface/IStudent";
-import AttendanceSummaryChart from "../components/AttendanceSummaryChart";
 
-// สร้างธีม Dark
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -35,7 +32,6 @@ const darkTheme = createTheme({
 export default function StudentDashboard() {
   const { profile, isLoading } = useProfile();
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
-  const [showDetails, setShowDetails] = useState(false); // สร้าง state สำหรับแสดงกราฟ
 
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
@@ -239,31 +235,16 @@ export default function StudentDashboard() {
             </Box>
           </CardContent>
         </Card>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Button
-              variant="contained"
-              fullWidth
-              startIcon={<CheckCircle />}
-              onClick={() => setIsScanning(true)}
-              sx={{ height: "100%" }}
-              disabled={isScanning}
-            >
-              Check Attendance
-            </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <Button
-              variant="outlined"
-              fullWidth
-              startIcon={<Info />}
-              sx={{ height: "100%" }}
-              onClick={() => setShowDetails(!showDetails)} // เปลี่ยนสถานะ showDetails
-            >
-              View Details
-            </Button>
-          </Grid>
-        </Grid>
+        <Button
+          variant="contained"
+          fullWidth
+          startIcon={<CheckCircle />}
+          onClick={() => setIsScanning(true)}
+          sx={{ height: "100%" }}
+          disabled={isScanning}
+        >
+          Check Attendance
+        </Button>
 
         {isScanning && (
           <Paper
@@ -319,8 +300,6 @@ export default function StudentDashboard() {
             </Button>
           </Paper>
         )}
-
-        {showDetails && <AttendanceSummaryChart sid={studentData.sid} />}
       </Box>
     </ThemeProvider>
   );
