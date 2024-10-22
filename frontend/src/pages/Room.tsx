@@ -110,7 +110,7 @@ const Room = () => {
           display: "flex",
           overflow: "hidden",
           flexDirection: "column",
-          borderRadius: 0,
+          borderRadius: 1,
         }}
       >
         {activeStep === 0 && (
