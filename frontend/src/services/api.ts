@@ -198,3 +198,69 @@ export async function GetAttSumBtSid(sid: string): Promise<any> {
     return { error: "เกิดข้อผิดพลาดในการดึงข้อมูลสรุปการเช็คชื่อ" };
   }
 }
+
+export async function getTotalAttendances(tid: string): Promise<any> {
+  try {
+    const response = await fetch(`${apiURL}/api/teacher/${tid}/total`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch total attendances.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching total attendances:", error);
+    throw error;
+  }
+}
+
+export async function getSubjectTaught(tid: string): Promise<any> {
+  try {
+    const response = await fetch(`${apiURL}/api/teacher/${tid}/subjects`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch total attendances.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching total attendances:", error);
+    throw error;
+  }
+}
+export async function getAllClasses(tid: string): Promise<any> {
+  try {
+    const response = await fetch(`${apiURL}/api/teacher/${tid}/class`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch total attendances.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching total attendances:", error);
+    throw error;
+  }
+}
+export async function getAverageAttendanceRate(tid: string): Promise<any> {
+  try {
+    const response = await fetch(`${apiURL}/api/teacher/${tid}/avg`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch total attendances.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching total attendances:", error);
+    throw error;
+  }
+}
