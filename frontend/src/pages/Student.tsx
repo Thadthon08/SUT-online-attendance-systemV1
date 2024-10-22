@@ -240,7 +240,7 @@ export default function StudentDashboard() {
           fullWidth
           startIcon={<CheckCircle />}
           onClick={() => setIsScanning(true)}
-          sx={{ height: "100%", p: 4 }}
+          sx={{ height: "100%", p: 2 }}
           disabled={isScanning}
         >
           Check Attendance
@@ -294,7 +294,7 @@ export default function StudentDashboard() {
               color="secondary"
               startIcon={<Close />}
               onClick={stopScan}
-              sx={{ mt: 2, width: "100%" }}
+              sx={{ mt: 2, width: "100%", p: 2 }}
             >
               Stop Scanning
             </Button>
