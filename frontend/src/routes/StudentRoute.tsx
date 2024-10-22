@@ -53,11 +53,7 @@ const StudentRoute = () => {
     );
   }
 
-  return (
-    <Suspense fallback={<CircularProgress />}>
-      {isVerified ? <StudentDashboard /> : <StudentRegister />}
-    </Suspense>
-  );
+  return isVerified ? <StudentDashboard /> : <StudentRegister />;
 };
 
 export default StudentRoute;
