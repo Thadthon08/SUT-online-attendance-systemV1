@@ -14,6 +14,7 @@ import {
   alpha,
   Alert,
   CircularProgress,
+  TableContainer,
 } from "@mui/material";
 import { GetAttendanceForRoom } from "../services/api";
 import * as XLSX from "xlsx";
@@ -38,13 +39,7 @@ export default function ViewAttendees() {
     try {
       setLoading(true);
       const data = await GetAttendanceForRoom(id);
-
-      if (!data || data.length === 0) {
-        setError("No attendance data found.");
-      } else {
-        setAttendanceData(data);
-        setError(null);
-      }
+      setAttendanceData(data);
     } catch (err) {
       console.error("Error fetching attendance:", err);
       setError("เกิดข้อผิดพลาดในการโหลดข้อมูล");
@@ -195,9 +190,17 @@ export default function ViewAttendees() {
       )}
 
       {attendanceData && attendanceData.totalCheckedIn === 0 ? (
-        <Alert severity="info">ไม่พบข้อมูลการเข้าร่วมในห้องเรียนนี้</Alert>
+        <Typography
+          sx={{ py: 10 }}
+          variant="h3"
+          fontWeight="normal"
+          color="text.secondary"
+          align="center"
+        >
+          ไม่มีข้อมูลการเข้าร่วมในห้องเรียน
+        </Typography>
       ) : (
-        <Paper>
+        <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
@@ -218,7 +221,7 @@ export default function ViewAttendees() {
               ))}
             </TableBody>
           </Table>
-        </Paper>
+        </TableContainer>
       )}
     </Container>
   );
