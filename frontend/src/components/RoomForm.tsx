@@ -330,10 +330,10 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
               borderRadius: 1,
               height: "56px",
               marginTop: "15px !important",
-              bgcolor: theme.palette.primary.light,
-              color: theme.palette.background.default,
+              bgcolor: "#de360c",
+              color: "#ffffffff",
               "&:hover": {
-                bgcolor: theme.palette.primary.main,
+                bgcolor: "#ff3908",
               },
             }}
           >
