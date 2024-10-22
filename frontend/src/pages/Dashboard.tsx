@@ -86,10 +86,10 @@ const Dashboard = () => {
             <Grid item sm={6} xs={12}>
               <AverageAttendanceRate teacherId={teacherId} />
             </Grid>
-            <Grid item xs={12}>
-              <AudienceOverview />
-            </Grid>
           </Grid>
+        </Grid>
+        <Grid item>
+          <AudienceOverview />
         </Grid>
       </Grid>
     </Container>
