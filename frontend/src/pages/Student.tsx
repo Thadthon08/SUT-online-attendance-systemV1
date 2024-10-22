@@ -35,12 +35,13 @@ const darkTheme = createTheme({
 export default function StudentDashboard() {
   const { profile, isLoading } = useProfile();
   const [studentData, setStudentData] = useState<StudentInterface | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
+  const [showDetails, setShowDetails] = useState(false); // สร้าง state สำหรับแสดงกราฟ
+
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const html5QrCode = useRef<Html5Qrcode | null>(null);
@@ -164,9 +165,6 @@ export default function StudentDashboard() {
   };
 
   const startScan = () => {
-    setShowDetails(false);
-    setIsScanning(true);
-
     if (scannerRef.current) {
       html5QrCode.current = new Html5Qrcode("reader");
       html5QrCode.current
@@ -201,6 +199,7 @@ export default function StudentDashboard() {
       });
     }
   };
+
   useEffect(() => {
     if (isScanning) {
       startScan();
@@ -246,12 +245,7 @@ export default function StudentDashboard() {
               variant="contained"
               fullWidth
               startIcon={<CheckCircle />}
-              onClick={() => {
-                if (!isScanning) {
-                  setIsScanning(true);
-                  setShowDetails(false);
-                }
-              }}
+              onClick={() => setIsScanning(true)}
               sx={{ height: "100%" }}
               disabled={isScanning}
             >
@@ -264,13 +258,7 @@ export default function StudentDashboard() {
               fullWidth
               startIcon={<Info />}
               sx={{ height: "100%" }}
-              onClick={() => {
-                if (!showDetails) {
-                  stopScan();
-                  setShowDetails(true);
-                  setIsScanning(false);
-                }
-              }}
+              onClick={() => setShowDetails(!showDetails)} // เปลี่ยนสถานะ showDetails
             >
               View Details
             </Button>
@@ -324,10 +312,7 @@ export default function StudentDashboard() {
               variant="contained"
               color="secondary"
               startIcon={<Close />}
-              onClick={() => {
-                stopScan();
-                setIsScanning(false);
-              }}
+              onClick={stopScan}
               sx={{ mt: 2, width: "100%" }}
             >
               Stop Scanning
@@ -335,26 +320,7 @@ export default function StudentDashboard() {
           </Paper>
         )}
 
-        {showDetails && !isScanning && (
-          <Paper
-            elevation={3}
-            sx={{
-              mt: 3,
-              p: 2,
-              backgroundColor: "background.paper",
-            }}
-          >
-            <Typography
-              variant="h6"
-              gutterBottom
-              align="center"
-              color="text.primary"
-            >
-              Attendance Summary
-            </Typography>
-            <AttendanceSummaryChart sid={studentData.sid} />
-          </Paper>
-        )}
+        {showDetails && <AttendanceSummaryChart sid={studentData.sid} />}
       </Box>
     </ThemeProvider>
   );
