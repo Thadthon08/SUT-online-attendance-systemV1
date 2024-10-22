@@ -133,7 +133,7 @@ export async function GetAttendanceForRoom(roomId: string): Promise<any> {
     throw new Error("Failed to get attendance.");
   }
 
-  if (response.status === 201) {
+  if (response.status === 204) {
     return [];
   }
 
@@ -152,7 +152,7 @@ export async function GetRoomFromSubject(id: string): Promise<any> {
   if (!response.ok) {
     throw new Error("Failed to get attendance.");
   }
-  if (response.status === 201) {
+  if (response.status === 204) {
     return [];
   }
 
