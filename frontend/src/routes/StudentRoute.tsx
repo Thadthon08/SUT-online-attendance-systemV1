@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { Verify } from "../services/api";
-import StudentDashboard from "../pages/Student";
-import StudentRegister from "../pages/Register";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 
+const StudentDashboard = lazy(() => import("../pages/Student"));
+const StudentRegister = lazy(() => import("../pages/Register"));
+
 const StudentRoute = () => {
-  const [isVerified, setIsVerified] = useState<boolean | null>(null); // null = loading, true/false = verified status
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
 
   useEffect(() => {
     const initializeLiff = async () => {
@@ -30,7 +31,7 @@ const StudentRoute = () => {
         setIsVerified(verifyResponse.status === "success");
       } catch (error) {
         console.error("Error verifying user:", error);
-        setIsVerified(false); // ให้ถือว่า verify ล้มเหลวเมื่อเกิด error
+        setIsVerified(false);
       }
     };
 
@@ -52,8 +53,11 @@ const StudentRoute = () => {
     );
   }
 
-  // ถ้า isVerified === true แสดงหน้า Dashboard, ถ้า false แสดงหน้า Register
-  return isVerified ? <StudentDashboard /> : <StudentRegister />;
+  return (
+    <Suspense fallback={<CircularProgress />}>
+      {isVerified ? <StudentDashboard /> : <StudentRegister />}
+    </Suspense>
+  );
 };
 
 export default StudentRoute;
