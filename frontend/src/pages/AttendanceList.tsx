@@ -13,7 +13,7 @@ import {
   alpha,
   Alert,
   CircularProgress,
-  TableContainer,
+  Paper,
 } from "@mui/material";
 import { GetAttendanceForRoom } from "../services/api";
 import * as XLSX from "xlsx";
@@ -48,18 +48,7 @@ export default function ViewAttendees() {
   }, [id]);
 
   useEffect(() => {
-    let pollingTimeout: NodeJS.Timeout;
-
-    const longPolling = async () => {
-      await fetchAttendance();
-      pollingTimeout = setTimeout(longPolling, 15000);
-    };
-
-    longPolling();
-
-    return () => {
-      clearTimeout(pollingTimeout);
-    };
+    fetchAttendance();
   }, [fetchAttendance]);
 
   const handleBack = () => {
@@ -116,7 +105,6 @@ export default function ViewAttendees() {
         p: 4,
       }}
     >
-      {/* Header */}
       <Grid
         container
         justifyContent="space-between"
@@ -149,9 +137,10 @@ export default function ViewAttendees() {
           >
             <Grid item>
               <Typography variant="h2" fontWeight="bolder" align="center">
-                {attendanceData ? attendanceData.totalCheckedIn : 0}
+                {attendanceData?.totalCheckedIn ?? 0}
               </Typography>
             </Grid>
+
             <Grid item>
               <Typography variant="subtitle2" align="center">
                 Total Checked In
@@ -188,18 +177,8 @@ export default function ViewAttendees() {
         </Alert>
       )}
 
-      {attendanceData.totalCheckedIn === 0 ? (
-        <Typography
-          sx={{ py: 10 }}
-          variant="h3"
-          fontWeight="normal"
-          color="text.secondary"
-          align="center"
-        >
-          ไม่มีข้อมูลการเข้าร่วมในห้องเรียน
-        </Typography>
-      ) : (
-        <TableContainer>
+      {attendanceData?.students && attendanceData.students.length > 0 ? (
+        <Paper>
           <Table>
             <TableHead>
               <TableRow>
@@ -209,27 +188,28 @@ export default function ViewAttendees() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {attendanceData?.students &&
-              attendanceData.students.length > 0 ? (
-                attendanceData.students.map((student: any) => (
-                  <TableRow key={student.sid}>
-                    <TableCell>{student.sid}</TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>
-                      {new Date(student.checkInTime).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} align="center">
-                    No attendees found
+              {attendanceData.students.map((student: any) => (
+                <TableRow key={student.sid}>
+                  <TableCell>{student.sid}</TableCell>
+                  <TableCell>{student.name}</TableCell>
+                  <TableCell>
+                    {new Date(student.checkInTime).toLocaleString()}
                   </TableCell>
                 </TableRow>
-              )}
+              ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </Paper>
+      ) : (
+        <Typography
+          sx={{ py: 10 }}
+          variant="h3"
+          fontWeight="normal"
+          color="text.secondary"
+          align="center"
+        >
+          ไม่มีข้อมูลการเข้าร่วมในห้องเรียน
+        </Typography>
       )}
     </Container>
   );
