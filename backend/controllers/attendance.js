@@ -5,6 +5,10 @@ const {
   AttendanceSummary,
 } = require("../models");
 const sequelize = require("../config/db");
+const line = require("@line/bot-sdk");
+const client = new line.Client({
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN, // Access Token ของ LINE OA
+});
 
 const haversineDistance = (lat1, lon1, lat2, lon2) => {
   const toRad = (value) => (value * Math.PI) / 180;
@@ -37,9 +41,9 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
 //     const currentTime = new Date();
 //     if (attendanceRoom.expired_at && attendanceRoom.expired_at < currentTime) {
 //       await t.rollback();
-//       return res.status(400).json({
-//         error: "ไม่สามารถเช็คชื่อได้เนื่องจากหมดเวลาแล้ว",
-//       });
+//       return res
+//         .status(400)
+//         .json({ error: "ไม่สามารถเช็คชื่อได้เนื่องจากหมดเวลาแล้ว" });
 //     }
 
 //     const student = await Student.findByPk(sid, { transaction: t });
@@ -72,6 +76,7 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
 //       });
 //     }
 
+//     // บันทึกการเช็คชื่อ
 //     const attendance = await Attendance.create(
 //       {
 //         ATR_id,
@@ -83,12 +88,21 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
 //       { transaction: t }
 //     );
 
-//     await t.commit();
-
-//     return res.status(201).json({
-//       message: "เช็คชื่อสำเร็จ",
-//       attendance,
+//     // อัปเดต attended_sessions และ attendance_rate ของนักเรียน
+//     const summary = await AttendanceSummary.findOne({
+//       where: { sid, sub_id: attendanceRoom.sub_id },
+//       transaction: t,
 //     });
+
+//     if (summary) {
+//       summary.attended_sessions += 1;
+//       summary.attendance_rate =
+//         (summary.attended_sessions / summary.total_sessions) * 100;
+//       await summary.save({ transaction: t });
+//     }
+
+//     await t.commit();
+//     return res.status(201).json({ message: "เช็คชื่อสำเร็จ", attendance });
 //   } catch (error) {
 //     await t.rollback();
 //     console.error("Error during attendance check-in:", error);
@@ -112,9 +126,9 @@ const checkInAttendance = async (req, res) => {
     const currentTime = new Date();
     if (attendanceRoom.expired_at && attendanceRoom.expired_at < currentTime) {
       await t.rollback();
-      return res
-        .status(400)
-        .json({ error: "ไม่สามารถเช็คชื่อได้เนื่องจากหมดเวลาแล้ว" });
+      return res.status(400).json({
+        error: "ไม่สามารถเช็คชื่อได้เนื่องจากหมดเวลาแล้ว",
+      });
     }
 
     const student = await Student.findByPk(sid, { transaction: t });
@@ -173,6 +187,26 @@ const checkInAttendance = async (req, res) => {
     }
 
     await t.commit();
+
+    // ส่งข้อความตอบกลับไปยัง LINE OA
+    if (student.LineID) {
+      const message = {
+        type: "text",
+        text: `เช็คชื่อสำเร็จในห้อง ${attendanceRoom.ATR_name}`,
+      };
+
+      await client
+        .pushMessage(student.LineID, message)
+        .then(() => {
+          console.log("ส่งข้อความเช็คชื่อสำเร็จไปยัง LINE ID:", student.LineID);
+        })
+        .catch((err) => {
+          console.error("Error sending message to LINE OA:", err);
+        });
+    } else {
+      console.log(`ไม่พบ Line ID ที่เชื่อมโยงกับรหัสนักศึกษา ${sid}`);
+    }
+
     return res.status(201).json({ message: "เช็คชื่อสำเร็จ", attendance });
   } catch (error) {
     await t.rollback();
