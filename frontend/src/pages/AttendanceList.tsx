@@ -90,7 +90,7 @@ export default function ViewAttendees() {
     XLSX.writeFile(wb, `attendees_room_${id}.xlsx`);
   };
 
-  if (loading && !attendanceData) {
+  if (loading) {
     return (
       <Container
         sx={{
