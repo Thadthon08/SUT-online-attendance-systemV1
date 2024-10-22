@@ -11,19 +11,29 @@ import {
   ListItem,
   styled,
 } from "@mui/material";
-import AssessmentTwoToneIcon from "@mui/icons-material/AssessmentTwoTone";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import { getAverageAttendanceRate } from "../services/api"; // Import API service
 
 // Styled Avatar component
 const AvatarSuccess = styled(Avatar)(
   ({ theme }) => `
-      background-color: "#ffffff";
-      color: ${theme.palette.primary.contrastText};
+      background-color: #ffa319;
+      color: #FFFFFF;
       width: ${theme.spacing(8)};
       height: ${theme.spacing(8)};
-      box-shadow:  "#ffffff";
 `
 );
+
+const StyledLink = styled(Link)`
+  color: #7367f0;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+    color: #5e50ee;
+  }
+`;
 
 // Styled CardContent component
 const CardContentWrapper = styled(CardContent)(
@@ -76,7 +86,7 @@ function AverageAttendanceRate({ teacherId }: Props) {
         >
           <ListItemAvatar>
             <AvatarSuccess variant="rounded">
-              <AssessmentTwoToneIcon fontSize="large" />
+              <BarChartIcon fontSize="large" />
             </AvatarSuccess>
           </ListItemAvatar>
 
@@ -103,9 +113,7 @@ function AverageAttendanceRate({ teacherId }: Props) {
           <ListItemText
             primary={
               <>
-                <Link fontWeight="bold" href="#">
-                  {"See attendance details"}
-                </Link>
+                <StyledLink href="#">{"See attendance details"}</StyledLink>
                 <Box
                   component="span"
                   sx={{

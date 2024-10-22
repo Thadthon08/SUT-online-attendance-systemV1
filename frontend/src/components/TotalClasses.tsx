@@ -11,18 +11,27 @@ import {
   ListItem,
   styled,
 } from "@mui/material";
-import AssessmentTwoToneIcon from "@mui/icons-material/AssessmentTwoTone";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { getAllClasses } from "../services/api";
 
 const AvatarSuccess = styled(Avatar)(
   ({ theme }) => `
-      background-color: "#ffffff";
-      color: ${theme.palette.primary.contrastText};
+      background-color: #4CD964;
+      color: #FFFFFF;
       width: ${theme.spacing(8)};
       height: ${theme.spacing(8)};
-      box-shadow:  "#ffffff";
 `
 );
+const StyledLink = styled(Link)`
+  color: #7367f0;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+    color: #5e50ee;
+  }
+`;
 
 const CardContentWrapper = styled(CardContent)(
   ({ theme }) => `
@@ -73,7 +82,7 @@ function TotalClasses({ teacherId }: Props) {
         >
           <ListItemAvatar>
             <AvatarSuccess variant="rounded">
-              <AssessmentTwoToneIcon fontSize="large" />
+              <MenuBookIcon fontSize="large" />
             </AvatarSuccess>
           </ListItemAvatar>
 
@@ -100,9 +109,7 @@ function TotalClasses({ teacherId }: Props) {
           <ListItemText
             primary={
               <>
-                <Link fontWeight="bold" href="#">
-                  {"See all classes"}
-                </Link>
+                <StyledLink href="#">See all classes</StyledLink>
                 <Box
                   component="span"
                   sx={{

@@ -69,6 +69,7 @@ const Dashboard = () => {
           <Grid
             container
             spacing={4}
+            width={"full"}
             direction="row"
             justifyContent="center"
             alignItems="stretch"
@@ -77,10 +78,10 @@ const Dashboard = () => {
               <SubjectsTaught teacherId={teacherId} />
             </Grid>
             <Grid item sm={6} xs={12}>
-              <TotalClasses teacherId={teacherId} />
+              <TotalAttendances teacherId={teacherId} />
             </Grid>
             <Grid item sm={6} xs={12}>
-              <TotalAttendances teacherId={teacherId} />
+              <TotalClasses teacherId={teacherId} />
             </Grid>
             <Grid item sm={6} xs={12}>
               <AverageAttendanceRate teacherId={teacherId} />

@@ -11,16 +11,15 @@ import {
   ListItem,
   styled,
 } from "@mui/material";
-import AssessmentTwoToneIcon from "@mui/icons-material/AssessmentTwoTone";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { getSubjectTaught } from "../services/api";
 
 const AvatarSuccess = styled(Avatar)(
   ({ theme }) => `
-      background-color: "#ffffff";
-      color: ${theme.palette.primary.contrastText};
+      background-color: #7367F0;
+      color: #FFFFFF;
       width: ${theme.spacing(8)};
       height: ${theme.spacing(8)};
-      box-shadow:  "#ffffff";
 `
 );
 
@@ -33,6 +32,17 @@ const CardContentWrapper = styled(CardContent)(
      }
 `
 );
+
+const StyledLink = styled(Link)`
+  color: #7367f0;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+    color: #5e50ee;
+  }
+`;
 
 // ปรับให้ props ถูกต้อง โดยกำหนด type ของ teacherId เป็น string
 interface Props {
@@ -75,7 +85,7 @@ function SubjectsTaught({ teacherId }: Props) {
         >
           <ListItemAvatar>
             <AvatarSuccess variant="rounded">
-              <AssessmentTwoToneIcon fontSize="large" />
+              <AutoStoriesIcon fontSize="large" />
             </AvatarSuccess>
           </ListItemAvatar>
 
@@ -102,9 +112,7 @@ function SubjectsTaught({ teacherId }: Props) {
           <ListItemText
             primary={
               <>
-                <Link fontWeight="bold" href="#">
-                  {"See all subjects"}
-                </Link>
+                <StyledLink href="#">{"See all subjects"}</StyledLink>
                 <Box
                   component="span"
                   sx={{
