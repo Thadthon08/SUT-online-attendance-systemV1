@@ -7,7 +7,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Paper,
   Typography,
   Button,
   Grid,
