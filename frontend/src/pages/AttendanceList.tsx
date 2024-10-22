@@ -38,10 +38,15 @@ export default function ViewAttendees() {
     try {
       setLoading(true);
       const data = await GetAttendanceForRoom(id);
-      setAttendanceData(data);
-      setError(null);
+
+      if (!data || data.length === 0) {
+        setError("No attendance data found.");
+      } else {
+        setAttendanceData(data);
+        setError(null);
+      }
     } catch (err) {
-      setLoading(false);
+      console.error("Error fetching attendance:", err);
       setError("เกิดข้อผิดพลาดในการโหลดข้อมูล");
     } finally {
       setLoading(false);
@@ -53,7 +58,7 @@ export default function ViewAttendees() {
 
     const longPolling = async () => {
       await fetchAttendance();
-      pollingTimeout = setTimeout(longPolling, 5000);
+      pollingTimeout = setTimeout(longPolling, 15000);
     };
 
     longPolling();
