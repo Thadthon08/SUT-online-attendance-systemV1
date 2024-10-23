@@ -1,9 +1,11 @@
+import { CheckInRequest } from "../interface/CheckIn";
+import { CreateRoomInterface } from "../interface/CreateRoom";
 import { SigninInterface } from "../interface/ISignin";
 import { StudentInterface } from "../interface/IStudent";
 import { SigninResponse } from "../interface/Signinrespone";
 
-// const apiURL = "http://localhost:3000";
-const apiURL = "https://sut-online-attendance-systemv1.onrender.com";
+const apiURL = "http://localhost:3000";
+// const apiURL = "https://sut-online-attendance-systemv1.onrender.com";
 
 function getToken() {
   const token = localStorage.getItem("token");
@@ -26,7 +28,7 @@ export async function SignIn(login: SigninInterface): Promise<SigninResponse> {
   return response.json();
 }
 
-export async function CreateRoom(data: any): Promise<any> {
+export async function CreateRoom(data: CreateRoomInterface): Promise<any> {
   const response = await fetch(`${apiURL}/api/room/create`, {
     method: "POST",
     headers: {
@@ -71,7 +73,7 @@ export async function GetStudentIDByLineId(lineId: string): Promise<any> {
   return response.json();
 }
 
-export async function CheckIn(data: any): Promise<any> {
+export async function CheckIn(data: CheckInRequest): Promise<any> {
   const response = await fetch(`${apiURL}/api/checkin`, {
     method: "POST",
     headers: {

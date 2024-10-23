@@ -3,4 +3,6 @@ export interface StudentInterface {
   St_fname: string;
   St_lname: string;
   LineID: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
