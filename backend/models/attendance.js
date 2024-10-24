@@ -21,7 +21,6 @@ const Attendance = sequelize.define("Attendance", {
   },
 });
 
-// ตั้งความสัมพันธ์
 Attendance.belongsTo(AttendanceRoom, {
   foreignKey: "ATR_id",
   allowNull: false,

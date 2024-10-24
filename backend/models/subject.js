@@ -14,9 +14,6 @@ const Subject = sequelize.define("Subject", {
   sub_name: {
     type: DataTypes.STRING,
   },
-  sub_pic: {
-    type: DataTypes.TEXT,
-  },
 });
 
 module.exports = Subject;

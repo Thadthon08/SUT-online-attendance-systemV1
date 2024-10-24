@@ -133,8 +133,8 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
     if (selectedSubject) {
       const roomName = `${
         selectedSubject.sub_code
-      }เช็คชื่อ${new Date().toLocaleDateString()}ครั้งที่ 1`;
-      setValue("ATR_name", roomName); // ตั้งชื่อห้องอัตโนมัติ
+      } เช็คชื่อ ${new Date().toLocaleDateString()} ครั้งที่ 1`;
+      setValue("ATR_name", roomName);
     }
   }, [selectedSubjectId, subjects, setValue]);
 

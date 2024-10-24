@@ -19,7 +19,6 @@ const createAttendanceRoom = async (req, res) => {
       return res.status(400).json({ error: "ไม่พบวิชานี้ในระบบ" });
     }
 
-    // สร้างห้องเช็คชื่อใหม่
     const attendanceRoom = await AttendanceRoom.create({
       sub_id,
       ATR_name,

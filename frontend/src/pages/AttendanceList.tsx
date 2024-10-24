@@ -20,6 +20,7 @@ import * as XLSX from "xlsx";
 import theme from "../config/theme";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { showToast } from "../utils/toastUtils";
 
 export default function ViewAttendees() {
   const { id } = useParams<{ id: string }>();
@@ -61,7 +62,7 @@ export default function ViewAttendees() {
       !attendanceData.students ||
       attendanceData.students.length === 0
     ) {
-      alert("No data available to export");
+      showToast("No data available to export", "error");
       return;
     }
 
