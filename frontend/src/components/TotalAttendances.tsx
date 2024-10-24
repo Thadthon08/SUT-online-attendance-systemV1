@@ -88,7 +88,7 @@ function TotalAttendances({ teacherId }: Props) {
           </ListItemAvatar>
 
           <ListItemText
-            primary={error ? "Error" : attendanceCount ?? "Loading..."}
+            primary={error ? "0" : attendanceCount ?? "Loading..."}
             primaryTypographyProps={{
               variant: "h1",
               sx: {
