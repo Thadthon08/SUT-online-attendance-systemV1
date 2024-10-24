@@ -4,7 +4,6 @@ const Teacher = require("./teacher");
 const Subject = require("./subject");
 const AttendanceRoom = require("./attendance_Room");
 const Attendance = require("./attendance");
-const AttendanceSummary = require("./attendance_Summary");
 const TeacherSubject = require("./teacher_subject");
 
 Teacher.belongsToMany(Subject, {
@@ -35,6 +34,5 @@ module.exports = {
   Subject,
   AttendanceRoom,
   Attendance,
-  AttendanceSummary,
   TeacherSubject,
 };

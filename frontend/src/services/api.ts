@@ -4,8 +4,8 @@ import { SigninInterface } from "../interface/ISignin";
 import { StudentInterface } from "../interface/IStudent";
 import { SigninResponse } from "../interface/Signinrespone";
 
-// const apiURL = "http://localhost:3000";
-const apiURL = "https://sut-online-attendance-systemv1.onrender.com";
+const apiURL = "http://localhost:3000";
+// const apiURL = "https://sut-online-attendance-systemv1.onrender.com";
 
 function getToken() {
   const token = localStorage.getItem("token");
@@ -177,30 +177,6 @@ export async function DeleteRoom(id: string): Promise<any> {
   return response.json();
 }
 
-export async function GetAttSumBtSid(sid: string): Promise<any> {
-  const apiUrl = `${apiURL}/api/attsum/${sid}`;
-
-  try {
-    // ส่ง request ไปยัง backend API
-    const response = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch attendance summary.");
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching attendance summary:", error);
-    return { error: "เกิดข้อผิดพลาดในการดึงข้อมูลสรุปการเช็คชื่อ" };
-  }
-}
-
 export async function getTotalAttendances(tid: string): Promise<any> {
   try {
     const response = await fetch(`${apiURL}/api/teacher/${tid}/total`, {
@@ -253,6 +229,25 @@ export async function getAllClasses(tid: string): Promise<any> {
 export async function getAverageAttendanceRate(tid: string): Promise<any> {
   try {
     const response = await fetch(`${apiURL}/api/teacher/${tid}/avg`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch total attendances.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching total attendances:", error);
+    throw error;
+  }
+}
+
+export async function getAttendanceRateForAllSubjects(
+  tid: string
+): Promise<any> {
+  try {
+    const response = await fetch(`${apiURL}/api/teacher/${tid}/subjects/rate`, {
       method: "GET",
     });
 

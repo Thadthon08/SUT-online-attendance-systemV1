@@ -15,7 +15,6 @@ app.use("/api/room", authenticateJWT, require("./routes/attendanceRoom"));
 app.use("/line", require("./routes/line"));
 app.use("/api/subject", authenticateJWT, require("./routes/subject"));
 app.use("/api/checkin", require("./routes/attendance"));
-app.use("/api/attsum", require("./routes/attendanceSum"));
 app.use("/api/student", require("./routes/student"));
 app.use("/api/teacher", require("./routes/teacher"));
 

@@ -1,61 +1,6 @@
-const {
-  AttendanceRoom,
-  Subject,
-  Attendance,
-  AttendanceSummary,
-  Student,
-} = require("../models");
+const { AttendanceRoom, Subject, Attendance, Student } = require("../models");
 const QRCode = require("qrcode");
 const sequelize = require("../config/db");
-
-// const createAttendanceRoom = async (req, res) => {
-//   try {
-//     const { sub_id, ATR_name, ATR_lat, ATR_long, start_time, end_time } =
-//       req.body;
-
-//     const start = new Date(start_time.replace(" ", "T"));
-//     const end = new Date(end_time.replace(" ", "T"));
-
-//     const diffMilliseconds = end - start;
-//     let countdown_duration =
-//       diffMilliseconds > 0 ? Math.round(diffMilliseconds / 60000) : 0;
-
-//     const subject = await Subject.findByPk(sub_id);
-//     if (!subject) {
-//       return res.status(400).json({ error: "ไม่พบวิชานี้ในระบบ" });
-//     }
-
-//     const attendanceRoom = await AttendanceRoom.create({
-//       sub_id,
-//       ATR_name,
-//       ATR_lat,
-//       ATR_long,
-//       start_time,
-//       end_time,
-//       countdown_duration,
-//       expired_at: new Date(end_time.replace(" ", "T")),
-//     });
-
-//     const qrCodeData = await QRCode.toDataURL(`${attendanceRoom.ATR_id}`, {
-//       scale: 10,
-//       width: 500,
-//     });
-
-//     attendanceRoom.qrcode_data = qrCodeData;
-//     await attendanceRoom.save();
-
-//     return res.status(201).json({
-//       message: "สร้างห้องเช็คชื่อสำเร็จ",
-//       attendanceRoom,
-//       qrCodeData, // ยังคงส่ง QR code กลับมาให้ client
-//     });
-//   } catch (error) {
-//     console.error("Error creating attendance room:", error);
-//     return res
-//       .status(500)
-//       .json({ error: "เกิดข้อผิดพลาดในการสร้างห้องเช็คชื่อ" });
-//   }
-// };
 
 const createAttendanceRoom = async (req, res) => {
   try {
@@ -85,27 +30,6 @@ const createAttendanceRoom = async (req, res) => {
       countdown_duration,
       expired_at: new Date(end_time.replace(" ", "T")),
     });
-
-    // ดึงนักเรียนทุกคนที่มีอยู่ในวิชานี้
-    const students = await Student.findAll();
-
-    // อัปเดต total_sessions ของนักเรียนแต่ละคนในวิชานี้
-    await Promise.all(
-      students.map(async (student) => {
-        const [summary, created] = await AttendanceSummary.findOrCreate({
-          where: { sid: student.sid, sub_id },
-          defaults: {
-            total_sessions: 0,
-            attended_sessions: 0,
-            attendance_rate: 0,
-          },
-        });
-        summary.total_sessions += 1;
-        summary.attendance_rate =
-          (summary.attended_sessions / summary.total_sessions) * 100;
-        await summary.save();
-      })
-    );
 
     const qrCodeData = await QRCode.toDataURL(`${attendanceRoom.ATR_id}`, {
       scale: 10,
@@ -163,11 +87,10 @@ const getRoomsBySubject = async (req, res) => {
 };
 
 const deleteAttendanceRoom = async (req, res) => {
-  const { ATR_id } = req.params; // ID ของห้องเช็คชื่อที่จะลบ
+  const { ATR_id } = req.params;
   const t = await sequelize.transaction();
 
   try {
-    // ค้นหาห้องเช็คชื่อที่จะลบ
     const attendanceRoom = await AttendanceRoom.findByPk(ATR_id, {
       transaction: t,
     });
@@ -176,65 +99,25 @@ const deleteAttendanceRoom = async (req, res) => {
       return res.status(404).json({ error: "ไม่พบห้องเช็คชื่อ" });
     }
 
-    // ดึงนักเรียนที่เช็คชื่อในห้องนี้
     const studentsWhoAttended = await Attendance.findAll({
       where: { ATR_id },
       transaction: t,
     });
 
-    // ดึงข้อมูลนักเรียนทั้งหมดในวิชานี้เพื่ออัปเดต total_sessions
-    const studentsInSubject = await AttendanceSummary.findAll({
-      where: { sub_id: attendanceRoom.sub_id },
-      transaction: t,
-    });
-
-    // ลด total_sessions ของนักเรียนทุกคนในวิชานี้
-    await Promise.all(
-      studentsInSubject.map(async (summary) => {
-        summary.total_sessions = Math.max(summary.total_sessions - 1, 0); // ป้องกันไม่ให้ติดลบ
-        summary.attendance_rate =
-          summary.total_sessions > 0
-            ? (summary.attended_sessions / summary.total_sessions) * 100
-            : 0;
-        await summary.save({ transaction: t });
-      })
-    );
-
-    // ลด attended_sessions เฉพาะนักเรียนที่เช็คชื่อในห้องนี้
-    await Promise.all(
-      studentsWhoAttended.map(async (attendance) => {
-        const summary = await AttendanceSummary.findOne({
-          where: { sid: attendance.sid, sub_id: attendanceRoom.sub_id },
-          transaction: t,
-        });
-        if (summary) {
-          summary.attended_sessions = Math.max(
-            summary.attended_sessions - 1,
-            0
-          ); // ป้องกันไม่ให้ติดลบ
-          summary.attendance_rate =
-            summary.total_sessions > 0
-              ? (summary.attended_sessions / summary.total_sessions) * 100
-              : 0;
-          await summary.save({ transaction: t });
-        }
-      })
-    );
-
-    // ลบข้อมูลการเช็คชื่อในห้องนี้
     await Attendance.destroy({
       where: { ATR_id },
       transaction: t,
     });
 
-    // ลบห้องเช็คชื่อ
     await AttendanceRoom.destroy({
       where: { ATR_id },
       transaction: t,
     });
 
     await t.commit();
-    return res.status(200).json({ message: "ลบห้องเช็คชื่อและอัปเดตสำเร็จ" });
+    return res
+      .status(200)
+      .json({ message: "ลบห้องเช็คชื่อและข้อมูลการเช็คชื่อสำเร็จ" });
   } catch (error) {
     await t.rollback();
     console.error("Error deleting attendance room:", error);

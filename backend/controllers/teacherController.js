@@ -1,5 +1,4 @@
-const sequelize = require("../config/db");
-const { Teacher, Subject } = require("../models");
+const { Teacher, Subject, AttendanceRoom, Attendance } = require("../models");
 
 exports.getTeacherSubjectsCount = async (req, res) => {
   const { tid } = req.params; // รับรหัสอาจารย์จาก request params
@@ -25,115 +24,259 @@ exports.getTeacherSubjectsCount = async (req, res) => {
   }
 };
 
-// ดึงข้อมูลสรุปการเข้าร่วมของนักเรียนในวิชาที่อาจารย์สอน
-exports.getAttendanceSummary = async (req, res) => {
-  const { tid } = req.params;
-  try {
-    const attendanceSummary = await sequelize.query(
-      `
-  SELECT s.sub_name, a.attended_sessions, a.total_sessions, a.attendance_rate
-  FROM "AttendanceSummaries" a  -- ใช้ชื่อตาราง AttendanceSummaries
-  JOIN "TeacherSubjects" ts ON ts.sub_id = a.sub_id
-  JOIN "Subjects" s ON s.sub_id = ts.sub_id
-  WHERE ts.tid = :tid
-`,
-      {
-        replacements: { tid }, // ส่งค่า tid (รหัสอาจารย์) เพื่อกรองข้อมูล
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
-    res.json(attendanceSummary);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 exports.getClassesCreated = async (req, res) => {
   const { tid } = req.params;
 
   try {
-    const [results] = await sequelize.query(
-      `
-      SELECT COUNT("ar"."ATR_id") AS "classCount"
-      FROM "AttendanceRooms" ar
-      JOIN "Subjects" s ON "ar"."sub_id" = "s"."sub_id"
-      JOIN "TeacherSubjects" ts ON "ts"."sub_id" = "s"."sub_id"
-      WHERE "ts"."tid" = :tid
-    `,
-      {
-        replacements: { tid }, // ส่งค่า tid ไปใช้ใน SQL query
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
-
-    console.log(results); // เพิ่มบรรทัดนี้เพื่อตรวจสอบโครงสร้างของผลลัพธ์
-
-    // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-    if (results && results.classCount !== undefined) {
-      res.json({ classCount: results.classCount });
-    } else {
-      res.json({ classCount: 0 }); // ถ้าไม่มีข้อมูล ให้แสดงค่าเป็น 0
+    const teacher = await Teacher.findOne({ where: { tid } });
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
     }
+
+    const subjects = await Subject.findAll({
+      include: [
+        {
+          model: Teacher,
+          where: { tid },
+          through: { attributes: [] },
+        },
+        {
+          model: AttendanceRoom,
+        },
+      ],
+    });
+    if (!subjects || subjects.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No classes found for this teacher." });
+    }
+
+    const classes = subjects.map((subject) => subject.AttendanceRooms).flat();
+    const classCount = classes.length;
+
+    if (classCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "No classes found for this teacher." });
+    }
+
+    res.status(200).json({ classCount: classCount.toString() });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error occurred:", error);
+    res.status(500).json({ message: "Error retrieving classes." });
   }
 };
 
 exports.getAverageAttendanceRate = async (req, res) => {
-  const { tid } = req.params;
+  const { tid } = req.params; // รับค่า tid จาก URL parameter
+
   try {
-    const [results] = await sequelize.query(
-      `
-      SELECT AVG("as"."attendance_rate") AS "averageAttendanceRate"
-      FROM "AttendanceSummaries" AS "as"
-      JOIN "Subjects" AS "s" ON "as"."sub_id" = "s"."sub_id"
-      JOIN "TeacherSubjects" AS "ts" ON "ts"."sub_id" = "s"."sub_id"
-      WHERE "ts"."tid" = :tid
-    `,
-      {
-        replacements: { tid },
-        type: sequelize.QueryTypes.SELECT,
-      }
+    // ตรวจสอบว่าครูมีอยู่ในระบบหรือไม่
+    const teacher = await Teacher.findOne({ where: { tid } });
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    // ดึงข้อมูลคลาสที่อาจารย์คนนี้สร้าง
+    const attendanceRooms = await AttendanceRoom.findAll({
+      include: [
+        {
+          model: Subject,
+          include: [
+            {
+              model: Teacher,
+              where: { tid }, // กรองตาม tid ของครู
+              through: { attributes: [] },
+            },
+          ],
+        },
+      ],
+    });
+
+    // ตรวจสอบว่ามีคลาสที่อาจารย์สร้างหรือไม่
+    if (attendanceRooms.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No classes found for this teacher." });
+    }
+
+    let totalAttendances = 0;
+    let totalClasses = attendanceRooms.length;
+
+    // ดึงข้อมูลการเข้าร่วมของนักเรียนในแต่ละคลาส
+    for (const room of attendanceRooms) {
+      const attendances = await Attendance.count({
+        where: { ATR_id: room.ATR_id },
+      });
+      totalAttendances += attendances;
+    }
+
+    // คำนวณอัตราการเข้าร่วมเฉลี่ย (average attendance rate)
+    const averageAttendanceRate =
+      totalClasses > 0 ? (totalAttendances / totalClasses) * 100 : 0;
+
+    // ส่งผลลัพธ์กลับ
+    res
+      .status(200)
+      .json({ averageAttendanceRate: averageAttendanceRate.toFixed(2) });
+  } catch (error) {
+    console.error("Error occurred:", error);
+    res
+      .status(500)
+      .json({ message: "Error retrieving average attendance rate." });
+  }
+};
+
+// exports.getAttendanceRateForAllSubjects = async (req, res) => {
+//   const { tid } = req.params; // รับค่า tid จาก URL parameter
+
+//   try {
+//     const subjects = await Subject.findAll({
+//       include: [
+//         {
+//           model: Teacher,
+//           where: { tid }, // กรองตาม tid ของครู
+//           through: { attributes: [] }, // ไม่ดึงข้อมูลจากตารางกลาง
+//         },
+//         {
+//           model: AttendanceRoom, // เชื่อมโยงกับห้องเช็คชื่อ
+//         },
+//       ],
+//     });
+
+//     if (subjects.length === 0) {
+//       return res.status(404).json({ message: "ไม่พบวิชาที่อาจารย์สอน" });
+//     }
+
+//     let totalClasses = 0;
+//     let totalAttendances = 0;
+
+//     const attendanceRates = await Promise.all(
+//       subjects.map(async (subject) => {
+//         const attendanceRooms = subject.AttendanceRooms;
+
+//         let subjectClasses = 0;
+//         let subjectAttendances = 0;
+
+//         for (const room of attendanceRooms) {
+//           const attendances = await Attendance.count({
+//             where: { ATR_id: room.ATR_id },
+//           });
+//           subjectAttendances += attendances;
+//           subjectClasses += 1;
+//         }
+
+//         totalClasses += subjectClasses;
+//         totalAttendances += subjectAttendances;
+
+//         const attendanceRate =
+//           subjectClasses > 0 ? (subjectAttendances / subjectClasses) * 100 : 0;
+
+//         return {
+//           subject: subject.sub_name,
+//           attendanceRate: attendanceRate.toFixed(2) + "%",
+//         };
+//       })
+//     );
+
+//     const overallAttendanceRate =
+//       totalClasses > 0 ? (totalAttendances / totalClasses) * 100 : 0;
+
+//     return res.status(200).json({
+//       attendanceRates,
+//       overallAttendanceRate: overallAttendanceRate.toFixed(2) + "%",
+//     });
+//   } catch (error) {
+//     console.error("Error retrieving attendance rates:", error);
+//     return res
+//       .status(500)
+//       .json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลอัตราการเข้าร่วม" });
+//   }
+// };
+
+exports.getAttendanceRateForAllSubjects = async (req, res) => {
+  const { tid } = req.params; // รับค่า tid จาก URL parameter
+
+  try {
+    const subjects = await Subject.findAll({
+      include: [
+        {
+          model: Teacher,
+          where: { tid },
+          through: { attributes: [] },
+        },
+        {
+          model: AttendanceRoom,
+        },
+      ],
+    });
+
+    if (subjects.length === 0) {
+      return res.status(404).json({ message: "ไม่พบวิชาที่อาจารย์สอน" });
+    }
+
+    const attendanceRates = await Promise.all(
+      subjects.map(async (subject) => {
+        const attendanceRooms = subject.AttendanceRooms;
+
+        let subjectClasses = 0;
+        let subjectAttendances = 0;
+
+        for (const room of attendanceRooms) {
+          const attendances = await Attendance.count({
+            where: { ATR_id: room.ATR_id },
+          });
+          subjectAttendances += attendances;
+          subjectClasses += 1;
+        }
+
+        const attendanceRate =
+          subjectClasses > 0 ? (subjectAttendances / subjectClasses) * 100 : 0;
+
+        return {
+          subject: subject.sub_name,
+          sub_code: subject.sub_code, // เพิ่ม sub_code ในผลลัพธ์
+          attendanceRate: attendanceRate.toFixed(2) + "%",
+        };
+      })
     );
 
-    console.log("Results from query:", results);
-
-    if (results && results.averageAttendanceRate !== null) {
-      res.json({
-        averageAttendanceRate: parseFloat(
-          results.averageAttendanceRate
-        ).toFixed(2),
-      });
-    } else {
-      res.json({ averageAttendanceRate: 0 });
-    }
+    return res.status(200).json(attendanceRates);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error retrieving attendance rates:", error);
+    return res
+      .status(500)
+      .json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลอัตราการเข้าร่วม" });
   }
 };
 
 exports.getTotalAttendances = async (req, res) => {
   const { tid } = req.params;
-  try {
-    const [results] = await sequelize.query(
-      `
-      SELECT COUNT("a"."att_id") AS "totalAttendances"
-      FROM "Attendances" AS "a"
-      JOIN "AttendanceRooms" AS "ar" ON "a"."ATR_id" = "ar"."ATR_id"
-      JOIN "Subjects" AS "s" ON "ar"."sub_id" = "s"."sub_id"
-      JOIN "TeacherSubjects" AS "ts" ON "ts"."sub_id" = "s"."sub_id"
-      WHERE "ts"."tid" = :tid
-    `,
-      {
-        replacements: { tid },
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
 
-    if (results && results.totalAttendances !== null) {
-      res.json({ totalAttendances: results.totalAttendances });
+  try {
+    const totalAttendances = await Attendance.count({
+      include: [
+        {
+          model: AttendanceRoom,
+          include: [
+            {
+              model: Subject,
+              include: [
+                {
+                  model: Teacher,
+                  where: { tid },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (totalAttendances > 0) {
+      res.json({ totalAttendances: totalAttendances.toString() });
     } else {
-      res.json({ totalAttendances: 0 });
+      res.json({ totalAttendances: "0" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

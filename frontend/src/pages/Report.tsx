@@ -103,11 +103,10 @@ export default function Report() {
           setFilters({ role: firstSubjectId });
 
           const roomResult = await GetRoomFromSubject(firstSubjectId);
-          // ตรวจสอบว่าข้อมูลที่ได้เป็นอาร์เรย์ก่อนตั้งค่า
           if (Array.isArray(roomResult)) {
             setRoom(roomResult);
           } else {
-            setRoom([]); // ถ้าไม่ใช่อาร์เรย์ให้ตั้งเป็นอาร์เรย์ว่าง
+            setRoom([]);
           }
         }
       } catch (err) {
@@ -135,7 +134,7 @@ export default function Report() {
     newValue: string
   ) => {
     setFilters({ ...filters, role: newValue });
-    setRoom([]); // Clear the room data before fetching new one
+    setRoom([]);
 
     try {
       const result = await GetRoomFromSubject(newValue);
@@ -234,7 +233,8 @@ export default function Report() {
             Report Management
           </Typography>
           <Typography variant="subtitle2">
-            All aspects related to the app users can be managed from this page.
+            View and manage rooms, check QR codes, and track attendance reports
+            for each room.
           </Typography>
         </Grid>
       </Grid>
@@ -255,7 +255,11 @@ export default function Report() {
             ref={tabsRef}
           >
             <TabBackground
-              style={{ left: tabBounds.left, width: tabBounds.width }}
+              style={{
+                left: tabBounds.left,
+                width: tabBounds.width,
+                backgroundColor: "#ffa319",
+              }}
             />
             {subjects.map((subject) => (
               <StyledTab

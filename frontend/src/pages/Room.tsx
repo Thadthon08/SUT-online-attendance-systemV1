@@ -97,7 +97,8 @@ const Room = () => {
             Room Management
           </Typography>
           <Typography variant="subtitle2">
-            All aspects related to the app users can be managed from this page.
+            Manage rooms for attendance and generate QR codes for students to
+            check in.
           </Typography>
         </Grid>
       </Grid>

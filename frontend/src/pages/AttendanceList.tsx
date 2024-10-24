@@ -124,7 +124,7 @@ export default function ViewAttendees() {
             View Attendees List
           </Typography>
           <Typography variant="subtitle2">
-            All aspects related to the app users can be managed from this page.
+            Browse the list of students who have checked in for each room.
           </Typography>
         </Grid>
 
@@ -163,7 +163,13 @@ export default function ViewAttendees() {
         <Button
           variant="contained"
           onClick={handleExport}
-          sx={{ borderRadius: 1 }}
+          sx={{
+            borderRadius: 1,
+            bgcolor: "#4cd963",
+            "&:hover": {
+              bgcolor: "#3bb350",
+            },
+          }}
           startIcon={<FileDownloadIcon />}
           disabled={!attendanceData || attendanceData.totalCheckedIn === 0}
         >

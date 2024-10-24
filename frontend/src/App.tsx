@@ -11,7 +11,6 @@ import Room from "./pages/Room";
 import { lazy } from "react";
 import StudentLayout from "./layouts/StudentLayout";
 import AttendanceList from "./pages/AttendanceList";
-import AttendanceSummaryChart from "./components/AttendanceSummaryChart";
 
 // Lazy load สำหรับ student route
 const StudentRoute = lazy(() => import("./routes/StudentRoute"));
@@ -53,14 +52,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Report />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/test"
-            element={
-              <ProtectedRoute>
-                <AttendanceSummaryChart sid="B6405526" />
               </ProtectedRoute>
             }
           />

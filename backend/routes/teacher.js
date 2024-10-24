@@ -2,17 +2,15 @@ const express = require("express");
 const router = express.Router();
 const {
   getTeacherSubjectsCount,
-  getAttendanceSummary,
   getClassesCreated,
   getAverageAttendanceRate,
   getTotalAttendances,
+  getAttendanceRateForAllSubjects,
 } = require("../controllers/teacherController");
 
 // Route สำหรับดึงจำนวนวิชาที่อาจารย์สอน
 router.get("/:tid/subjects", getTeacherSubjectsCount);
-
-// Route สำหรับดึงข้อมูลสรุปการเข้าร่วมของนักเรียนในวิชาที่อาจารย์สอน
-router.get("/:tid/attendance-summary", getAttendanceSummary);
+router.get("/:tid/subjects/rate", getAttendanceRateForAllSubjects);
 
 router.get("/:tid/class", getClassesCreated);
 router.get("/:tid/avg", getAverageAttendanceRate);
