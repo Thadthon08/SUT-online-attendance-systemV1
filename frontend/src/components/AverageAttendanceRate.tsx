@@ -91,7 +91,7 @@ function AverageAttendanceRate({ teacherId }: Props) {
           </ListItemAvatar>
 
           <ListItemText
-            primary={error ? "Error" : `${attendanceRate ?? "Loading..."}%`} // แสดงค่าเฉลี่ยหรือข้อความ Error หรือ Loading
+            primary={error ? "0" : `${attendanceRate ?? "Loading..."}%`} // แสดงค่าเฉลี่ยหรือข้อความ Error หรือ Loading
             primaryTypographyProps={{
               variant: "h1",
               sx: {
