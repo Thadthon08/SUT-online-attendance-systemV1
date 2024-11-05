@@ -166,7 +166,7 @@ export default function StudentDashboard() {
       html5QrCode.current
         .start(
           { facingMode: "environment" },
-          { fps: 30, qrbox: { width: 250, height: 250 } },
+          { fps: 30, qrbox: { width: 400, height: 400 } },
           handleScan,
           (errorMessage) =>
             console.error("QR Code scanning error:", errorMessage)
