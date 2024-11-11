@@ -1,90 +1,54 @@
-import { createTheme } from "@mui/material/styles";
-import { grey } from "@mui/material/colors";
+// src/theme/theme.ts
+import { createTheme, PaletteMode } from "@mui/material";
 
-let theme = createTheme();
-
-theme = createTheme(theme, {
+export const getThemeTokens = (mode: PaletteMode) => ({
   palette: {
-    mode: "dark",
+    mode,
     primary: {
-      main: grey[300],
-      light: grey[100],
-      dark: grey[500],
+      main: "#F97316",
+      light: mode === "light" ? "#FB923C" : "#FB923C",
+      dark: mode === "light" ? "#EA580C" : "#EA580C",
+    },
+    secondary: {
+      main: mode === "light" ? "#64748B" : "#94A3B8",
+      light: mode === "light" ? "#94A3B8" : "#CBD5E1",
+      dark: mode === "light" ? "#475569" : "#475569",
     },
     background: {
-      default: "#121212",
-      paper: "#1e1e1e",
+      default: mode === "light" ? "#F8FAFC" : "#0F172A",
+      paper: mode === "light" ? "#FFFFFF" : "#1E293B",
     },
     text: {
-      primary: grey[100],
-      secondary: grey[400],
+      primary: mode === "light" ? "#1E293B" : "#F1F5F9",
+      secondary: mode === "light" ? "#64748B" : "#94A3B8",
     },
     action: {
-      selected: grey[800],
-      hover: grey[700],
+      selected:
+        mode === "light"
+          ? "rgba(249, 115, 22, 0.12)"
+          : "rgba(249, 115, 22, 0.16)",
+      hover:
+        mode === "light"
+          ? "rgba(249, 115, 22, 0.04)"
+          : "rgba(249, 115, 22, 0.08)",
     },
+    divider: mode === "light" ? "#E2E8F0" : "#334155",
   },
   components: {
     MuiTextField: {
       styleOverrides: {
         root: {
-          backgroundColor: "#1e1e1e",
-          borderRadius: 1,
-          borderColor: grey[600],
-          "& .MuiInputBase-input": {
-            color: grey[100],
-            height: "24px",
-            padding: "16.5px 14px 16.5px 0px",
-          },
-          "& .MuiInputBase-input::placeholder": {
-            color: grey[400],
-            opacity: 1,
-          },
           "& .MuiOutlinedInput-root": {
+            backgroundColor: mode === "light" ? "#FFFFFF" : "#1E293B",
             "& fieldset": {
-              borderColor: grey[600],
+              borderColor: mode === "light" ? "#E2E8F0" : "#475569",
             },
             "&:hover fieldset": {
-              borderColor: grey[400],
+              borderColor: "#F97316",
             },
             "&.Mui-focused fieldset": {
-              borderColor: grey[300],
+              borderColor: "#F97316",
             },
-          },
-          "& input:-webkit-autofill": {
-            WebkitBoxShadow: "0 0 0 1000px #1f1f1f inset",
-            WebkitTextFillColor: "#ffffff",
-          },
-          "& input:-webkit-autofill:hover": {
-            WebkitBoxShadow: "0 0 0 1000px #1f1f1f inset",
-          },
-          "& input:-webkit-autofill:focus": {
-            WebkitBoxShadow: "0 0 0 1000px #1f1f1f inset",
-          },
-          "& input:-webkit-autofill:active": {
-            WebkitBoxShadow: "0 0 0 1000px #1f1f1f  inset",
-          },
-        },
-      },
-    },
-    MuiSelect: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "#1e1e1e",
-          color: grey[100],
-          borderRadius: 1,
-          height: "56px",
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: grey[600],
-          },
-          "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: grey[400],
-          },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: grey[300],
-          },
-          "& .MuiSelect-icon": {
-            color: grey[300],
           },
         },
       },
@@ -92,39 +56,29 @@ theme = createTheme(theme, {
     MuiButton: {
       styleOverrides: {
         root: {
-          fontWeight: "bold",
-          textTransform: "none",
-          borderRadius: 1,
-          height: "56px",
-          backgroundColor: grey[300],
-          color: "#121212",
-          "&:hover": {
-            backgroundColor: grey[400],
-          },
-        },
-      },
-    },
-    MuiInputAdornment: {
-      styleOverrides: {
-        root: {
-          "& .MuiSvgIcon-root": {
-            color: grey[400],
-          },
-        },
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          "&.Mui-disabled": {
-            "& .MuiInputBase-input": {
-              WebkitTextFillColor: grey[400],
+          "&.MuiButton-contained": {
+            backgroundColor: "#F97316",
+            color: "#FFFFFF",
+            "&:hover": {
+              backgroundColor: "#EA580C",
             },
           },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: mode === "light" ? "#FFFFFF" : "#1E293B",
+          borderColor: mode === "light" ? "#E2E8F0" : "#475569",
         },
       },
     },
   },
 });
 
-export default theme;
+// สร้าง theme
+export const createAppTheme = (mode: PaletteMode) => {
+  const themeOptions = getThemeTokens(mode);
+  return createTheme(themeOptions);
+};

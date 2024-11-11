@@ -48,14 +48,11 @@ const SigninForm = () => {
           }, 2000);
         }
       }
-
-      console.log(response.message);
     } catch (error) {
       const errorMsg =
         (error as any)?.response?.data?.message ||
         "Signin failed. Please try again.";
       showToast(errorMsg, "error");
-      console.error("Signin failed:", errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -65,33 +62,33 @@ const SigninForm = () => {
     borderRadius: "4px",
     "& .MuiOutlinedInput-root": {
       borderRadius: "4px",
-      backgroundColor: "rgba(160, 180, 209, 0.1)",
-      color: "#FFFFFF",
+      backgroundColor: "#FFFFFF",
+      color: "#1E293B",
       "& fieldset": {
-        borderColor: "#a0b4d1",
+        borderColor: "#E2E8F0",
       },
       "&:hover fieldset": {
-        borderColor: "#c1d3e8",
+        borderColor: "#F97316",
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#e1eeff",
+        borderColor: "#F97316",
       },
     },
     "& .MuiFormHelperText-root": {
-      color: "#ff9999",
+      color: "#EF4444",
     },
     "& input:-webkit-autofill": {
-      WebkitBoxShadow: "0 0 0 1000px #2c2e30 inset !important",
-      WebkitTextFillColor: "#ffffff",
+      WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset !important",
+      WebkitTextFillColor: "#1E293B",
     },
     "& input:-webkit-autofill:hover": {
-      WebkitBoxShadow: "0 0 0 1000px #2c2e30 inset !important",
+      WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset !important",
     },
     "& input:-webkit-autofill:focus": {
-      WebkitBoxShadow: "0 0 0 1000px #2c2e30inset !important",
+      WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset !important",
     },
     "& input:-webkit-autofill:active": {
-      WebkitBoxShadow: "0 0 0 1000px #2c2e30  inset !important",
+      WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset !important",
     },
   };
 
@@ -114,7 +111,8 @@ const SigninForm = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <AccountCircle sx={{ color: "#a0b4d1" }} />
+                  <AccountCircle sx={{ color: "#64748B" }} />{" "}
+                  {/* Slate 500 for icon */}
                 </InputAdornment>
               ),
             }}
@@ -138,7 +136,7 @@ const SigninForm = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock sx={{ color: "#a0b4d1" }} />
+                  <Lock sx={{ color: "#64748B" }} />
                 </InputAdornment>
               ),
             }}
@@ -152,13 +150,16 @@ const SigninForm = () => {
           type="submit"
           disabled={isSubmitting}
           sx={{
-            backgroundColor: "#FF7F50",
+            backgroundColor: "#F97316",
             borderRadius: "4px",
             color: "white",
             fontSize: "1rem",
             fontWeight: "bolder",
             "&:hover": {
-              backgroundColor: "#FF6347",
+              backgroundColor: "#EA580C",
+            },
+            "&:disabled": {
+              backgroundColor: "#F97316",
             },
           }}
         >
@@ -188,10 +189,10 @@ const Signin = () => {
             className="text-center p-3 m-0"
             sx={{
               backgroundColor: "rgba(160, 180, 209, 0.3)",
-              color: "white",
+              color: "#ffffff",
             }}
           >
-            SUT Attendance
+            SUT ATTENDANCE SYSTEM
           </Typography>
           <Box className="p-10" sx={{ backgroundColor: "transparent" }}>
             <SigninForm />

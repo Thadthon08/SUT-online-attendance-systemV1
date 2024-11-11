@@ -226,10 +226,8 @@ export const RoomForm: React.FC<RoomFormProps> = ({ onSubmit }) => {
                   helperText={errors.ATR_name?.message}
                   sx={{
                     bgcolor: theme.palette.background.paper,
-                    color: theme.palette.common.white,
                     borderRadius: 1,
                     "& .MuiInputBase-input::placeholder": {
-                      color: theme.palette.common.white,
                       opacity: 1,
                     },
                   }}

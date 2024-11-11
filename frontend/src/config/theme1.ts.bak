@@ -1,0 +1,218 @@
+import { createTheme } from "@mui/material/styles";
+
+let theme = createTheme();
+
+theme = createTheme({
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#F97316", // Orange 500
+      light: "#FB923C", // Orange 400
+      dark: "#EA580C", // Orange 600
+    },
+    secondary: {
+      main: "#64748B", // Slate 500
+      light: "#94A3B8", // Slate 400
+      dark: "#475569", // Slate 600
+    },
+    background: {
+      default: "#F8FAFC", // Slate 50
+      paper: "#FFFFFF",
+    },
+    text: {
+      primary: "#1E293B", // Slate 800
+      secondary: "#64748B", // Slate 500
+    },
+    action: {
+      selected: "rgba(249, 115, 22, 0.12)", // Orange with opacity
+      hover: "rgba(249, 115, 22, 0.04)",
+    },
+    divider: "#E2E8F0", // Slate 200
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#FFFFFF",
+          borderRadius: 8,
+          "& .MuiInputBase-input": {
+            color: "#1E293B",
+            height: "24px",
+            padding: "16.5px 14px",
+          },
+          "& .MuiInputBase-input::placeholder": {
+            color: "#94A3B8",
+            opacity: 1,
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "#E2E8F0",
+            },
+            "&:hover fieldset": {
+              borderColor: "#F97316",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#F97316",
+            },
+          },
+          "& input:-webkit-autofill": {
+            WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset",
+            WebkitTextFillColor: "#1E293B",
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#FFFFFF",
+          color: "#1E293B",
+          borderRadius: 8,
+          height: "56px",
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#E2E8F0",
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#F97316",
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#F97316",
+          },
+          "& .MuiSelect-icon": {
+            color: "#64748B",
+          },
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontWeight: 600,
+          textTransform: "none",
+          borderRadius: 8,
+          height: "56px",
+          boxShadow: "none",
+          "&.MuiButton-contained": {
+            backgroundColor: "#F97316",
+            color: "#FFFFFF",
+            "&:hover": {
+              backgroundColor: "#EA580C",
+              boxShadow: "0 2px 8px rgba(249, 115, 22, 0.25)",
+            },
+          },
+          "&.MuiButton-outlined": {
+            borderColor: "#F97316",
+            color: "#F97316",
+            "&:hover": {
+              backgroundColor: "rgba(249, 115, 22, 0.04)",
+              borderColor: "#EA580C",
+            },
+          },
+          "&.MuiButton-text": {
+            color: "#F97316",
+            "&:hover": {
+              backgroundColor: "rgba(249, 115, 22, 0.04)",
+            },
+          },
+          transition: "all 0.2s ease-in-out",
+          "&:active": {
+            transform: "scale(0.98)",
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
+          "&:hover": {
+            boxShadow: "0 4px 18px rgba(0, 0, 0, 0.12)",
+          },
+          transition: "box-shadow 0.3s ease-in-out",
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          "& .MuiSvgIcon-root": {
+            color: "#64748B",
+          },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          "&.Mui-disabled": {
+            "& .MuiInputBase-input": {
+              WebkitTextFillColor: "#94A3B8",
+            },
+          },
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: "#CBD5E1",
+          "&.Mui-checked": {
+            color: "#F97316",
+          },
+        },
+      },
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          "& .MuiSwitch-switchBase.Mui-checked": {
+            color: "#F97316",
+            "&:hover": {
+              backgroundColor: "rgba(249, 115, 22, 0.08)",
+            },
+          },
+          "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+            backgroundColor: "#F97316",
+          },
+        },
+      },
+    },
+  },
+
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    button: {
+      fontWeight: 600,
+    },
+    h1: {
+      fontWeight: 700,
+      color: "#1E293B",
+    },
+    h2: {
+      fontWeight: 700,
+      color: "#1E293B",
+    },
+    h3: {
+      fontWeight: 600,
+      color: "#1E293B",
+    },
+    h4: {
+      fontWeight: 600,
+      color: "#1E293B",
+    },
+    h5: {
+      fontWeight: 600,
+      color: "#1E293B",
+    },
+    h6: {
+      fontWeight: 600,
+      color: "#1E293B",
+    },
+  },
+  shape: {
+    borderRadius: 8,
+  },
+});
+
+export default theme;

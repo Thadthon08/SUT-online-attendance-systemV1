@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import { GetAttendanceForRoom } from "../services/api";
 import * as XLSX from "xlsx";
-import theme from "../config/theme";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { showToast } from "../utils/toastUtils";
@@ -111,13 +110,13 @@ export default function ViewAttendees() {
         justifyContent="space-between"
         alignItems="center"
         sx={{
-          maxWidth: 1472,
-          overflow: "hidden",
-          bgcolor: theme.palette.background.paper,
-          border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-          borderRadius: 0,
-          p: 2,
+          width: "100%",
+          backgroundColor: "background.paper",
+          borderRadius: 2,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          border: `1px solid ${alpha("#E2E8F0", 0.8)}`, // Slate 200 with opacity
           mb: 3,
+          p: 3,
         }}
       >
         <Grid item>

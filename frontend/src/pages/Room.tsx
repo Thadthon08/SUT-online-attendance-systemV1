@@ -1,13 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Paper,
-  useMediaQuery,
-  Container,
-  Typography,
-  alpha,
-  Grid,
-} from "@mui/material";
+import { Box, Paper, useMediaQuery, Container } from "@mui/material";
 import { LocationMap } from "../components/LocationMap";
 import { RoomForm } from "../components/RoomForm";
 import { RoomInterface } from "../interface/IRoom";
@@ -15,7 +7,7 @@ import { CreateRoom } from "../services/api";
 import { showToast } from "../utils/toastUtils";
 import { ToastContainer } from "react-toastify";
 import QRCodeSection from "../components/QRCodeSection";
-import theme from "../config/theme";
+import TitleHeader from "../components/TitleHeader";
 
 const Room = () => {
   const [currentLocation, setCurrentLocation] = useState({
@@ -51,7 +43,6 @@ const Room = () => {
       ATR_lat: currentLocation.lat,
       ATR_long: currentLocation.lng,
     };
-    console.log("Form Data:", formattedData);
 
     try {
       const response = await CreateRoom(formattedData);
@@ -78,30 +69,10 @@ const Room = () => {
         p: 4,
       }}
     >
-      <Grid
-        container
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{
-          maxWidth: 1472,
-          overflow: "hidden",
-          bgcolor: theme.palette.background.paper,
-          border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-          borderRadius: 0,
-          p: 2,
-          mb: 3,
-        }}
-      >
-        <Grid item>
-          <Typography variant="h5" fontWeight="bolder">
-            Room Management
-          </Typography>
-          <Typography variant="subtitle2">
-            Manage rooms for attendance and generate QR codes for students to
-            check in.
-          </Typography>
-        </Grid>
-      </Grid>
+      <TitleHeader
+        Title="Room Management"
+        Subtitle="Manage rooms for attendance and generate QR codes for students to check in."
+      />
       <Paper
         elevation={3}
         sx={{

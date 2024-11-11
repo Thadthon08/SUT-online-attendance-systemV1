@@ -160,6 +160,7 @@ const QRCodeSection: React.FC<QRCodeSectionProps> = ({
             boxShadow: 3,
             "&:hover": {
               bgcolor: theme.palette.primary.light,
+              color: theme.palette.text.primary,
               boxShadow: 5,
             },
           }}

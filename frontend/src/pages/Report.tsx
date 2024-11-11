@@ -4,7 +4,6 @@ import {
   alpha,
   Container,
   Typography,
-  Grid,
   Tabs,
   Tab,
   Box,
@@ -30,10 +29,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PeopleIcon from "@mui/icons-material/People";
 import { DeleteRoom, GetAllSubject, GetRoomFromSubject } from "../services/api";
 import { SubjectInterface } from "../interface/ISubject";
-import theme from "../config/theme";
 import QRCodeModal from "../components/QRCodeModal";
 import { UserData } from "../interface/Signinrespone";
 import { showToast } from "../utils/toastUtils";
+import TitleHeader from "../components/TitleHeader";
+import { ToastContainer } from "react-toastify";
 
 const TabsWrapper = styled(Tabs)(
   ({ theme }) => `
@@ -62,13 +62,26 @@ const TabBackground = styled("div")(
 
 const StyledTab = styled(Tab)(
   ({ theme }) => `
-    color: ${alpha(theme.palette.common.white, 0.7)};
+    font-weight: 500;
+    color: ${
+      theme.palette.mode === "light"
+        ? alpha(theme.palette.text.primary, 0.7)
+        : alpha(theme.palette.text.primary, 0.7)
+    };
+    
     &.Mui-selected {
-      color: ${theme.palette.common.white};
+      color: ${theme.palette.mode === "light" ? "white" : "black"};
     }
+    
     &:hover {
-      color: ${theme.palette.common.white};
+      color: ${
+        theme.palette.mode === "light"
+          ? theme.palette.primary.dark
+          : theme.palette.primary.light
+      };
     }
+
+    transition: color 0.2s ease-in-out;
   `
 );
 
@@ -183,10 +196,9 @@ export default function Report() {
     if (result.isConfirmed) {
       try {
         await DeleteRoom(roomId);
+        showToast("ลบห้องสำเร็จ!", "success");
         const roomResult = await GetRoomFromSubject(filters.role);
         setRoom(roomResult);
-
-        showToast("The room has been deleted.", "success");
       } catch (err) {
         showToast("There was an issue deleting the room.", "error");
       }
@@ -214,31 +226,10 @@ export default function Report() {
         p: 4,
       }}
     >
-      <Grid
-        container
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{
-          maxWidth: 1472,
-          overflow: "hidden",
-          bgcolor: theme.palette.background.paper,
-          border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-          borderRadius: 0,
-          p: 2,
-          mb: 3,
-        }}
-      >
-        <Grid item>
-          <Typography variant="h5" fontWeight="bolder">
-            Report Management
-          </Typography>
-          <Typography variant="subtitle2">
-            View and manage rooms, check QR codes, and track attendance reports
-            for each room.
-          </Typography>
-        </Grid>
-      </Grid>
-
+      <TitleHeader
+        Title="Report Management"
+        Subtitle="View and manage rooms, check QR codes, and track attendance reports for each room."
+      />
       {subjects.length > 0 && (
         <Box
           display="flex"
@@ -272,7 +263,6 @@ export default function Report() {
           </TabsWrapper>
         </Box>
       )}
-
       <Card>
         <Box p={2}>
           <TextField
@@ -335,7 +325,7 @@ export default function Report() {
                           <IconButton
                             onClick={() => handleViewQRCode(record.qrcode_data)}
                           >
-                            <QrCodeIcon sx={{ color: "#ffffff" }} />
+                            <QrCodeIcon />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
@@ -344,7 +334,7 @@ export default function Report() {
                           <IconButton
                             onClick={() => handleViewAttendees(record.ATR_id)}
                           >
-                            <PeopleIcon sx={{ color: "#ffffff" }} />
+                            <PeopleIcon />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
@@ -353,7 +343,7 @@ export default function Report() {
                           <IconButton
                             onClick={() => handleDeleteRoom(record.ATR_id)}
                           >
-                            <DeleteIcon sx={{ color: "#ffffff" }} />
+                            <DeleteIcon />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
@@ -376,12 +366,12 @@ export default function Report() {
           </>
         )}
       </Card>
-
       <QRCodeModal
         open={openQRCode}
         onClose={handleCloseQRCode}
         qrcode={currentQRCode}
       />
+      <ToastContainer />
     </Container>
   );
 }

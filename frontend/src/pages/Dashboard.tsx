@@ -1,12 +1,4 @@
-import {
-  alpha,
-  Container,
-  Grid,
-  Typography,
-  Skeleton,
-  Alert,
-} from "@mui/material";
-import theme from "../config/theme";
+import { Container, Grid, Skeleton, Alert } from "@mui/material";
 import { useEffect, useState } from "react";
 import { UserData } from "../interface/Signinrespone";
 import SubjectsTaught from "../components/SubjectsTaught";
@@ -14,6 +6,7 @@ import TotalAttendances from "../components/TotalAttendances";
 import TotalClasses from "../components/TotalClasses";
 import AverageAttendanceRate from "../components/AverageAttendanceRate";
 import AttendanceOverview from "../components/AttendanceOverview";
+import TitleHeader from "../components/TitleHeader";
 
 const Dashboard = () => {
   document.title = "Dashboard | Attendance System";
@@ -72,32 +65,10 @@ const Dashboard = () => {
         p: 4,
       }}
     >
-      <Grid
-        container
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{
-          maxWidth: 1472,
-          overflow: "hidden",
-          bgcolor: theme.palette.background.paper,
-          border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-          borderRadius: 0,
-          p: 2,
-          mb: 3,
-        }}
-      >
-        <Grid item>
-          <Typography variant="h5" fontWeight={"bolder"}>
-            Dashboard
-          </Typography>
-
-          <Typography variant="subtitle2">
-            {
-              "Manage and monitor all aspects related to attendance and performance tracking in this system."
-            }
-          </Typography>
-        </Grid>
-      </Grid>
+      <TitleHeader
+        Title="Dashboard"
+        Subtitle="Manage and monitor all aspects related to attendance and performance tracking in this system."
+      />
       <Grid
         container
         direction="row"
