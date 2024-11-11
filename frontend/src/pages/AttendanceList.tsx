@@ -76,7 +76,7 @@ export default function ViewAttendees() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Attendees");
 
-    XLSX.writeFile(wb, `attendees_room_${id}.xlsx`);
+    XLSX.writeFile(wb, `รายชื่อผู้เข้าห้องเรียน_${id}.xlsx`);
   };
 
   if (loading) {
@@ -163,13 +163,6 @@ export default function ViewAttendees() {
         <Button
           variant="contained"
           onClick={handleExport}
-          sx={{
-            borderRadius: 1,
-            bgcolor: "#4cd963",
-            "&:hover": {
-              bgcolor: "#3bb350",
-            },
-          }}
           startIcon={<FileDownloadIcon />}
           disabled={!attendanceData || attendanceData.totalCheckedIn === 0}
         >

@@ -97,6 +97,7 @@ export default function Report() {
   const [openQRCode, setOpenQRCode] = useState(false);
   const [currentQRCode, setCurrentQRCode] = useState("");
   const navigate = useNavigate();
+  document.title = "Report | Attendance System";
 
   useEffect(() => {
     const data = localStorage.getItem("data");
