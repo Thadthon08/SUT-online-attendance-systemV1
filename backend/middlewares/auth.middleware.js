@@ -11,7 +11,7 @@ const authenticateJWT = (req, res, next) => {
         return res.sendStatus(403); // Forbidden
       }
 
-      req.user = user; // ใส่ข้อมูล token ที่ decode แล้วใน req
+      req.user = user;
       next();
     });
   } else {
